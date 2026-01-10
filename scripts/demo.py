@@ -15,7 +15,7 @@ Usage:
 
 import json
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 # Add project root to path
@@ -27,16 +27,36 @@ from adapters.deeptempo_offline_export.loader import (
     save_findings,
     load_findings,
 )
-from mcp.deeptempo_findings_server.server import (
-    get_finding_by_id,
-    cosine_similarity,
-    filter_findings,
-)
-from mcp.case_store_server.server import (
-    load_cases,
-    save_cases,
-    generate_case_id,
-)
+import uuid
+
+# Define helper functions locally to avoid MCP SDK dependency
+def cosine_similarity(a, b):
+    """Calculate cosine similarity between two vectors."""
+    a = np.array(a)
+    b = np.array(b)
+    return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
+
+
+def load_cases():
+    """Load cases from JSON file."""
+    cases_file = PROJECT_ROOT / "data" / "cases.json"
+    if cases_file.exists():
+        with open(cases_file, 'r') as f:
+            data = json.load(f)
+            # Handle both formats: {"cases": [...]} or [...]
+            if isinstance(data, dict) and 'cases' in data:
+                return data['cases']
+            elif isinstance(data, list):
+                return data
+    return []
+
+
+def save_cases(cases):
+    """Save cases to JSON file."""
+    cases_file = PROJECT_ROOT / "data" / "cases.json"
+    cases_file.parent.mkdir(parents=True, exist_ok=True)
+    with open(cases_file, 'w') as f:
+        json.dump({"cases": cases}, f, indent=2)
 
 import numpy as np
 
@@ -94,7 +114,8 @@ def demo_nearest_neighbors(findings: list[dict]):
             continue
         
         embedding = np.array(f['embedding'])
-        sim = cosine_similarity(seed_embedding, embedding)
+        # Convert to lists for cosine_similarity function
+        sim = cosine_similarity(seed_embedding.tolist(), embedding.tolist())
         similarities.append((f, sim))
     
     # Sort by similarity
@@ -204,9 +225,10 @@ def demo_create_case(seed_finding: dict, neighbors: list):
     finding_ids.extend([f['finding_id'] for f, _ in neighbors[:4]])
     
     # Create case
-    now = datetime.utcnow().isoformat() + "Z"
+    now = datetime.now(timezone.utc).isoformat()
+    case_id = f"case-{datetime.now().strftime('%Y-%m-%d')}-{uuid.uuid4().hex[:8]}"
     case = {
-        "case_id": generate_case_id(),
+        "case_id": case_id,
         "title": f"Investigation: {seed_finding.get('cluster_id', 'Suspicious Activity')}",
         "description": f"Automated case created from finding {seed_finding['finding_id']} and {len(finding_ids)-1} similar findings",
         "finding_ids": finding_ids,

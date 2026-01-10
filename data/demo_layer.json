@@ -10,57 +10,64 @@
   "techniques": [
     {
       "techniqueID": "T1071.001",
-      "score": 91,
-      "comment": "15 findings, avg conf 0.86",
+      "score": 93,
+      "comment": "15 findings, avg conf 0.89",
       "enabled": true,
       "showSubtechniques": true
     },
     {
       "techniqueID": "T1573.001",
-      "score": 74,
-      "comment": "15 findings, avg conf 0.58",
+      "score": 75,
+      "comment": "15 findings, avg conf 0.60",
       "enabled": true,
       "showSubtechniques": true
     },
     {
       "techniqueID": "T1071.004",
-      "score": 86,
-      "comment": "10 findings, avg conf 0.77",
+      "score": 87,
+      "comment": "10 findings, avg conf 0.79",
       "enabled": true,
       "showSubtechniques": true
     },
     {
       "techniqueID": "T1190",
-      "score": 91,
-      "comment": "10 findings, avg conf 0.86",
-      "enabled": true,
-      "showSubtechniques": true
-    },
-    {
-      "techniqueID": "T1021.002",
-      "score": 79,
-      "comment": "8 findings, avg conf 0.79",
+      "score": 92,
+      "comment": "10 findings, avg conf 0.88",
       "enabled": true,
       "showSubtechniques": true
     },
     {
       "techniqueID": "T1048.003",
-      "score": 61,
-      "comment": "7 findings, avg conf 0.55",
+      "score": 67,
+      "comment": "8 findings, avg conf 0.60",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1021.002",
+      "score": 77,
+      "comment": "8 findings, avg conf 0.76",
       "enabled": true,
       "showSubtechniques": true
     },
     {
       "techniqueID": "T1018",
-      "score": 64,
-      "comment": "7 findings, avg conf 0.61",
+      "score": 66,
+      "comment": "7 findings, avg conf 0.65",
       "enabled": true,
       "showSubtechniques": true
     },
     {
       "techniqueID": "T1059.001",
-      "score": 44,
-      "comment": "3 findings, avg conf 0.55",
+      "score": 52,
+      "comment": "5 findings, avg conf 0.54",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1059.003",
+      "score": 36,
+      "comment": "1 findings, avg conf 0.54",
       "enabled": true,
       "showSubtechniques": true
     }

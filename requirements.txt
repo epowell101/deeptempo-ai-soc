@@ -8,6 +8,13 @@ numpy>=1.24.0
 # Uncomment when MCP SDK is publicly available:
 # mcp[cli]>=0.1.0
 
+# Desktop UI dependencies
+PyQt6>=6.6.0
+anthropic>=0.18.0
+qdarkstyle>=3.2.0
+keyring>=24.0.0
+reportlab>=4.0.0
+
 # Optional: FastAPI for REST API (not required for basic usage)
 # fastapi>=0.100.0
 # uvicorn>=0.22.0
