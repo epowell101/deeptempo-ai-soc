@@ -1,0 +1,32 @@
+{
+  "cases": [
+    {
+      "case_id": "case-2026-01-10-38c545f3",
+      "title": "Investigation: c-beaconing-001",
+      "description": "Automated case created from finding f-20260109-9bfe5ba7 and 4 similar findings",
+      "finding_ids": [
+        "f-20260109-9bfe5ba7",
+        "f-20260109-a975f660",
+        "f-20260109-bbd1e4e0",
+        "f-20260109-4ecf79da",
+        "f-20260109-dde2075c"
+      ],
+      "status": "new",
+      "priority": "high",
+      "assignee": "",
+      "tags": [
+        "auto-generated",
+        "demo"
+      ],
+      "notes": [],
+      "timeline": [
+        {
+          "timestamp": "2026-01-10T02:06:50.389231Z",
+          "event": "Case created by demo script"
+        }
+      ],
+      "created_at": "2026-01-10T02:06:50.389231Z",
+      "updated_at": "2026-01-10T02:06:50.389231Z"
+    }
+  ]
+}
