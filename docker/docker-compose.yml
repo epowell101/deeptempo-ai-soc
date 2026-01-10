@@ -1,0 +1,136 @@
+# DeepTempo AI SOC - Docker Compose with Timesketch
+#
+# This sets up a local Timesketch instance for timeline visualization
+# of DeepTempo LogLM security findings.
+#
+# Usage:
+#   cd docker
+#   docker compose up -d
+#
+# Access:
+#   - Timesketch UI: http://localhost:5000
+#   - Default login: dev / dev
+#
+# Note: Requires at least 8GB RAM
+
+version: '3.8'
+
+services:
+  # OpenSearch - Search backend for Timesketch
+  opensearch:
+    image: opensearchproject/opensearch:2.12.0
+    container_name: deeptempo-opensearch
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      - DISABLE_SECURITY_PLUGIN=true
+      - DISABLE_INSTALL_DEMO_CONFIG=true
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+    ports:
+      - "9200:9200"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9200 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # PostgreSQL - Database for Timesketch
+  postgres:
+    image: postgres:15-alpine
+    container_name: deeptempo-postgres
+    environment:
+      - POSTGRES_USER=timesketch
+      - POSTGRES_PASSWORD=timesketch
+      - POSTGRES_DB=timesketch
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U timesketch"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis - Message broker for Timesketch
+  redis:
+    image: redis:7-alpine
+    container_name: deeptempo-redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Timesketch - Timeline analysis platform
+  timesketch:
+    image: us-docker.pkg.dev/osdfir-registry/timesketch/timesketch:latest
+    container_name: deeptempo-timesketch
+    depends_on:
+      opensearch:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - TIMESKETCH_USER=dev
+      - TIMESKETCH_PASSWORD=dev
+      - POSTGRES_USER=timesketch
+      - POSTGRES_PASSWORD=timesketch
+      - POSTGRES_ADDRESS=postgres
+      - POSTGRES_PORT=5432
+      - OPENSEARCH_HOST=opensearch
+      - OPENSEARCH_PORT=9200
+      - REDIS_ADDRESS=redis
+      - REDIS_PORT=6379
+      - SECRET_KEY=deeptempo-ai-soc-secret-key-change-in-production
+    ports:
+      - "5000:5000"
+    volumes:
+      - timesketch-data:/var/lib/timesketch
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:5000/login || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+
+  # Timesketch Worker - Background task processing
+  timesketch-worker:
+    image: us-docker.pkg.dev/osdfir-registry/timesketch/timesketch:latest
+    container_name: deeptempo-timesketch-worker
+    depends_on:
+      timesketch:
+        condition: service_healthy
+    environment:
+      - TIMESKETCH_USER=dev
+      - TIMESKETCH_PASSWORD=dev
+      - POSTGRES_USER=timesketch
+      - POSTGRES_PASSWORD=timesketch
+      - POSTGRES_ADDRESS=postgres
+      - POSTGRES_PORT=5432
+      - OPENSEARCH_HOST=opensearch
+      - OPENSEARCH_PORT=9200
+      - REDIS_ADDRESS=redis
+      - REDIS_PORT=6379
+      - SECRET_KEY=deeptempo-ai-soc-secret-key-change-in-production
+    command: celery -A timesketch.lib.tasks worker --loglevel=info
+    volumes:
+      - timesketch-data:/var/lib/timesketch
+
+volumes:
+  opensearch-data:
+  postgres-data:
+  timesketch-data:
+
+networks:
+  default:
+    name: deeptempo-network

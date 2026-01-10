@@ -1,4 +1,8 @@
-"""Evidence Snippets MCP Server."""
+"""
+Evidence Snippets MCP Server
+
+Provides access to raw log evidence for security findings.
+"""
 
 import json
 import logging
@@ -18,15 +22,33 @@ mcp = FastMCP("evidence-snippets")
 DATA_DIR = Path(os.environ.get("DEEPTEMPO_DATA_DIR", Path(__file__).parent.parent.parent / "data"))
 FINDINGS_FILE = DATA_DIR / "findings.json"
 
+
 def load_findings():
+    """Load findings from JSON file."""
     if FINDINGS_FILE.exists():
         with open(FINDINGS_FILE, 'r') as f:
-            return json.load(f)
+            data = json.load(f)
+            # Handle both formats: {"findings": [...]} or [...]
+            if isinstance(data, dict) and 'findings' in data:
+                return data['findings']
+            elif isinstance(data, list):
+                return data
+            else:
+                return []
     return []
 
+
 @mcp.tool()
-def get_evidence(finding_id: str) -> str:
-    """Get raw log evidence for a finding."""
+def get_evidence(finding_id: str, **kwargs) -> str:
+    """
+    Get raw log evidence for a finding.
+    
+    Args:
+        finding_id: The finding ID to get evidence for
+    
+    Returns:
+        JSON string with the raw log evidence
+    """
     findings = load_findings()
     for f in findings:
         if f.get('finding_id') == finding_id:
@@ -38,9 +60,19 @@ def get_evidence(finding_id: str) -> str:
             }, indent=2)
     return json.dumps({"error": f"Finding {finding_id} not found"})
 
+
 @mcp.tool()
-def search_evidence(query: str, limit: int = 20) -> str:
-    """Search evidence by keyword."""
+def search_evidence(query: str, limit: int = 20, **kwargs) -> str:
+    """
+    Search evidence by keyword.
+    
+    Args:
+        query: Search term to look for in raw logs
+        limit: Maximum number of results to return
+    
+    Returns:
+        JSON string with matching evidence snippets
+    """
     findings = load_findings()
     matches = []
     for f in findings:
@@ -51,7 +83,8 @@ def search_evidence(query: str, limit: int = 20) -> str:
                 "snippet": raw_log[:200],
                 "data_source": f.get('data_source')
             })
-    return json.dumps({"matches": matches[:limit]}, indent=2)
+    return json.dumps({"query": query, "matches": matches[:limit]}, indent=2)
+
 
 if __name__ == "__main__":
     logger.info("Starting Evidence Snippets Server")

@@ -9,58 +9,61 @@ This project demonstrates how to build an AI-powered SOC where:
 - **DeepTempo LogLM** handles log analysis, embedding generation, and MITRE ATT&CK classification
 - **Claude** serves as the primary analyst interface, orchestrating investigations through natural conversation
 - **MCP Servers** provide the bridge, exposing SOC tools that Claude can invoke
+- **Timesketch** provides timeline visualization for forensic analysis
 
 ### The Vision: Claude as Your SOC Analyst
 
 Instead of clicking through dashboards, you have conversations:
 
+```
 You: "Show me today's high-severity findings"
-Claude: [queries findings] "I found 18 high-severity findings. 15 are clustered
-as C2 beaconing from workstation-042..."
+Claude: [queries findings] "I found 18 high-severity findings. 15 are clustered 
+        as C2 beaconing from workstation-042..."
+
 You: "Find similar activity across the network"
-Claude: [runs embedding search] "Found 47 similar findings across 3 hosts,
-all showing the same beacon pattern to 203.0.113.50..."
-You: "Create a case and show me the ATT&CK techniques involved"
-Claude: [creates case, generates rollup] "Created case-2026-01-10-abc123.
-Primary techniques: T1071.001 (Web Protocols), T1573.001 (Encrypted Channel)..."
-Plain Text
+Claude: [runs embedding search] "Found 47 similar findings across 3 hosts, 
+        all showing the same beacon pattern to 203.0.113.50..."
+
+You: "Create a timeline view in Timesketch"
+Claude: [syncs to Timesketch] "Created sketch with 50 events. 
+        View at: http://localhost:5000/sketch/1/"
+```
 
 ## Quick Start
 
 ### Prerequisites
 
 - **Python 3.10+** (required for MCP SDK)
-- **Claude Desktop** ([download here](https://claude.ai/download ))
-- **Git**
+- **Claude Desktop** ([download here](https://claude.ai/download))
+- **Docker** (optional, for Timesketch visualization)
 
 ### Step 1: Clone and Set Up
 
 ```bash
-# Clone the repository
 git clone https://github.com/epowell101/deeptempo-ai-soc.git
 cd deeptempo-ai-soc
 
-# Create a virtual environment (required )
 python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate
 
-# Install dependencies
 pip install -r requirements.txt
-pip install "mcp[cli]"
-Step 2: Generate Sample Data
-Bash
+```
+
+### Step 2: Generate Sample Data
+
+```bash
 python scripts/demo.py
-This creates 50 sample security findings with:
-768-dimensional embeddings
-MITRE ATT&CK technique predictions
-Anomaly scores and cluster assignments
-An ATT&CK Navigator layer JSON file
-Step 3: Configure Claude Desktop
-Find your Claude Desktop config file:
-Mac: ~/Library/Application Support/Claude/claude_desktop_config.json
-Windows: %APPDATA%\Claude\claude_desktop_config.json
-Create or edit the file with this content (replace /path/to/deeptempo-ai-soc with your actual path):
-JSON
+```
+
+### Step 3: Configure Claude Desktop
+
+Find your config file:
+- **Mac**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+Add this content (adjust paths to match your setup):
+
+```json
 {
   "mcpServers": {
     "deeptempo-findings": {
@@ -86,233 +89,189 @@ JSON
       "env": {
         "PYTHONPATH": "/path/to/deeptempo-ai-soc"
       }
-    }
-  }
-}
-Example for Mac (if cloned to Downloads):
-JSON
-{
-  "mcpServers": {
-    "deeptempo-findings": {
-      "command": "/Users/yourname/Downloads/deeptempo-ai-soc/venv/bin/python",
-      "args": ["-m", "mcp_servers.deeptempo_findings_server.server"],
-      "cwd": "/Users/yourname/Downloads/deeptempo-ai-soc",
-      "env": {
-        "PYTHONPATH": "/Users/yourname/Downloads/deeptempo-ai-soc"
-      }
     },
-    "evidence-snippets": {
-      "command": "/Users/yourname/Downloads/deeptempo-ai-soc/venv/bin/python",
-      "args": ["-m", "mcp_servers.evidence_snippets_server.server"],
-      "cwd": "/Users/yourname/Downloads/deeptempo-ai-soc",
+    "timesketch": {
+      "command": "/path/to/deeptempo-ai-soc/venv/bin/python",
+      "args": ["-m", "mcp_servers.timesketch_server.server"],
+      "cwd": "/path/to/deeptempo-ai-soc",
       "env": {
-        "PYTHONPATH": "/Users/yourname/Downloads/deeptempo-ai-soc"
-      }
-    },
-    "case-store": {
-      "command": "/Users/yourname/Downloads/deeptempo-ai-soc/venv/bin/python",
-      "args": ["-m", "mcp_servers.case_store_server.server"],
-      "cwd": "/Users/yourname/Downloads/deeptempo-ai-soc",
-      "env": {
-        "PYTHONPATH": "/Users/yourname/Downloads/deeptempo-ai-soc"
+        "PYTHONPATH": "/path/to/deeptempo-ai-soc",
+        "TIMESKETCH_MOCK": "true"
       }
     }
   }
 }
-Step 4: Restart Claude Desktop
-Quit Claude Desktop completely (Cmd+Q on Mac, not just close the window)
-Reopen Claude Desktop
-Look for the tools icon (🔨) in the chat input area - this confirms MCP servers are connected
-Step 5: Start Investigating!
+```
+
+### Step 4: Restart Claude Desktop
+
+Quit completely (Cmd+Q on Mac, Alt+F4 on Windows) and reopen.
+
+### Step 5: Start Investigating!
+
 Try these prompts in Claude Desktop:
-Plain Text
-"What MCP tools do you have available?"
 
+```
 "Show me all high severity findings"
+"Find findings similar to f-20260109-9bfe5ba7"
+"What MITRE ATT&CK techniques are detected?"
+"Create a case for the beaconing cluster"
+"Sync all findings to Timesketch"
+```
 
-"Find findings similar to the first one"
+## Timesketch Integration
 
-"What MITRE ATT&CK techniques are detected across all findings?"
+### Mock Mode (Default)
 
-"Create a case for the beaconing cluster findings"
-ATT&CK Navigator Visualization
-The demo script generates an ATT&CK Navigator layer file that visualizes detected techniques.
-To view the ATT&CK layer:
-Run the demo to generate the layer file:
-Bash
-python scripts/demo.py
-Open the ATT&CK Navigator: https://mitre-attack.github.io/attack-navigator/
-Click "Open Existing Layer" → "Upload from local"
-Select the file: data/demo_layer.json
-You'll see the detected MITRE ATT&CK techniques highlighted on the matrix, with colors indicating detection frequency.
-Architecture
-Plain Text
-┌─────────────────────────────────────────────────────────────────┐
-│                         Claude Desktop                           │
-│                    (Natural Language Interface )                  │
-└─────────────────────────────┬───────────────────────────────────┘
-                              │ MCP Protocol
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                         MCP Servers                              │
-├─────────────────┬─────────────────────┬─────────────────────────┤
-│ deeptempo-      │ evidence-snippets   │ case-store              │
-│ findings        │                     │                         │
-│                 │                     │                         │
-│ • list_findings │ • get_evidence      │ • list_cases            │
-│ • get_finding   │ • search_evidence   │ • create_case           │
-│ • nearest_      │                     │ • update_case           │
-│   neighbors     │                     │ • get_case              │
-│ • technique_    │                     │                         │
-│   rollup        │                     │                         │
-└────────┬────────┴──────────┬──────────┴────────────┬────────────┘
-         │                   │                       │
-         ▼                   ▼                       ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                      JSON File Storage                           │
-│                                                                  │
-│  data/findings.json    data/cases.json    data/demo_layer.json  │
-└─────────────────────────────────────────────────────────────────┘
-         ▲
-         │
-┌────────┴────────────────────────────────────────────────────────┐
-│                    DeepTempo LogLM Export                        │
-│                                                                  │
-│  • 768-dim embeddings    • MITRE predictions    • Anomaly scores│
-└─────────────────────────────────────────────────────────────────┘
-MCP Tools Reference
-Findings Server (deeptempo-findings)
-Tool
-Description
-Parameters
-list_findings
-List security findings with filters
-severity, data_source, cluster_id, min_anomaly_score, limit
-get_finding
-Get a specific finding by ID
-finding_id
-nearest_neighbors
-Find similar findings by embedding
-finding_id, k
-technique_rollup
-MITRE ATT&CK technique statistics
-min_confidence
-Evidence Server (evidence-snippets)
-Tool
-Description
-Parameters
-get_evidence
-Get raw log evidence for a finding
-finding_id
-search_evidence
-Search evidence by keyword
-query, limit
-Case Store (case-store)
-Tool
-Description
-Parameters
-list_cases
-List investigation cases
-status, priority
-get_case
-Get a specific case
-case_id
-create_case
-Create a new case
-title, finding_ids, priority, description
-update_case
-Update an existing case
-case_id, status, priority, notes
-Troubleshooting
-"Could not connect to MCP server"
-Check Python version - Must be 3.10+:
-Bash
+The Timesketch server runs in mock mode by default, simulating functionality without requiring a real server. Perfect for demos.
+
+### Live Timesketch Server
+
+To use a real Timesketch server:
+
+1. **Start Timesketch with Docker:**
+```bash
+cd docker
+docker compose up -d
+# Wait 2-3 minutes for services to start
+```
+
+2. **Access Timesketch** at http://localhost:5000 (login: dev / dev)
+
+3. **Update Claude Desktop config** to disable mock mode:
+```json
+"env": {
+  "PYTHONPATH": "/path/to/deeptempo-ai-soc",
+  "TIMESKETCH_HOST": "http://localhost:5000",
+  "TIMESKETCH_USER": "dev",
+  "TIMESKETCH_PASSWORD": "dev",
+  "TIMESKETCH_MOCK": "false"
+}
+```
+
+4. **Restart Claude Desktop**
+
+### Timesketch Tools
+
+| Tool | Description |
+|------|-------------|
+| `sync_findings_to_timesketch` | One-click: creates sketch and uploads all findings |
+| `create_timesketch_sketch` | Create a new investigation sketch |
+| `upload_findings_to_timesketch` | Upload findings to an existing sketch |
+| `search_timesketch` | Search events in a sketch |
+| `get_timesketch_url` | Get URL to view a sketch |
+| `get_timesketch_status` | Check connection status |
+
+## ATT&CK Navigator Visualization
+
+Generate and view MITRE ATT&CK technique coverage:
+
+1. Run the demo: `python scripts/demo.py`
+2. Open https://mitre-attack.github.io/attack-navigator/
+3. Click **"Open Existing Layer"** → **"Upload from local"**
+4. Select `data/demo_layer.json`
+
+## MCP Tools Reference
+
+### Findings Server
+
+| Tool | Description |
+|------|-------------|
+| `list_findings` | List findings with filters (severity, data_source, cluster) |
+| `get_finding` | Get details for a specific finding |
+| `nearest_neighbors` | Find similar findings using embeddings |
+| `technique_rollup` | Get MITRE ATT&CK technique statistics |
+
+### Evidence Server
+
+| Tool | Description |
+|------|-------------|
+| `get_evidence` | Get raw log evidence for a finding |
+| `search_evidence` | Search across all evidence |
+
+### Case Store
+
+| Tool | Description |
+|------|-------------|
+| `list_cases` | List all investigation cases |
+| `get_case` | Get details for a specific case |
+| `create_case` | Create a new investigation case |
+| `update_case` | Update case status, priority, or notes |
+
+## Troubleshooting
+
+### Python Version
+
+MCP requires Python 3.10+:
+```bash
 python3 --version
-Verify the virtual environment:
-Bash
+```
+
+On Mac with Homebrew:
+```bash
+brew install python@3.12
+/opt/homebrew/opt/python@3.12/bin/python3.12 -m venv venv
+```
+
+### Test Server Manually
+
+```bash
 cd /path/to/deeptempo-ai-soc
 source venv/bin/activate
-pip list | grep mcp
-Test the server manually:
-Bash
-source venv/bin/activate
 python -m mcp_servers.deeptempo_findings_server.server
-It should start without errors (just sit there waiting). Press Ctrl+C to stop.
-Check config paths are correct:
-Bash
-cat ~/Library/Application\ Support/Claude/claude_desktop_config.json
-Kill stale processes and restart:
-Bash
-pkill -f "mcp_servers"
-Then quit and reopen Claude Desktop.
-"Module not found" errors
-Ensure PYTHONPATH is set in the Claude Desktop config:
-JSON
-"env": {
-  "PYTHONPATH": "/path/to/deeptempo-ai-soc"
-}
-Check the logs
-Bash
-# Claude Desktop MCP logs (Mac)
-cat ~/Library/Logs/Claude/mcp-server-deeptempo-findings.log
+```
 
-# Server-side debug logs
-cat /tmp/deeptempo-findings.log
-Common Issues
-Issue
-Solution
-Python 3.9 or older
-Install Python 3.10+ via brew install python@3.12 or python.org
-mcp package not found
-Run pip install "mcp[cli]" in your venv
-Import conflicts
-Make sure folder is named mcp_servers not mcp
-JSON serialization errors
-Ensure you have the latest server code with NumpyEncoder
-Project Structure
-Plain Text
+### Check Logs
+
+```bash
+cat ~/Library/Logs/Claude/mcp-server-deeptempo-findings.log
+```
+
+### Kill Stale Processes
+
+```bash
+pkill -f "mcp_servers"
+```
+
+### Timesketch Docker Issues
+
+- Ensure Docker has at least 8GB RAM
+- Wait 2-3 minutes for initial startup
+- Check logs: `docker compose logs -f timesketch`
+
+## Project Structure
+
+```
 deeptempo-ai-soc/
-├── README.md
-├── requirements.txt
-├── mcp_servers/                    # MCP server implementations
-│   ├── deeptempo_findings_server/  # Findings queries & embedding search
-│   ├── evidence_snippets_server/   # Raw log evidence access
-│   └── case_store_server/          # Investigation case management
-├── skills/                         # Claude skill definitions
-│   ├── soc-triage/
-│   ├── embedding-hunt/
-│   ├── cross-signal-correlator/
-│   ├── attack-layer-exporter/
-│   └── response-recommender/
-├── adapters/                       # Data source adapters
-│   ├── deeptempo_offline_export/   # Load from JSON exports
-│   └── deeptempo_api_client/       # Future: SaaS API integration
-├── data/                           # Data storage
-│   ├── findings.json               # Security findings
-│   ├── cases.json                  # Investigation cases
-│   ├── demo_layer.json             # ATT&CK Navigator layer
-│   └── schemas/                    # JSON schemas
-├── scripts/
-│   └── demo.py                     # Generate sample data
-└── docs/                           # Additional documentation
-    ├── architecture.md
-    ├── data-model.md
-    └── mcp-contracts.md
-Roadmap
- v0.1: File-based MCP servers with sample data
- v0.2: Real DeepTempo LogLM integration
- v0.3: ATT&CK Navigator layer export skill
- v0.4: Streamlit dashboard for visualization
- v0.5: Postgres + pgvector for production scale
- v1.0: Full SaaS API integration
-Contributing
-See CONTRIBUTING.md for guidelines.
-License
-Apache 2.0 - See LICENSE for details.
-References
-Claude Skills - Official Anthropic skills repository
-ATT&CK Navigator - MITRE ATT&CK visualization
-Model Context Protocol - MCP specification
-DeepTempo - LogLM for security
-About DeepTempo
-DeepTempo provides LogLM, a foundation model for security log analysis that generates embeddings and MITRE ATT&CK predictions from raw logs.
+├── mcp_servers/                 # MCP server implementations
+│   ├── deeptempo_findings_server/
+│   ├── evidence_snippets_server/
+│   ├── case_store_server/
+│   └── timesketch_server/       # Timesketch integration
+├── adapters/                    # External system adapters
+│   ├── deeptempo_offline_export/
+│   └── timesketch_adapter/
+├── docker/                      # Docker Compose for Timesketch
+├── scripts/                     # Demo and utility scripts
+├── data/                        # Sample data and outputs
+└── docs/                        # Additional documentation
+```
+
+## Roadmap
+
+- [x] v0.1: File-based MCP servers with sample data
+- [x] v0.2: Timesketch integration for timeline visualization
+- [ ] v0.3: Real DeepTempo LogLM integration
+- [ ] v0.4: Streamlit dashboard
+- [ ] v1.0: Full SaaS API integration
+
+## License
+
+Apache 2.0 - See [LICENSE](LICENSE) for details.
+
+## References
+
+- [Timesketch](https://timesketch.org/) - Timeline analysis platform
+- [ATT&CK Navigator](https://mitre-attack.github.io/attack-navigator/) - MITRE ATT&CK visualization
+- [Model Context Protocol](https://modelcontextprotocol.io/) - MCP specification
+- [DeepTempo](https://deeptempo.ai) - LogLM for security

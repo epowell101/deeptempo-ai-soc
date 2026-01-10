@@ -1,15 +1,15 @@
 {
   "cases": [
     {
-      "case_id": "case-2026-01-10-38c545f3",
+      "case_id": "case-2026-01-10-30cb53d2",
       "title": "Investigation: c-beaconing-001",
-      "description": "Automated case created from finding f-20260109-9bfe5ba7 and 4 similar findings",
+      "description": "Automated case created from finding f-20260109-963bc7d4 and 4 similar findings",
       "finding_ids": [
-        "f-20260109-9bfe5ba7",
-        "f-20260109-a975f660",
-        "f-20260109-bbd1e4e0",
-        "f-20260109-4ecf79da",
-        "f-20260109-dde2075c"
+        "f-20260109-963bc7d4",
+        "f-20260109-5fe25522",
+        "f-20260109-119aaa1d",
+        "f-20260109-92ad6a03",
+        "f-20260109-f5ea22de"
       ],
       "status": "new",
       "priority": "high",
@@ -21,12 +21,12 @@
       "notes": [],
       "timeline": [
         {
-          "timestamp": "2026-01-10T02:06:50.389231Z",
+          "timestamp": "2026-01-10T01:29:09.710398Z",
           "event": "Case created by demo script"
         }
       ],
-      "created_at": "2026-01-10T02:06:50.389231Z",
-      "updated_at": "2026-01-10T02:06:50.389231Z"
+      "created_at": "2026-01-10T01:29:09.710398Z",
+      "updated_at": "2026-01-10T01:29:09.710398Z"
     }
   ]
 }

@@ -2,21 +2,40 @@
   "mcpServers": {
     "deeptempo-findings": {
       "command": "python",
-      "args": ["-m", "mcp.deeptempo_findings_server.server"],
-      "cwd": "${workspaceFolder}",
-      "env": {}
+      "args": ["-m", "mcp_servers.deeptempo_findings_server.server"],
+      "cwd": "${PROJECT_DIR}",
+      "env": {
+        "PYTHONPATH": "${PROJECT_DIR}"
+      }
     },
     "evidence-snippets": {
       "command": "python",
-      "args": ["-m", "mcp.evidence_snippets_server.server"],
-      "cwd": "${workspaceFolder}",
-      "env": {}
+      "args": ["-m", "mcp_servers.evidence_snippets_server.server"],
+      "cwd": "${PROJECT_DIR}",
+      "env": {
+        "PYTHONPATH": "${PROJECT_DIR}"
+      }
     },
     "case-store": {
       "command": "python",
-      "args": ["-m", "mcp.case_store_server.server"],
-      "cwd": "${workspaceFolder}",
-      "env": {}
+      "args": ["-m", "mcp_servers.case_store_server.server"],
+      "cwd": "${PROJECT_DIR}",
+      "env": {
+        "PYTHONPATH": "${PROJECT_DIR}"
+      }
+    },
+    "timesketch": {
+      "command": "python",
+      "args": ["-m", "mcp_servers.timesketch_server.server"],
+      "cwd": "${PROJECT_DIR}",
+      "env": {
+        "PYTHONPATH": "${PROJECT_DIR}",
+        "TIMESKETCH_HOST": "http://localhost:5000",
+        "TIMESKETCH_USER": "dev",
+        "TIMESKETCH_PASSWORD": "dev",
+        "TIMESKETCH_MOCK": "true"
+      }
     }
-  }
+  },
+  "_instructions": "Replace ${PROJECT_DIR} with your actual project path. For Claude Desktop, use the full path to your venv python binary."
 }

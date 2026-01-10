@@ -9,7 +9,7 @@ from .server import (
 
 __all__ = [
     "list_findings",
-    "get_finding", 
+    "get_finding",
     "nearest_neighbors",
     "technique_rollup",
 ]

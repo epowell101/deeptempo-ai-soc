@@ -8,11 +8,15 @@ This script demonstrates the core functionality of the AI SOC:
 3. Generating technique rollups
 4. Exporting ATT&CK Navigator layers
 5. Creating investigation cases
+6. Syncing to Timesketch (optional)
 
 Usage:
-    python scripts/demo.py
+    python scripts/demo.py                    # Basic demo
+    python scripts/demo.py --timesketch       # Include Timesketch sync
+    python scripts/demo.py --timesketch-live  # Use real Timesketch server
 """
 
+import argparse
 import json
 import sys
 from datetime import datetime, timedelta
@@ -27,18 +31,41 @@ from adapters.deeptempo_offline_export.loader import (
     save_findings,
     load_findings,
 )
-from mcp.deeptempo_findings_server.server import (
-    get_finding_by_id,
-    cosine_similarity,
-    filter_findings,
-)
-from mcp.case_store_server.server import (
-    load_cases,
-    save_cases,
-    generate_case_id,
-)
 
 import numpy as np
+
+
+def cosine_similarity(a, b) -> float:
+    """Calculate cosine similarity between two vectors."""
+    a = np.array(a)
+    b = np.array(b)
+    return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
+
+
+def load_cases() -> list:
+    """Load cases from JSON file."""
+    cases_file = PROJECT_ROOT / "data" / "cases.json"
+    if cases_file.exists():
+        with open(cases_file, 'r') as f:
+            data = json.load(f)
+            if isinstance(data, dict) and "cases" in data:
+                return data["cases"]
+            return data if isinstance(data, list) else []
+    return []
+
+
+def save_cases(cases: list):
+    """Save cases to JSON file."""
+    cases_file = PROJECT_ROOT / "data" / "cases.json"
+    cases_file.parent.mkdir(parents=True, exist_ok=True)
+    with open(cases_file, 'w') as f:
+        json.dump({"cases": cases}, f, indent=2)
+
+
+def generate_case_id() -> str:
+    """Generate a unique case ID."""
+    import uuid
+    return f"case-{datetime.now().strftime('%Y-%m-%d')}-{uuid.uuid4().hex[:8]}"
 
 
 def print_header(title: str):
@@ -67,7 +94,7 @@ def demo_load_findings():
     return findings
 
 
-def demo_nearest_neighbors(findings: list[dict]):
+def demo_nearest_neighbors(findings: list):
     """Demo: Find similar findings."""
     print_header("Step 2: Finding Similar Findings (Nearest Neighbors)")
     
@@ -107,7 +134,7 @@ def demo_nearest_neighbors(findings: list[dict]):
     return seed, similarities[:10]
 
 
-def demo_technique_rollup(findings: list[dict]):
+def demo_technique_rollup(findings: list):
     """Demo: Aggregate MITRE ATT&CK techniques."""
     print_header("Step 3: MITRE ATT&CK Technique Rollup")
     
@@ -147,7 +174,7 @@ def demo_technique_rollup(findings: list[dict]):
     return results
 
 
-def demo_attack_layer(technique_rollup: list[dict]):
+def demo_attack_layer(technique_rollup: list):
     """Demo: Generate ATT&CK Navigator layer."""
     print_header("Step 4: Generating ATT&CK Navigator Layer")
     
@@ -235,7 +262,62 @@ def demo_create_case(seed_finding: dict, neighbors: list):
     return case
 
 
-def demo_summary(findings: list[dict]):
+def demo_timesketch_sync(findings: list, mock_mode: bool = True):
+    """Demo: Sync findings to Timesketch."""
+    print_header("Step 6: Syncing to Timesketch")
+    
+    try:
+        from adapters.timesketch_adapter import TimesketchAdapter
+        
+        adapter = TimesketchAdapter(mock_mode=mock_mode)
+        adapter.connect()
+        
+        mode_str = "mock" if mock_mode else "live"
+        print(f"Connected to Timesketch ({mode_str} mode)")
+        
+        # Create sketch
+        sketch_name = f"DeepTempo AI SOC Demo - {datetime.now().strftime('%Y-%m-%d %H:%M')}"
+        sketch = adapter.create_sketch(
+            name=sketch_name,
+            description="Demo sketch with sample security findings from DeepTempo LogLM"
+        )
+        
+        if sketch:
+            print(f"Created sketch: {sketch['name']} (ID: {sketch['id']})")
+            
+            # Upload findings
+            timeline = adapter.upload_findings_as_timeline(
+                sketch["id"],
+                findings,
+                "DeepTempo Findings"
+            )
+            
+            if timeline:
+                print(f"Uploaded {timeline.get('event_count', len(findings))} events to timeline")
+                print(f"\nTimesketch URL: {adapter.get_sketch_url(sketch['id'])}")
+                print(f"Explore URL: {adapter.get_timeline_url(sketch['id'])}")
+                
+                if mock_mode:
+                    print(f"\nNote: Running in mock mode. To use real Timesketch:")
+                    print(f"  1. Start Timesketch: cd docker && docker compose up -d")
+                    print(f"  2. Run with --timesketch-live flag")
+                
+                return sketch, timeline
+            else:
+                print("Failed to upload timeline")
+        else:
+            print("Failed to create sketch")
+            
+    except ImportError as e:
+        print(f"Timesketch adapter not available: {e}")
+        print("Install with: pip install timesketch-api-client")
+    except Exception as e:
+        print(f"Error syncing to Timesketch: {e}")
+    
+    return None, None
+
+
+def demo_summary(findings: list, timesketch_enabled: bool = False):
     """Print demo summary."""
     print_header("Demo Summary")
     
@@ -269,10 +351,29 @@ def demo_summary(findings: list[dict]):
     print(f"  - data/findings.json")
     print(f"  - data/cases.json")
     print(f"  - data/demo_layer.json")
+    
+    if timesketch_enabled:
+        print(f"  - data/timesketch_state.json")
 
 
 def main():
     """Run the demo."""
+    parser = argparse.ArgumentParser(description="DeepTempo AI SOC Demo")
+    parser.add_argument(
+        "--timesketch",
+        action="store_true",
+        help="Enable Timesketch sync (mock mode)"
+    )
+    parser.add_argument(
+        "--timesketch-live",
+        action="store_true",
+        help="Enable Timesketch sync with real server"
+    )
+    args = parser.parse_args()
+    
+    timesketch_enabled = args.timesketch or args.timesketch_live
+    timesketch_mock = not args.timesketch_live
+    
     print("\n" + "="*60)
     print(" DeepTempo AI SOC - Demo")
     print("="*60)
@@ -292,8 +393,12 @@ def main():
     # Step 5: Create case
     case = demo_create_case(seed, neighbors)
     
+    # Step 6: Timesketch sync (optional)
+    if timesketch_enabled:
+        demo_timesketch_sync(findings, mock_mode=timesketch_mock)
+    
     # Summary
-    demo_summary(findings)
+    demo_summary(findings, timesketch_enabled)
     
     print("\n" + "="*60)
     print(" Demo Complete!")

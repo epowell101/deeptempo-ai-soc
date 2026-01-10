@@ -1,0 +1,12 @@
+{
+  "sketches": [
+    {
+      "id": 1,
+      "name": "High Severity Findings - 2026-01-10",
+      "description": "DeepTempo LogLM high severity security findings",
+      "created_at": "2026-01-10T13:27:48.863296",
+      "url": "http://localhost:5000/sketch/1/"
+    }
+  ],
+  "last_sync": null
+}
