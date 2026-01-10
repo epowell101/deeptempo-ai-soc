@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "deeptempo-findings": {
+      "command": "python",
+      "args": ["-m", "mcp.deeptempo_findings_server.server"],
+      "cwd": "${workspaceFolder}",
+      "env": {}
+    },
+    "evidence-snippets": {
+      "command": "python",
+      "args": ["-m", "mcp.evidence_snippets_server.server"],
+      "cwd": "${workspaceFolder}",
+      "env": {}
+    },
+    "case-store": {
+      "command": "python",
+      "args": ["-m", "mcp.case_store_server.server"],
+      "cwd": "${workspaceFolder}",
+      "env": {}
+    }
+  }
+}
