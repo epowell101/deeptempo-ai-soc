@@ -9,6 +9,7 @@ This project demonstrates how to build an AI-powered SOC where:
 - **DeepTempo LogLM** handles log analysis, embedding generation, and MITRE ATT&CK classification
 - **Claude** serves as the primary analyst interface, orchestrating investigations through natural conversation
 - **MCP Servers** provide the bridge, exposing SOC tools that Claude can invoke
+- **Streamlit** provides a rich, interactive dashboard for visualizing attack flows.
 - **Timesketch** provides timeline visualization for forensic analysis
 
 ### The Vision: Claude as Your SOC Analyst
@@ -104,7 +105,6 @@ Add this content (adjust paths to match your setup):
 ```
 
 ### Step 4: Restart Claude Desktop
-
 Quit completely (Cmd+Q on Mac, Alt+F4 on Windows) and reopen.
 
 ### Step 5: Start Investigating!
@@ -118,6 +118,28 @@ Try these prompts in Claude Desktop:
 "Create a case for the beaconing cluster"
 "Sync all findings to Timesketch"
 ```
+
+## Attack Flow Visualization (Streamlit)
+
+This project includes a Streamlit dashboard to visualize the entire attack flow, from initial compromise to data exfiltration.
+
+### Step 1: Install Dependencies
+
+```bash
+pip install streamlit plotly pandas networkx pyvis
+```
+
+### Step 2: Run the Dashboard
+
+```bash
+streamlit run streamlit_app/app.py
+```
+
+This will open the dashboard in your browser, where you can explore:
+- **Attack Graph**: An interactive network graph of all entities.
+- **Kill Chain Timeline**: A visual timeline of the attack phases.
+- **Data Exfiltration Flow**: A Sankey diagram showing how data was exfiltrated.
+- **MITRE ATT&CK Heatmap**: A bar chart of detected techniques.
 
 ## Timesketch Integration
 
@@ -190,7 +212,6 @@ Generate and view MITRE ATT&CK technique coverage:
 | `search_evidence` | Search across all evidence |
 
 ### Case Store
-
 | Tool | Description |
 |------|-------------|
 | `list_cases` | List all investigation cases |
@@ -243,6 +264,7 @@ pkill -f "mcp_servers"
 
 ```
 deeptempo-ai-soc/
+├── streamlit_app/             # Streamlit attack flow visualization
 ├── mcp_servers/                 # MCP server implementations
 │   ├── deeptempo_findings_server/
 │   ├── evidence_snippets_server/
@@ -261,8 +283,8 @@ deeptempo-ai-soc/
 
 - [x] v0.1: File-based MCP servers with sample data
 - [x] v0.2: Timesketch integration for timeline visualization
-- [ ] v0.3: Real DeepTempo LogLM integration
-- [ ] v0.4: Streamlit dashboard
+- [x] v0.3: Streamlit dashboard for attack flow visualization
+- [ ] v0.4: Real DeepTempo LogLM integration
 - [ ] v1.0: Full SaaS API integration
 
 ## License
@@ -270,6 +292,7 @@ deeptempo-ai-soc/
 Apache 2.0 - See [LICENSE](LICENSE) for details.
 
 ## References
+
 
 - [Timesketch](https://timesketch.org/) - Timeline analysis platform
 - [ATT&CK Navigator](https://mitre-attack.github.io/attack-navigator/) - MITRE ATT&CK visualization
