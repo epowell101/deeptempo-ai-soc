@@ -4,31 +4,31 @@
     "technique_name": "DNS",
     "tactic": "Command and Control",
     "count": 45,
-    "avg_confidence": 0.79,
+    "avg_confidence": 0.78,
     "evasive_count": 40
-  },
-  "T1078": {
-    "technique_id": "T1078",
-    "technique_name": "Valid Accounts",
-    "tactic": "Initial Access",
-    "count": 1,
-    "avg_confidence": 0.89,
-    "evasive_count": 0
   },
   "T1071.001": {
     "technique_id": "T1071.001",
     "technique_name": "Web Protocols",
     "tactic": "Command and Control",
     "count": 50,
-    "avg_confidence": 0.81,
+    "avg_confidence": 0.82,
     "evasive_count": 30
+  },
+  "T1078": {
+    "technique_id": "T1078",
+    "technique_name": "Valid Accounts",
+    "tactic": "Initial Access",
+    "count": 1,
+    "avg_confidence": 0.8,
+    "evasive_count": 0
   },
   "T1021.001": {
     "technique_id": "T1021.001",
     "technique_name": "Remote Desktop Protocol",
     "tactic": "Lateral Movement",
     "count": 2,
-    "avg_confidence": 0.83,
+    "avg_confidence": 0.84,
     "evasive_count": 0
   },
   "T1041": {
@@ -36,7 +36,7 @@
     "technique_name": "Exfiltration Over C2 Channel",
     "tactic": "Exfiltration",
     "count": 1,
-    "avg_confidence": 0.86,
+    "avg_confidence": 0.85,
     "evasive_count": 0
   },
   "T1190": {
@@ -44,24 +44,24 @@
     "technique_name": "Exploit Public-Facing Application",
     "tactic": "Initial Access",
     "count": 10,
-    "avg_confidence": 0.81,
+    "avg_confidence": 0.79,
     "evasive_count": 0
   },
   "T1021.006": {
     "technique_id": "T1021.006",
     "technique_name": "Windows Remote Management",
     "tactic": "Lateral Movement",
-    "count": 12,
-    "avg_confidence": 0.78,
-    "evasive_count": 12
+    "count": 10,
+    "avg_confidence": 0.79,
+    "evasive_count": 10
   },
   "T1047": {
     "technique_id": "T1047",
     "technique_name": "Windows Management Instrumentation",
     "tactic": "Execution",
-    "count": 3,
-    "avg_confidence": 0.78,
-    "evasive_count": 3
+    "count": 5,
+    "avg_confidence": 0.76,
+    "evasive_count": 5
   },
   "T1048.001": {
     "technique_id": "T1048.001",

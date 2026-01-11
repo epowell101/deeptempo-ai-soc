@@ -1080,7 +1080,7 @@ def generate_scenario():
         "attack_timeline": []
     }
     
-    # Add standard attack phases to timeline
+    # Add standard attack phases to timeline (event_ids will be populated later)
     for phase in ATTACK_PHASES[:5]:  # Non-evasive phases
         ground_truth["attack_timeline"].append({
             "phase": phase["phase"],
@@ -1143,6 +1143,21 @@ def generate_scenario():
     evasive_conn, evasive_dns, event_idx = generate_evasive_attacks(event_idx, ground_truth)
     all_conn_events.extend(evasive_conn)
     all_dns_events.extend(evasive_dns)
+    
+    # Populate event_ids in attack_timeline for phases 1-5 based on event data
+    print("Populating attack timeline event IDs...")
+    for eid, info in ground_truth["events"].items():
+        if info.get("label") == "malicious" and info.get("attack_phase"):
+            phase_num = info["attack_phase"]
+            # Find the matching phase in attack_timeline
+            for phase in ground_truth["attack_timeline"]:
+                if phase["phase"] == phase_num:
+                    phase["event_ids"].append(eid)
+                    break
+    
+    # Print timeline summary
+    for phase in ground_truth["attack_timeline"]:
+        print(f"  Phase {phase['phase']} ({phase['name']}): {len(phase['event_ids'])} events")
     
     # Count events
     malicious_count = sum(1 for e in ground_truth["events"].values() if e.get("label") == "malicious")

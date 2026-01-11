@@ -9,16 +9,16 @@
   "benign_events": 5563,
   "false_positive_triggers": 690,
   "evasion_techniques": [
+    "Small chunks + legitimate cloud IP",
+    "WINRM instead of RDP/SMB + slow timing",
     "WMI instead of RDP/SMB + slow timing",
     "Short subdomain + A record + low volume",
-    "Legitimate CDN IP + varied timing + long duration",
-    "Small chunks + legitimate cloud IP",
-    "WINRM instead of RDP/SMB + slow timing"
+    "Legitimate CDN IP + varied timing + long duration"
   ],
   "attack_phases": 8,
   "log_types": [
     "zeek_conn",
     "zeek_dns"
   ],
-  "generated_at": "2026-01-11T01:28:48.050773"
+  "generated_at": "2026-01-11T01:46:56.586816"
 }

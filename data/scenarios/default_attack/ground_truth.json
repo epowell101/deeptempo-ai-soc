@@ -14622,27 +14622,27 @@
     "conn_04873": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 140.82.113.3 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 35.186.224.25 (GitHub/Reddit/etc)"
     },
     "conn_04874": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 151.101.65.69 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 199.232.69.194 (GitHub/Reddit/etc)"
     },
     "conn_04875": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 151.101.65.69 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 23.185.0.2 (GitHub/Reddit/etc)"
     },
     "conn_04876": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 192.0.78.24 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 35.186.224.25 (GitHub/Reddit/etc)"
     },
     "conn_04877": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 34.117.59.81 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 198.252.206.25 (GitHub/Reddit/etc)"
     },
     "conn_04878": {
       "label": "benign",
@@ -14652,17 +14652,17 @@
     "conn_04879": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 104.244.42.65 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 151.101.65.69 (GitHub/Reddit/etc)"
     },
     "conn_04880": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 192.0.78.24 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 140.82.113.3 (GitHub/Reddit/etc)"
     },
     "conn_04881": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 185.199.108.153 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 34.117.59.81 (GitHub/Reddit/etc)"
     },
     "conn_04882": {
       "label": "benign",
@@ -14672,112 +14672,112 @@
     "conn_04883": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 104.244.42.65 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 199.232.69.194 (GitHub/Reddit/etc)"
     },
     "conn_04884": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 34.117.59.81 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 23.185.0.2 (GitHub/Reddit/etc)"
     },
     "conn_04885": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 23.185.0.2 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 140.82.113.3 (GitHub/Reddit/etc)"
     },
     "conn_04886": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 199.232.69.194 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 185.199.108.153 (GitHub/Reddit/etc)"
     },
     "conn_04887": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 104.244.42.65 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 199.232.69.194 (GitHub/Reddit/etc)"
     },
     "conn_04888": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 35.186.224.25 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 140.82.113.3 (GitHub/Reddit/etc)"
     },
     "conn_04889": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 35.186.224.25 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 192.0.78.24 (GitHub/Reddit/etc)"
     },
     "conn_04890": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 23.185.0.2 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 192.0.78.24 (GitHub/Reddit/etc)"
     },
     "conn_04891": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 199.232.69.194 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 35.186.224.25 (GitHub/Reddit/etc)"
     },
     "conn_04892": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 199.232.69.194 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 23.185.0.2 (GitHub/Reddit/etc)"
     },
     "conn_04893": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 192.0.78.24 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 140.82.113.3 (GitHub/Reddit/etc)"
     },
     "conn_04894": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 140.82.113.3 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 151.101.65.69 (GitHub/Reddit/etc)"
     },
     "conn_04895": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 140.82.113.3 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 198.252.206.25 (GitHub/Reddit/etc)"
     },
     "conn_04896": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 185.199.108.153 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 34.117.59.81 (GitHub/Reddit/etc)"
     },
     "conn_04897": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 198.252.206.25 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 104.244.42.65 (GitHub/Reddit/etc)"
     },
     "conn_04898": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 151.101.65.69 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 140.82.113.3 (GitHub/Reddit/etc)"
     },
     "conn_04899": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 151.101.65.69 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 104.244.42.65 (GitHub/Reddit/etc)"
     },
     "conn_04900": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 34.117.59.81 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 185.199.108.153 (GitHub/Reddit/etc)"
     },
     "conn_04901": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 192.0.78.24 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 34.117.59.81 (GitHub/Reddit/etc)"
     },
     "conn_04902": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 35.186.224.25 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 151.101.65.69 (GitHub/Reddit/etc)"
     },
     "conn_04903": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 198.252.206.25 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 192.0.78.24 (GitHub/Reddit/etc)"
     },
     "conn_04904": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 34.117.59.81 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 151.101.65.69 (GitHub/Reddit/etc)"
     },
     "conn_04905": {
       "label": "benign",
@@ -14792,117 +14792,117 @@
     "conn_04907": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 35.186.224.25 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 23.185.0.2 (GitHub/Reddit/etc)"
     },
     "conn_04908": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 151.101.65.69 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 104.244.42.65 (GitHub/Reddit/etc)"
     },
     "conn_04909": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 35.186.224.25 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 34.117.59.81 (GitHub/Reddit/etc)"
     },
     "conn_04910": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 198.252.206.25 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 23.185.0.2 (GitHub/Reddit/etc)"
     },
     "conn_04911": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 35.186.224.25 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 140.82.113.3 (GitHub/Reddit/etc)"
     },
     "conn_04912": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 192.0.78.24 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 34.117.59.81 (GitHub/Reddit/etc)"
     },
     "conn_04913": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 192.0.78.24 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 140.82.113.3 (GitHub/Reddit/etc)"
     },
     "conn_04914": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 23.185.0.2 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 198.252.206.25 (GitHub/Reddit/etc)"
     },
     "conn_04915": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 198.252.206.25 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 185.199.108.153 (GitHub/Reddit/etc)"
     },
     "conn_04916": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 198.252.206.25 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 34.117.59.81 (GitHub/Reddit/etc)"
     },
     "conn_04917": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 23.185.0.2 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 104.244.42.65 (GitHub/Reddit/etc)"
     },
     "conn_04918": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 198.252.206.25 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 104.244.42.65 (GitHub/Reddit/etc)"
     },
     "conn_04919": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 35.186.224.25 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 192.0.78.24 (GitHub/Reddit/etc)"
     },
     "conn_04920": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 35.186.224.25 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 192.0.78.24 (GitHub/Reddit/etc)"
     },
     "conn_04921": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 23.185.0.2 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 185.199.108.153 (GitHub/Reddit/etc)"
     },
     "conn_04922": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 104.244.42.65 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 198.252.206.25 (GitHub/Reddit/etc)"
     },
     "conn_04923": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 35.186.224.25 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 199.232.69.194 (GitHub/Reddit/etc)"
     },
     "conn_04924": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 23.185.0.2 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 185.199.108.153 (GitHub/Reddit/etc)"
     },
     "conn_04925": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 34.117.59.81 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 35.186.224.25 (GitHub/Reddit/etc)"
     },
     "conn_04926": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 199.232.69.194 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 140.82.113.3 (GitHub/Reddit/etc)"
     },
     "conn_04927": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 185.199.108.153 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 151.101.65.69 (GitHub/Reddit/etc)"
     },
     "conn_04928": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 140.82.113.3 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 185.199.108.153 (GitHub/Reddit/etc)"
     },
     "conn_04929": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 140.82.113.3 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 185.199.108.153 (GitHub/Reddit/etc)"
     },
     "conn_04930": {
       "label": "benign",
@@ -14912,7 +14912,7 @@
     "conn_04931": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 192.0.78.24 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 199.232.69.194 (GitHub/Reddit/etc)"
     },
     "conn_04932": {
       "label": "benign",
@@ -14922,17 +14922,17 @@
     "conn_04933": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 199.232.69.194 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 104.244.42.65 (GitHub/Reddit/etc)"
     },
     "conn_04934": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 34.117.59.81 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 140.82.113.3 (GitHub/Reddit/etc)"
     },
     "conn_04935": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 34.117.59.81 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 199.232.69.194 (GitHub/Reddit/etc)"
     },
     "conn_04936": {
       "label": "benign",
@@ -14947,57 +14947,57 @@
     "conn_04938": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 199.232.69.194 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 192.0.78.24 (GitHub/Reddit/etc)"
     },
     "conn_04939": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 34.117.59.81 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 23.185.0.2 (GitHub/Reddit/etc)"
     },
     "conn_04940": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 199.232.69.194 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 151.101.65.69 (GitHub/Reddit/etc)"
     },
     "conn_04941": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 199.232.69.194 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 23.185.0.2 (GitHub/Reddit/etc)"
     },
     "conn_04942": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 199.232.69.194 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 151.101.65.69 (GitHub/Reddit/etc)"
     },
     "conn_04943": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 151.101.65.69 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 192.0.78.24 (GitHub/Reddit/etc)"
     },
     "conn_04944": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 199.232.69.194 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 34.117.59.81 (GitHub/Reddit/etc)"
     },
     "conn_04945": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 185.199.108.153 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 151.101.65.69 (GitHub/Reddit/etc)"
     },
     "conn_04946": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 185.199.108.153 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 151.101.65.69 (GitHub/Reddit/etc)"
     },
     "conn_04947": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 198.252.206.25 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 185.199.108.153 (GitHub/Reddit/etc)"
     },
     "conn_04948": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 151.101.65.69 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 35.186.224.25 (GitHub/Reddit/etc)"
     },
     "conn_04949": {
       "label": "benign",
@@ -15007,67 +15007,67 @@
     "conn_04950": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 199.232.69.194 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 35.186.224.25 (GitHub/Reddit/etc)"
     },
     "conn_04951": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 23.185.0.2 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 199.232.69.194 (GitHub/Reddit/etc)"
     },
     "conn_04952": {
       "label": "benign",
       "false_positive_type": "rare_external_ip",
-      "description": "Legitimate connection to 35.186.224.25 (GitHub/Reddit/etc)"
+      "description": "Legitimate connection to 199.232.69.194 (GitHub/Reddit/etc)"
     },
     "conn_04953": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-web-02"
+      "description": "IT admin tjohnson managing server-db-01"
     },
     "conn_04954": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-web-02"
+      "description": "IT admin jsmith managing server-db-01"
     },
     "conn_04955": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-file-01"
+      "description": "IT admin tjohnson managing server-web-02"
     },
     "conn_04956": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-web-02"
+      "description": "IT admin tjohnson managing server-file-01"
     },
     "conn_04957": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-web-02"
+      "description": "IT admin jsmith managing server-db-01"
     },
     "conn_04958": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-file-01"
+      "description": "IT admin mwilson managing server-db-01"
     },
     "conn_04959": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-web-02"
+      "description": "IT admin mwilson managing server-db-01"
     },
     "conn_04960": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-db-01"
+      "description": "IT admin jsmith managing server-db-01"
     },
     "conn_04961": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-file-01"
+      "description": "IT admin tjohnson managing server-db-01"
     },
     "conn_04962": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-db-01"
+      "description": "IT admin mwilson managing server-file-01"
     },
     "conn_04963": {
       "label": "benign",
@@ -15077,62 +15077,62 @@
     "conn_04964": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-file-01"
+      "description": "IT admin mwilson managing server-file-01"
     },
     "conn_04965": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-db-01"
+      "description": "IT admin tjohnson managing server-file-01"
     },
     "conn_04966": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-web-02"
+      "description": "IT admin jsmith managing server-db-01"
     },
     "conn_04967": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-file-01"
+      "description": "IT admin jsmith managing server-web-02"
     },
     "conn_04968": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-file-01"
+      "description": "IT admin jsmith managing server-web-02"
     },
     "conn_04969": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-file-01"
+      "description": "IT admin tjohnson managing server-file-01"
     },
     "conn_04970": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-file-01"
+      "description": "IT admin tjohnson managing server-web-02"
     },
     "conn_04971": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-file-01"
+      "description": "IT admin tjohnson managing server-db-01"
     },
     "conn_04972": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-web-02"
+      "description": "IT admin tjohnson managing server-db-01"
     },
     "conn_04973": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-web-02"
+      "description": "IT admin jsmith managing server-db-01"
     },
     "conn_04974": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-db-01"
+      "description": "IT admin mwilson managing server-web-02"
     },
     "conn_04975": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-web-02"
+      "description": "IT admin tjohnson managing server-db-01"
     },
     "conn_04976": {
       "label": "benign",
@@ -15142,92 +15142,92 @@
     "conn_04977": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-db-01"
+      "description": "IT admin jsmith managing server-web-02"
     },
     "conn_04978": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-file-01"
+      "description": "IT admin tjohnson managing server-db-01"
     },
     "conn_04979": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-web-02"
+      "description": "IT admin jsmith managing server-db-01"
     },
     "conn_04980": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-db-01"
+      "description": "IT admin jsmith managing server-web-02"
     },
     "conn_04981": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-file-01"
+      "description": "IT admin jsmith managing server-db-01"
     },
     "conn_04982": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-web-02"
+      "description": "IT admin jsmith managing server-file-01"
     },
     "conn_04983": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-db-01"
+      "description": "IT admin jsmith managing server-file-01"
     },
     "conn_04984": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-db-01"
+      "description": "IT admin jsmith managing server-web-02"
     },
     "conn_04985": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-web-02"
+      "description": "IT admin tjohnson managing server-db-01"
     },
     "conn_04986": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-db-01"
+      "description": "IT admin tjohnson managing server-file-01"
     },
     "conn_04987": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-db-01"
+      "description": "IT admin mwilson managing server-web-02"
     },
     "conn_04988": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-db-01"
+      "description": "IT admin jsmith managing server-file-01"
     },
     "conn_04989": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-db-01"
+      "description": "IT admin jsmith managing server-web-02"
     },
     "conn_04990": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-web-02"
+      "description": "IT admin tjohnson managing server-db-01"
     },
     "conn_04991": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-file-01"
+      "description": "IT admin mwilson managing server-web-02"
     },
     "conn_04992": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-db-01"
+      "description": "IT admin jsmith managing server-file-01"
     },
     "conn_04993": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-file-01"
+      "description": "IT admin jsmith managing server-db-01"
     },
     "conn_04994": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-file-01"
+      "description": "IT admin tjohnson managing server-web-02"
     },
     "conn_04995": {
       "label": "benign",
@@ -15237,37 +15237,37 @@
     "conn_04996": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-file-01"
+      "description": "IT admin mwilson managing server-db-01"
     },
     "conn_04997": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-web-02"
+      "description": "IT admin tjohnson managing server-file-01"
     },
     "conn_04998": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-db-01"
+      "description": "IT admin tjohnson managing server-file-01"
     },
     "conn_04999": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-file-01"
+      "description": "IT admin jsmith managing server-file-01"
     },
     "conn_05000": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-file-01"
+      "description": "IT admin jsmith managing server-db-01"
     },
     "conn_05001": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-file-01"
+      "description": "IT admin mwilson managing server-file-01"
     },
     "conn_05002": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-db-01"
+      "description": "IT admin tjohnson managing server-db-01"
     },
     "conn_05003": {
       "label": "benign",
@@ -15277,17 +15277,17 @@
     "conn_05004": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-web-02"
+      "description": "IT admin jsmith managing server-web-02"
     },
     "conn_05005": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-web-02"
+      "description": "IT admin jsmith managing server-file-01"
     },
     "conn_05006": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-web-02"
+      "description": "IT admin jsmith managing server-file-01"
     },
     "conn_05007": {
       "label": "benign",
@@ -15297,52 +15297,52 @@
     "conn_05008": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-file-01"
+      "description": "IT admin tjohnson managing server-db-01"
     },
     "conn_05009": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-file-01"
+      "description": "IT admin mwilson managing server-web-02"
     },
     "conn_05010": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-db-01"
+      "description": "IT admin jsmith managing server-file-01"
     },
     "conn_05011": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-db-01"
+      "description": "IT admin jsmith managing server-file-01"
     },
     "conn_05012": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-db-01"
+      "description": "IT admin mwilson managing server-web-02"
     },
     "conn_05013": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-file-01"
+      "description": "IT admin jsmith managing server-db-01"
     },
     "conn_05014": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-db-01"
+      "description": "IT admin tjohnson managing server-file-01"
     },
     "conn_05015": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-file-01"
+      "description": "IT admin tjohnson managing server-web-02"
     },
     "conn_05016": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-web-02"
+      "description": "IT admin jsmith managing server-file-01"
     },
     "conn_05017": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-web-02"
+      "description": "IT admin tjohnson managing server-db-01"
     },
     "conn_05018": {
       "label": "benign",
@@ -15352,127 +15352,127 @@
     "conn_05019": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-web-02"
+      "description": "IT admin tjohnson managing server-db-01"
     },
     "conn_05020": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-db-01"
+      "description": "IT admin tjohnson managing server-file-01"
     },
     "conn_05021": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-web-02"
+      "description": "IT admin jsmith managing server-web-02"
     },
     "conn_05022": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-file-01"
+      "description": "IT admin mwilson managing server-file-01"
     },
     "conn_05023": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-db-01"
+      "description": "IT admin mwilson managing server-web-02"
     },
     "conn_05024": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-file-01"
+      "description": "IT admin tjohnson managing server-web-02"
     },
     "conn_05025": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-db-01"
+      "description": "IT admin jsmith managing server-web-02"
     },
     "conn_05026": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-file-01"
+      "description": "IT admin tjohnson managing server-web-02"
     },
     "conn_05027": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-web-02"
+      "description": "IT admin tjohnson managing server-db-01"
     },
     "conn_05028": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-file-01"
+      "description": "IT admin jsmith managing server-db-01"
     },
     "conn_05029": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-web-02"
+      "description": "IT admin jsmith managing server-db-01"
     },
     "conn_05030": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-web-02"
+      "description": "IT admin mwilson managing server-file-01"
     },
     "conn_05031": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-file-01"
+      "description": "IT admin jsmith managing server-web-02"
     },
     "conn_05032": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-web-02"
+      "description": "IT admin jsmith managing server-file-01"
     },
     "conn_05033": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-file-01"
+      "description": "IT admin jsmith managing server-web-02"
     },
     "conn_05034": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-db-01"
+      "description": "IT admin tjohnson managing server-file-01"
     },
     "conn_05035": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-db-01"
+      "description": "IT admin jsmith managing server-file-01"
     },
     "conn_05036": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-db-01"
+      "description": "IT admin mwilson managing server-file-01"
     },
     "conn_05037": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-file-01"
+      "description": "IT admin mwilson managing server-web-02"
     },
     "conn_05038": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-db-01"
+      "description": "IT admin tjohnson managing server-file-01"
     },
     "conn_05039": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-web-02"
+      "description": "IT admin tjohnson managing server-file-01"
     },
     "conn_05040": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-db-01"
+      "description": "IT admin mwilson managing server-file-01"
     },
     "conn_05041": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-web-02"
+      "description": "IT admin mwilson managing server-web-02"
     },
     "conn_05042": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-file-01"
+      "description": "IT admin jsmith managing server-db-01"
     },
     "conn_05043": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-file-01"
+      "description": "IT admin mwilson managing server-db-01"
     },
     "conn_05044": {
       "label": "benign",
@@ -15482,27 +15482,27 @@
     "conn_05045": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-file-01"
+      "description": "IT admin jsmith managing server-web-02"
     },
     "conn_05046": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-web-02"
+      "description": "IT admin tjohnson managing server-web-02"
     },
     "conn_05047": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-web-02"
+      "description": "IT admin tjohnson managing server-file-01"
     },
     "conn_05048": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-web-02"
+      "description": "IT admin tjohnson managing server-file-01"
     },
     "conn_05049": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-db-01"
+      "description": "IT admin tjohnson managing server-file-01"
     },
     "conn_05050": {
       "label": "benign",
@@ -15512,92 +15512,92 @@
     "conn_05051": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-file-01"
+      "description": "IT admin jsmith managing server-file-01"
     },
     "conn_05052": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-web-02"
+      "description": "IT admin tjohnson managing server-db-01"
     },
     "conn_05053": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-file-01"
+      "description": "IT admin jsmith managing server-web-02"
     },
     "conn_05054": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-db-01"
+      "description": "IT admin mwilson managing server-db-01"
     },
     "conn_05055": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-file-01"
+      "description": "IT admin mwilson managing server-file-01"
     },
     "conn_05056": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-web-02"
+      "description": "IT admin mwilson managing server-file-01"
     },
     "conn_05057": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-db-01"
+      "description": "IT admin jsmith managing server-file-01"
     },
     "conn_05058": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-file-01"
+      "description": "IT admin tjohnson managing server-db-01"
     },
     "conn_05059": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-file-01"
+      "description": "IT admin tjohnson managing server-db-01"
     },
     "conn_05060": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-db-01"
+      "description": "IT admin jsmith managing server-db-01"
     },
     "conn_05061": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-db-01"
+      "description": "IT admin mwilson managing server-file-01"
     },
     "conn_05062": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-file-01"
+      "description": "IT admin mwilson managing server-file-01"
     },
     "conn_05063": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-db-01"
+      "description": "IT admin jsmith managing server-web-02"
     },
     "conn_05064": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-file-01"
+      "description": "IT admin jsmith managing server-web-02"
     },
     "conn_05065": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-db-01"
+      "description": "IT admin tjohnson managing server-file-01"
     },
     "conn_05066": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-file-01"
+      "description": "IT admin jsmith managing server-file-01"
     },
     "conn_05067": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-file-01"
+      "description": "IT admin tjohnson managing server-web-02"
     },
     "conn_05068": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-file-01"
+      "description": "IT admin mwilson managing server-web-02"
     },
     "conn_05069": {
       "label": "benign",
@@ -15607,7 +15607,7 @@
     "conn_05070": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-file-01"
+      "description": "IT admin mwilson managing server-file-01"
     },
     "conn_05071": {
       "label": "benign",
@@ -15627,7 +15627,7 @@
     "conn_05074": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-db-01"
+      "description": "IT admin tjohnson managing server-db-01"
     },
     "conn_05075": {
       "label": "benign",
@@ -15637,82 +15637,82 @@
     "conn_05076": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-db-01"
+      "description": "IT admin jsmith managing server-db-01"
     },
     "conn_05077": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-web-02"
+      "description": "IT admin mwilson managing server-file-01"
     },
     "conn_05078": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-db-01"
+      "description": "IT admin jsmith managing server-db-01"
     },
     "conn_05079": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-file-01"
+      "description": "IT admin jsmith managing server-web-02"
     },
     "conn_05080": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-web-02"
+      "description": "IT admin tjohnson managing server-db-01"
     },
     "conn_05081": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-file-01"
+      "description": "IT admin mwilson managing server-db-01"
     },
     "conn_05082": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-file-01"
+      "description": "IT admin tjohnson managing server-file-01"
     },
     "conn_05083": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-web-02"
+      "description": "IT admin jsmith managing server-db-01"
     },
     "conn_05084": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-db-01"
+      "description": "IT admin jsmith managing server-file-01"
     },
     "conn_05085": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-web-02"
+      "description": "IT admin jsmith managing server-file-01"
     },
     "conn_05086": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-db-01"
+      "description": "IT admin tjohnson managing server-file-01"
     },
     "conn_05087": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-file-01"
+      "description": "IT admin mwilson managing server-file-01"
     },
     "conn_05088": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-file-01"
+      "description": "IT admin tjohnson managing server-web-02"
     },
     "conn_05089": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-file-01"
+      "description": "IT admin jsmith managing server-db-01"
     },
     "conn_05090": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-web-02"
+      "description": "IT admin mwilson managing server-file-01"
     },
     "conn_05091": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-db-01"
+      "description": "IT admin jsmith managing server-file-01"
     },
     "conn_05092": {
       "label": "benign",
@@ -15722,42 +15722,42 @@
     "conn_05093": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-db-01"
+      "description": "IT admin jsmith managing server-file-01"
     },
     "conn_05094": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-web-02"
+      "description": "IT admin jsmith managing server-db-01"
     },
     "conn_05095": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-db-01"
+      "description": "IT admin jsmith managing server-db-01"
     },
     "conn_05096": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-web-02"
+      "description": "IT admin mwilson managing server-db-01"
     },
     "conn_05097": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-db-01"
+      "description": "IT admin mwilson managing server-file-01"
     },
     "conn_05098": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin mwilson managing server-web-02"
+      "description": "IT admin tjohnson managing server-db-01"
     },
     "conn_05099": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin tjohnson managing server-db-01"
+      "description": "IT admin tjohnson managing server-file-01"
     },
     "conn_05100": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-file-01"
+      "description": "IT admin mwilson managing server-db-01"
     },
     "conn_05101": {
       "label": "benign",
@@ -15767,177 +15767,177 @@
     "conn_05102": {
       "label": "benign",
       "false_positive_type": "admin_activity",
-      "description": "IT admin jsmith managing server-db-01"
+      "description": "IT admin tjohnson managing server-web-02"
     },
     "conn_05103": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-web-02 and workstation-078"
+      "description": "Normal file sharing between server-db-01 and workstation-055"
     },
     "conn_05104": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-042 and workstation-055"
+      "description": "Normal file sharing between laptop-sales-03 and server-file-01"
     },
     "conn_05105": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-db-01 and workstation-055"
+      "description": "Normal file sharing between server-web-02 and server-db-01"
     },
     "conn_05106": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-042 and server-db-01"
+      "description": "Normal file sharing between server-file-01 and workstation-042"
     },
     "conn_05107": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and workstation-078"
+      "description": "Normal file sharing between server-file-01 and workstation-055"
     },
     "conn_05108": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-db-01 and laptop-sales-03"
+      "description": "Normal file sharing between workstation-078 and laptop-sales-03"
     },
     "conn_05109": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-055 and workstation-078"
+      "description": "Normal file sharing between workstation-078 and workstation-042"
     },
     "conn_05110": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and server-web-02"
+      "description": "Normal file sharing between workstation-055 and workstation-042"
     },
     "conn_05111": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and workstation-042"
+      "description": "Normal file sharing between workstation-078 and laptop-sales-03"
     },
     "conn_05112": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and workstation-078"
+      "description": "Normal file sharing between workstation-055 and server-web-02"
     },
     "conn_05113": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-042 and server-db-01"
+      "description": "Normal file sharing between server-file-01 and workstation-055"
     },
     "conn_05114": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between laptop-sales-03 and server-db-01"
+      "description": "Normal file sharing between server-web-02 and workstation-055"
     },
     "conn_05115": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-042 and server-web-02"
+      "description": "Normal file sharing between workstation-055 and laptop-sales-03"
     },
     "conn_05116": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-078 and server-web-02"
+      "description": "Normal file sharing between laptop-sales-03 and workstation-055"
     },
     "conn_05117": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-078 and server-web-02"
+      "description": "Normal file sharing between server-db-01 and workstation-042"
     },
     "conn_05118": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-042 and workstation-078"
+      "description": "Normal file sharing between workstation-042 and laptop-sales-03"
     },
     "conn_05119": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-042 and workstation-055"
+      "description": "Normal file sharing between laptop-sales-03 and server-file-01"
     },
     "conn_05120": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between laptop-sales-03 and server-web-02"
+      "description": "Normal file sharing between workstation-078 and server-web-02"
     },
     "conn_05121": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-042 and server-db-01"
+      "description": "Normal file sharing between laptop-sales-03 and workstation-078"
     },
     "conn_05122": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and laptop-sales-03"
+      "description": "Normal file sharing between workstation-078 and server-file-01"
     },
     "conn_05123": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-055 and workstation-078"
+      "description": "Normal file sharing between workstation-055 and workstation-042"
     },
     "conn_05124": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-042 and laptop-sales-03"
+      "description": "Normal file sharing between server-file-01 and server-db-01"
     },
     "conn_05125": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-db-01 and server-web-02"
+      "description": "Normal file sharing between server-file-01 and workstation-078"
     },
     "conn_05126": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-055 and server-web-02"
+      "description": "Normal file sharing between workstation-078 and server-file-01"
     },
     "conn_05127": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-078 and workstation-042"
+      "description": "Normal file sharing between workstation-078 and server-file-01"
     },
     "conn_05128": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between laptop-sales-03 and server-file-01"
+      "description": "Normal file sharing between server-db-01 and workstation-055"
     },
     "conn_05129": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-055 and server-web-02"
+      "description": "Normal file sharing between workstation-078 and workstation-042"
     },
     "conn_05130": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-web-02 and workstation-055"
+      "description": "Normal file sharing between server-web-02 and workstation-078"
     },
     "conn_05131": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-055 and workstation-078"
+      "description": "Normal file sharing between server-db-01 and server-file-01"
     },
     "conn_05132": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-078 and server-file-01"
+      "description": "Normal file sharing between server-db-01 and laptop-sales-03"
     },
     "conn_05133": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-055 and server-file-01"
+      "description": "Normal file sharing between workstation-078 and server-web-02"
     },
     "conn_05134": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-042 and workstation-078"
+      "description": "Normal file sharing between server-web-02 and laptop-sales-03"
     },
     "conn_05135": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-web-02 and server-file-01"
+      "description": "Normal file sharing between workstation-078 and workstation-055"
     },
     "conn_05136": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-db-01 and workstation-078"
+      "description": "Normal file sharing between laptop-sales-03 and workstation-042"
     },
     "conn_05137": {
       "label": "benign",
@@ -15947,17 +15947,17 @@
     "conn_05138": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-db-01 and server-web-02"
+      "description": "Normal file sharing between server-file-01 and server-db-01"
     },
     "conn_05139": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-web-02 and server-file-01"
+      "description": "Normal file sharing between laptop-sales-03 and workstation-078"
     },
     "conn_05140": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and server-web-02"
+      "description": "Normal file sharing between workstation-078 and server-db-01"
     },
     "conn_05141": {
       "label": "benign",
@@ -15967,432 +15967,432 @@
     "conn_05142": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and workstation-078"
+      "description": "Normal file sharing between server-web-02 and server-file-01"
     },
     "conn_05143": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and server-db-01"
+      "description": "Normal file sharing between workstation-042 and workstation-055"
     },
     "conn_05144": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-078 and server-web-02"
+      "description": "Normal file sharing between workstation-042 and server-web-02"
     },
     "conn_05145": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-db-01 and workstation-078"
+      "description": "Normal file sharing between laptop-sales-03 and server-file-01"
     },
     "conn_05146": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between laptop-sales-03 and workstation-055"
+      "description": "Normal file sharing between workstation-042 and server-file-01"
     },
     "conn_05147": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between laptop-sales-03 and workstation-055"
+      "description": "Normal file sharing between workstation-078 and workstation-055"
     },
     "conn_05148": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-078 and workstation-042"
+      "description": "Normal file sharing between workstation-042 and laptop-sales-03"
     },
     "conn_05149": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-db-01 and laptop-sales-03"
+      "description": "Normal file sharing between workstation-055 and laptop-sales-03"
     },
     "conn_05150": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-web-02 and laptop-sales-03"
+      "description": "Normal file sharing between laptop-sales-03 and workstation-078"
     },
     "conn_05151": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-web-02 and workstation-042"
+      "description": "Normal file sharing between server-db-01 and server-web-02"
     },
     "conn_05152": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between laptop-sales-03 and server-file-01"
+      "description": "Normal file sharing between laptop-sales-03 and workstation-042"
     },
     "conn_05153": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-web-02 and workstation-042"
+      "description": "Normal file sharing between laptop-sales-03 and server-db-01"
     },
     "conn_05154": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between laptop-sales-03 and server-web-02"
+      "description": "Normal file sharing between server-web-02 and laptop-sales-03"
     },
     "conn_05155": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and laptop-sales-03"
+      "description": "Normal file sharing between workstation-042 and server-db-01"
     },
     "conn_05156": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-db-01 and server-web-02"
+      "description": "Normal file sharing between workstation-078 and workstation-055"
     },
     "conn_05157": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-042 and server-file-01"
+      "description": "Normal file sharing between laptop-sales-03 and server-web-02"
     },
     "conn_05158": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-078 and server-db-01"
+      "description": "Normal file sharing between workstation-042 and server-db-01"
     },
     "conn_05159": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between laptop-sales-03 and server-db-01"
+      "description": "Normal file sharing between server-db-01 and workstation-078"
     },
     "conn_05160": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between laptop-sales-03 and server-web-02"
+      "description": "Normal file sharing between server-web-02 and server-file-01"
     },
     "conn_05161": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-078 and server-db-01"
+      "description": "Normal file sharing between laptop-sales-03 and workstation-078"
     },
     "conn_05162": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-055 and server-web-02"
+      "description": "Normal file sharing between laptop-sales-03 and server-file-01"
     },
     "conn_05163": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-055 and server-db-01"
+      "description": "Normal file sharing between workstation-042 and workstation-055"
     },
     "conn_05164": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-055 and workstation-078"
+      "description": "Normal file sharing between workstation-042 and server-web-02"
     },
     "conn_05165": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-055 and server-web-02"
+      "description": "Normal file sharing between workstation-055 and workstation-042"
     },
     "conn_05166": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and workstation-042"
+      "description": "Normal file sharing between workstation-078 and workstation-055"
     },
     "conn_05167": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-web-02 and server-db-01"
+      "description": "Normal file sharing between workstation-055 and laptop-sales-03"
     },
     "conn_05168": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-web-02 and workstation-078"
+      "description": "Normal file sharing between workstation-042 and workstation-078"
     },
     "conn_05169": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-078 and server-db-01"
+      "description": "Normal file sharing between laptop-sales-03 and server-web-02"
     },
     "conn_05170": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-web-02 and laptop-sales-03"
+      "description": "Normal file sharing between workstation-078 and server-db-01"
     },
     "conn_05171": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and workstation-042"
+      "description": "Normal file sharing between workstation-055 and workstation-078"
     },
     "conn_05172": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between laptop-sales-03 and workstation-078"
+      "description": "Normal file sharing between workstation-055 and workstation-042"
     },
     "conn_05173": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-042 and workstation-078"
+      "description": "Normal file sharing between laptop-sales-03 and workstation-055"
     },
     "conn_05174": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-042 and server-file-01"
+      "description": "Normal file sharing between workstation-042 and server-web-02"
     },
     "conn_05175": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-db-01 and laptop-sales-03"
+      "description": "Normal file sharing between workstation-042 and laptop-sales-03"
     },
     "conn_05176": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and workstation-055"
+      "description": "Normal file sharing between server-db-01 and laptop-sales-03"
     },
     "conn_05177": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-web-02 and workstation-042"
+      "description": "Normal file sharing between workstation-055 and server-web-02"
     },
     "conn_05178": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and laptop-sales-03"
+      "description": "Normal file sharing between server-file-01 and workstation-055"
     },
     "conn_05179": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-078 and workstation-042"
+      "description": "Normal file sharing between workstation-078 and workstation-055"
     },
     "conn_05180": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-web-02 and workstation-078"
+      "description": "Normal file sharing between server-file-01 and workstation-078"
     },
     "conn_05181": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-042 and laptop-sales-03"
+      "description": "Normal file sharing between server-file-01 and server-db-01"
     },
     "conn_05182": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-042 and laptop-sales-03"
+      "description": "Normal file sharing between server-web-02 and server-file-01"
     },
     "conn_05183": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-042 and workstation-055"
+      "description": "Normal file sharing between workstation-078 and server-file-01"
     },
     "conn_05184": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between laptop-sales-03 and server-file-01"
+      "description": "Normal file sharing between server-web-02 and workstation-078"
     },
     "conn_05185": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-042 and workstation-055"
+      "description": "Normal file sharing between laptop-sales-03 and server-db-01"
     },
     "conn_05186": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-078 and server-file-01"
+      "description": "Normal file sharing between server-db-01 and workstation-055"
     },
     "conn_05187": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-078 and workstation-055"
+      "description": "Normal file sharing between workstation-042 and server-db-01"
     },
     "conn_05188": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and laptop-sales-03"
+      "description": "Normal file sharing between server-web-02 and workstation-078"
     },
     "conn_05189": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and server-db-01"
+      "description": "Normal file sharing between server-web-02 and workstation-055"
     },
     "conn_05190": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-078 and workstation-055"
+      "description": "Normal file sharing between server-file-01 and laptop-sales-03"
     },
     "conn_05191": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-042 and workstation-055"
+      "description": "Normal file sharing between workstation-042 and server-web-02"
     },
     "conn_05192": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and workstation-055"
+      "description": "Normal file sharing between laptop-sales-03 and server-web-02"
     },
     "conn_05193": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between laptop-sales-03 and workstation-042"
+      "description": "Normal file sharing between laptop-sales-03 and workstation-055"
     },
     "conn_05194": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-db-01 and workstation-042"
+      "description": "Normal file sharing between workstation-042 and workstation-055"
     },
     "conn_05195": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-db-01 and server-web-02"
+      "description": "Normal file sharing between workstation-042 and laptop-sales-03"
     },
     "conn_05196": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-055 and workstation-042"
+      "description": "Normal file sharing between laptop-sales-03 and workstation-055"
     },
     "conn_05197": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-078 and server-web-02"
+      "description": "Normal file sharing between workstation-078 and workstation-055"
     },
     "conn_05198": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-055 and workstation-078"
+      "description": "Normal file sharing between server-db-01 and server-file-01"
     },
     "conn_05199": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-055 and server-db-01"
+      "description": "Normal file sharing between workstation-042 and server-web-02"
     },
     "conn_05200": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-078 and server-file-01"
+      "description": "Normal file sharing between workstation-078 and server-db-01"
     },
     "conn_05201": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and laptop-sales-03"
+      "description": "Normal file sharing between server-file-01 and server-db-01"
     },
     "conn_05202": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and workstation-055"
+      "description": "Normal file sharing between server-web-02 and server-file-01"
     },
     "conn_05203": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and laptop-sales-03"
+      "description": "Normal file sharing between workstation-042 and server-file-01"
     },
     "conn_05204": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-web-02 and server-db-01"
+      "description": "Normal file sharing between server-web-02 and server-file-01"
     },
     "conn_05205": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and laptop-sales-03"
+      "description": "Normal file sharing between workstation-078 and server-db-01"
     },
     "conn_05206": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and laptop-sales-03"
+      "description": "Normal file sharing between server-db-01 and workstation-055"
     },
     "conn_05207": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-055 and workstation-078"
+      "description": "Normal file sharing between laptop-sales-03 and workstation-042"
     },
     "conn_05208": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and laptop-sales-03"
+      "description": "Normal file sharing between workstation-078 and server-file-01"
     },
     "conn_05209": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and workstation-078"
+      "description": "Normal file sharing between laptop-sales-03 and workstation-055"
     },
     "conn_05210": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-db-01 and server-web-02"
+      "description": "Normal file sharing between laptop-sales-03 and workstation-055"
     },
     "conn_05211": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-web-02 and laptop-sales-03"
+      "description": "Normal file sharing between workstation-078 and server-db-01"
     },
     "conn_05212": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-078 and workstation-042"
+      "description": "Normal file sharing between workstation-078 and server-db-01"
     },
     "conn_05213": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-db-01 and workstation-078"
+      "description": "Normal file sharing between workstation-042 and laptop-sales-03"
     },
     "conn_05214": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-042 and server-file-01"
+      "description": "Normal file sharing between server-db-01 and workstation-055"
     },
     "conn_05215": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and server-db-01"
+      "description": "Normal file sharing between workstation-078 and server-file-01"
     },
     "conn_05216": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-055 and server-web-02"
+      "description": "Normal file sharing between server-web-02 and workstation-078"
     },
     "conn_05217": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-042 and workstation-055"
+      "description": "Normal file sharing between server-db-01 and laptop-sales-03"
     },
     "conn_05218": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-078 and workstation-042"
+      "description": "Normal file sharing between server-file-01 and workstation-055"
     },
     "conn_05219": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-078 and workstation-055"
+      "description": "Normal file sharing between server-file-01 and laptop-sales-03"
     },
     "conn_05220": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-042 and server-file-01"
+      "description": "Normal file sharing between server-file-01 and workstation-042"
     },
     "conn_05221": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-db-01 and workstation-078"
+      "description": "Normal file sharing between workstation-055 and workstation-042"
     },
     "conn_05222": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-078 and server-db-01"
+      "description": "Normal file sharing between server-db-01 and server-file-01"
     },
     "conn_05223": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-055 and workstation-042"
+      "description": "Normal file sharing between workstation-078 and server-file-01"
     },
     "conn_05224": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between laptop-sales-03 and server-db-01"
+      "description": "Normal file sharing between workstation-078 and server-db-01"
     },
     "conn_05225": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-055 and server-file-01"
+      "description": "Normal file sharing between server-db-01 and workstation-055"
     },
     "conn_05226": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-055 and server-file-01"
+      "description": "Normal file sharing between server-web-02 and server-db-01"
     },
     "conn_05227": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-web-02 and server-file-01"
+      "description": "Normal file sharing between server-file-01 and server-db-01"
     },
     "conn_05228": {
       "label": "benign",
@@ -16402,77 +16402,77 @@
     "conn_05229": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-042 and server-file-01"
+      "description": "Normal file sharing between workstation-055 and workstation-078"
     },
     "conn_05230": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-055 and workstation-078"
+      "description": "Normal file sharing between server-db-01 and laptop-sales-03"
     },
     "conn_05231": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and workstation-078"
+      "description": "Normal file sharing between server-web-02 and laptop-sales-03"
     },
     "conn_05232": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-db-01 and workstation-055"
+      "description": "Normal file sharing between server-web-02 and server-db-01"
     },
     "conn_05233": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-042 and workstation-078"
+      "description": "Normal file sharing between workstation-078 and laptop-sales-03"
     },
     "conn_05234": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and workstation-055"
+      "description": "Normal file sharing between server-db-01 and laptop-sales-03"
     },
     "conn_05235": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-db-01 and workstation-078"
+      "description": "Normal file sharing between laptop-sales-03 and workstation-042"
     },
     "conn_05236": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-078 and workstation-042"
+      "description": "Normal file sharing between server-web-02 and workstation-078"
     },
     "conn_05237": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-078 and server-file-01"
+      "description": "Normal file sharing between server-file-01 and server-db-01"
     },
     "conn_05238": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between laptop-sales-03 and server-web-02"
+      "description": "Normal file sharing between server-db-01 and workstation-078"
     },
     "conn_05239": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and server-web-02"
+      "description": "Normal file sharing between workstation-055 and laptop-sales-03"
     },
     "conn_05240": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-042 and server-db-01"
+      "description": "Normal file sharing between server-web-02 and workstation-055"
     },
     "conn_05241": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-db-01 and server-web-02"
+      "description": "Normal file sharing between workstation-078 and workstation-042"
     },
     "conn_05242": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-078 and laptop-sales-03"
+      "description": "Normal file sharing between workstation-078 and server-web-02"
     },
     "conn_05243": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-web-02 and server-file-01"
+      "description": "Normal file sharing between workstation-078 and workstation-055"
     },
     "conn_05244": {
       "label": "benign",
@@ -16482,292 +16482,292 @@
     "conn_05245": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-042 and server-web-02"
+      "description": "Normal file sharing between server-web-02 and workstation-042"
     },
     "conn_05246": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-055 and server-web-02"
+      "description": "Normal file sharing between workstation-042 and server-file-01"
     },
     "conn_05247": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between laptop-sales-03 and workstation-042"
+      "description": "Normal file sharing between server-db-01 and workstation-042"
     },
     "conn_05248": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between laptop-sales-03 and server-web-02"
+      "description": "Normal file sharing between server-file-01 and workstation-042"
     },
     "conn_05249": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and server-db-01"
+      "description": "Normal file sharing between workstation-078 and server-web-02"
     },
     "conn_05250": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between laptop-sales-03 and workstation-078"
+      "description": "Normal file sharing between workstation-078 and server-file-01"
     },
     "conn_05251": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-078 and laptop-sales-03"
+      "description": "Normal file sharing between server-file-01 and server-db-01"
     },
     "conn_05252": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and server-web-02"
+      "description": "Normal file sharing between laptop-sales-03 and server-file-01"
     },
     "conn_05253": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-db-01 and laptop-sales-03"
+      "description": "Normal file sharing between server-file-01 and server-db-01"
     },
     "conn_05254": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-db-01 and laptop-sales-03"
+      "description": "Normal file sharing between laptop-sales-03 and server-db-01"
     },
     "conn_05255": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and workstation-078"
+      "description": "Normal file sharing between server-db-01 and workstation-055"
     },
     "conn_05256": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-web-02 and laptop-sales-03"
+      "description": "Normal file sharing between workstation-055 and server-file-01"
     },
     "conn_05257": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-042 and server-web-02"
+      "description": "Normal file sharing between laptop-sales-03 and server-web-02"
     },
     "conn_05258": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between laptop-sales-03 and workstation-042"
+      "description": "Normal file sharing between workstation-055 and laptop-sales-03"
     },
     "conn_05259": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-web-02 and server-db-01"
+      "description": "Normal file sharing between laptop-sales-03 and server-web-02"
     },
     "conn_05260": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-db-01 and workstation-042"
+      "description": "Normal file sharing between laptop-sales-03 and workstation-042"
     },
     "conn_05261": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-078 and workstation-055"
+      "description": "Normal file sharing between laptop-sales-03 and workstation-042"
     },
     "conn_05262": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-055 and server-web-02"
+      "description": "Normal file sharing between workstation-078 and laptop-sales-03"
     },
     "conn_05263": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-web-02 and laptop-sales-03"
+      "description": "Normal file sharing between server-file-01 and server-db-01"
     },
     "conn_05264": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-042 and laptop-sales-03"
+      "description": "Normal file sharing between workstation-042 and workstation-078"
     },
     "conn_05265": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-db-01 and workstation-042"
+      "description": "Normal file sharing between server-web-02 and server-db-01"
     },
     "conn_05266": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-web-02 and server-db-01"
+      "description": "Normal file sharing between workstation-055 and workstation-078"
     },
     "conn_05267": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and workstation-055"
+      "description": "Normal file sharing between laptop-sales-03 and workstation-055"
     },
     "conn_05268": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-042 and server-web-02"
+      "description": "Normal file sharing between server-file-01 and server-db-01"
     },
     "conn_05269": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-web-02 and workstation-042"
+      "description": "Normal file sharing between workstation-078 and server-web-02"
     },
     "conn_05270": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-078 and workstation-055"
+      "description": "Normal file sharing between workstation-078 and server-file-01"
     },
     "conn_05271": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and laptop-sales-03"
+      "description": "Normal file sharing between workstation-078 and server-db-01"
     },
     "conn_05272": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-078 and workstation-042"
+      "description": "Normal file sharing between workstation-055 and server-web-02"
     },
     "conn_05273": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-078 and workstation-055"
+      "description": "Normal file sharing between server-web-02 and workstation-042"
     },
     "conn_05274": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and server-web-02"
+      "description": "Normal file sharing between workstation-055 and server-file-01"
     },
     "conn_05275": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-db-01 and workstation-055"
+      "description": "Normal file sharing between workstation-055 and server-db-01"
     },
     "conn_05276": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-db-01 and workstation-042"
+      "description": "Normal file sharing between server-db-01 and server-file-01"
     },
     "conn_05277": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and server-web-02"
+      "description": "Normal file sharing between workstation-042 and server-web-02"
     },
     "conn_05278": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-055 and laptop-sales-03"
+      "description": "Normal file sharing between server-web-02 and server-db-01"
     },
     "conn_05279": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between laptop-sales-03 and workstation-042"
+      "description": "Normal file sharing between server-db-01 and workstation-055"
     },
     "conn_05280": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-db-01 and laptop-sales-03"
+      "description": "Normal file sharing between workstation-055 and workstation-078"
     },
     "conn_05281": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-file-01 and workstation-042"
+      "description": "Normal file sharing between workstation-078 and laptop-sales-03"
     },
     "conn_05282": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-db-01 and server-web-02"
+      "description": "Normal file sharing between laptop-sales-03 and server-web-02"
     },
     "conn_05283": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-078 and laptop-sales-03"
+      "description": "Normal file sharing between workstation-055 and workstation-078"
     },
     "conn_05284": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-web-02 and laptop-sales-03"
+      "description": "Normal file sharing between server-file-01 and workstation-042"
     },
     "conn_05285": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-web-02 and workstation-055"
+      "description": "Normal file sharing between workstation-055 and server-web-02"
     },
     "conn_05286": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-055 and server-web-02"
+      "description": "Normal file sharing between server-db-01 and server-web-02"
     },
     "conn_05287": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-web-02 and laptop-sales-03"
+      "description": "Normal file sharing between server-file-01 and server-db-01"
     },
     "conn_05288": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-web-02 and workstation-042"
+      "description": "Normal file sharing between server-db-01 and laptop-sales-03"
     },
     "conn_05289": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-078 and server-db-01"
+      "description": "Normal file sharing between server-db-01 and workstation-042"
     },
     "conn_05290": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-db-01 and workstation-055"
+      "description": "Normal file sharing between server-web-02 and server-db-01"
     },
     "conn_05291": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-db-01 and server-web-02"
+      "description": "Normal file sharing between workstation-042 and laptop-sales-03"
     },
     "conn_05292": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-055 and server-file-01"
+      "description": "Normal file sharing between workstation-055 and laptop-sales-03"
     },
     "conn_05293": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-078 and server-web-02"
+      "description": "Normal file sharing between server-web-02 and laptop-sales-03"
     },
     "conn_05294": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between laptop-sales-03 and workstation-042"
+      "description": "Normal file sharing between server-file-01 and server-web-02"
     },
     "conn_05295": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-078 and laptop-sales-03"
+      "description": "Normal file sharing between laptop-sales-03 and server-db-01"
     },
     "conn_05296": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-db-01 and server-file-01"
+      "description": "Normal file sharing between server-web-02 and workstation-055"
     },
     "conn_05297": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-db-01 and workstation-055"
+      "description": "Normal file sharing between server-file-01 and laptop-sales-03"
     },
     "conn_05298": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-078 and workstation-042"
+      "description": "Normal file sharing between workstation-042 and server-db-01"
     },
     "conn_05299": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-055 and laptop-sales-03"
+      "description": "Normal file sharing between workstation-055 and server-web-02"
     },
     "conn_05300": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between workstation-078 and workstation-055"
+      "description": "Normal file sharing between server-db-01 and server-web-02"
     },
     "conn_05301": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-web-02 and workstation-042"
+      "description": "Normal file sharing between server-file-01 and workstation-078"
     },
     "conn_05302": {
       "label": "benign",
       "false_positive_type": "file_sharing",
-      "description": "Normal file sharing between server-db-01 and laptop-sales-03"
+      "description": "Normal file sharing between server-db-01 and workstation-055"
     },
     "conn_05303": {
       "label": "benign",
@@ -16777,7 +16777,7 @@
     "conn_05304": {
       "label": "benign",
       "false_positive_type": "large_upload",
-      "description": "Cloud backup or video upload from workstation-055"
+      "description": "Cloud backup or video upload from workstation-078"
     },
     "conn_05305": {
       "label": "benign",
@@ -16787,12 +16787,12 @@
     "conn_05306": {
       "label": "benign",
       "false_positive_type": "large_upload",
-      "description": "Cloud backup or video upload from workstation-078"
+      "description": "Cloud backup or video upload from workstation-042"
     },
     "conn_05307": {
       "label": "benign",
       "false_positive_type": "large_upload",
-      "description": "Cloud backup or video upload from workstation-055"
+      "description": "Cloud backup or video upload from workstation-078"
     },
     "conn_05308": {
       "label": "benign",
@@ -16802,27 +16802,27 @@
     "conn_05309": {
       "label": "benign",
       "false_positive_type": "large_upload",
-      "description": "Cloud backup or video upload from workstation-055"
+      "description": "Cloud backup or video upload from workstation-042"
     },
     "conn_05310": {
       "label": "benign",
       "false_positive_type": "large_upload",
-      "description": "Cloud backup or video upload from workstation-042"
+      "description": "Cloud backup or video upload from workstation-055"
     },
     "conn_05311": {
       "label": "benign",
       "false_positive_type": "large_upload",
-      "description": "Cloud backup or video upload from workstation-055"
+      "description": "Cloud backup or video upload from workstation-078"
     },
     "conn_05312": {
       "label": "benign",
       "false_positive_type": "large_upload",
-      "description": "Cloud backup or video upload from workstation-042"
+      "description": "Cloud backup or video upload from workstation-078"
     },
     "conn_05313": {
       "label": "benign",
       "false_positive_type": "large_upload",
-      "description": "Cloud backup or video upload from workstation-042"
+      "description": "Cloud backup or video upload from workstation-078"
     },
     "conn_05314": {
       "label": "benign",
@@ -16832,12 +16832,12 @@
     "conn_05315": {
       "label": "benign",
       "false_positive_type": "large_upload",
-      "description": "Cloud backup or video upload from workstation-042"
+      "description": "Cloud backup or video upload from workstation-078"
     },
     "conn_05316": {
       "label": "benign",
       "false_positive_type": "large_upload",
-      "description": "Cloud backup or video upload from workstation-055"
+      "description": "Cloud backup or video upload from workstation-078"
     },
     "conn_05317": {
       "label": "benign",
@@ -16847,12 +16847,12 @@
     "conn_05318": {
       "label": "benign",
       "false_positive_type": "large_upload",
-      "description": "Cloud backup or video upload from workstation-042"
+      "description": "Cloud backup or video upload from workstation-078"
     },
     "conn_05319": {
       "label": "benign",
       "false_positive_type": "large_upload",
-      "description": "Cloud backup or video upload from workstation-055"
+      "description": "Cloud backup or video upload from workstation-078"
     },
     "conn_05320": {
       "label": "benign",
@@ -16862,37 +16862,37 @@
     "conn_05321": {
       "label": "benign",
       "false_positive_type": "large_upload",
-      "description": "Cloud backup or video upload from workstation-078"
+      "description": "Cloud backup or video upload from workstation-042"
     },
     "conn_05322": {
       "label": "benign",
       "false_positive_type": "large_upload",
-      "description": "Cloud backup or video upload from workstation-042"
+      "description": "Cloud backup or video upload from workstation-055"
     },
     "conn_05323": {
       "label": "benign",
       "false_positive_type": "large_upload",
-      "description": "Cloud backup or video upload from workstation-042"
+      "description": "Cloud backup or video upload from workstation-078"
     },
     "conn_05324": {
       "label": "benign",
       "false_positive_type": "large_upload",
-      "description": "Cloud backup or video upload from workstation-078"
+      "description": "Cloud backup or video upload from workstation-042"
     },
     "conn_05325": {
       "label": "benign",
       "false_positive_type": "large_upload",
-      "description": "Cloud backup or video upload from workstation-055"
+      "description": "Cloud backup or video upload from workstation-078"
     },
     "conn_05326": {
       "label": "benign",
       "false_positive_type": "large_upload",
-      "description": "Cloud backup or video upload from workstation-042"
+      "description": "Cloud backup or video upload from workstation-055"
     },
     "conn_05327": {
       "label": "benign",
       "false_positive_type": "large_upload",
-      "description": "Cloud backup or video upload from workstation-042"
+      "description": "Cloud backup or video upload from workstation-055"
     },
     "conn_05328": {
       "label": "benign",
@@ -16902,7 +16902,7 @@
     "conn_05329": {
       "label": "benign",
       "false_positive_type": "large_upload",
-      "description": "Cloud backup or video upload from workstation-042"
+      "description": "Cloud backup or video upload from workstation-055"
     },
     "conn_05330": {
       "label": "benign",
@@ -16912,7 +16912,7 @@
     "conn_05331": {
       "label": "benign",
       "false_positive_type": "large_upload",
-      "description": "Cloud backup or video upload from workstation-055"
+      "description": "Cloud backup or video upload from workstation-078"
     },
     "conn_05332": {
       "label": "benign",
@@ -16922,62 +16922,62 @@
     "conn_05333": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from laptop-sales-03"
+      "description": "API health check or telemetry from server-file-01"
     },
     "conn_05334": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from laptop-sales-03"
+      "description": "API health check or telemetry from workstation-042"
     },
     "conn_05335": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-db-01"
+      "description": "API health check or telemetry from server-file-01"
     },
     "conn_05336": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-db-01"
+      "description": "API health check or telemetry from workstation-055"
     },
     "conn_05337": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-file-01"
+      "description": "API health check or telemetry from workstation-055"
     },
     "conn_05338": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from workstation-042"
+      "description": "API health check or telemetry from server-db-01"
     },
     "conn_05339": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from workstation-055"
+      "description": "API health check or telemetry from server-web-02"
     },
     "conn_05340": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-db-01"
+      "description": "API health check or telemetry from server-file-01"
     },
     "conn_05341": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from workstation-055"
+      "description": "API health check or telemetry from server-web-02"
     },
     "conn_05342": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from laptop-sales-03"
+      "description": "API health check or telemetry from server-web-02"
     },
     "conn_05343": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from laptop-sales-03"
+      "description": "API health check or telemetry from server-db-01"
     },
     "conn_05344": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from laptop-sales-03"
+      "description": "API health check or telemetry from workstation-078"
     },
     "conn_05345": {
       "label": "benign",
@@ -16987,52 +16987,52 @@
     "conn_05346": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-db-01"
+      "description": "API health check or telemetry from workstation-055"
     },
     "conn_05347": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-web-02"
+      "description": "API health check or telemetry from laptop-sales-03"
     },
     "conn_05348": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-web-02"
+      "description": "API health check or telemetry from workstation-042"
     },
     "conn_05349": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from workstation-042"
+      "description": "API health check or telemetry from laptop-sales-03"
     },
     "conn_05350": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-db-01"
+      "description": "API health check or telemetry from workstation-042"
     },
     "conn_05351": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from workstation-055"
+      "description": "API health check or telemetry from workstation-078"
     },
     "conn_05352": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-web-02"
+      "description": "API health check or telemetry from server-db-01"
     },
     "conn_05353": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-db-01"
+      "description": "API health check or telemetry from workstation-055"
     },
     "conn_05354": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from workstation-055"
+      "description": "API health check or telemetry from workstation-078"
     },
     "conn_05355": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-db-01"
+      "description": "API health check or telemetry from server-web-02"
     },
     "conn_05356": {
       "label": "benign",
@@ -17042,57 +17042,57 @@
     "conn_05357": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from workstation-078"
+      "description": "API health check or telemetry from server-file-01"
     },
     "conn_05358": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-web-02"
+      "description": "API health check or telemetry from server-file-01"
     },
     "conn_05359": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-web-02"
+      "description": "API health check or telemetry from server-db-01"
     },
     "conn_05360": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from laptop-sales-03"
+      "description": "API health check or telemetry from server-file-01"
     },
     "conn_05361": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from workstation-055"
+      "description": "API health check or telemetry from workstation-042"
     },
     "conn_05362": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from laptop-sales-03"
+      "description": "API health check or telemetry from workstation-055"
     },
     "conn_05363": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from workstation-078"
+      "description": "API health check or telemetry from server-web-02"
     },
     "conn_05364": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from laptop-sales-03"
+      "description": "API health check or telemetry from workstation-055"
     },
     "conn_05365": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-web-02"
+      "description": "API health check or telemetry from laptop-sales-03"
     },
     "conn_05366": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from workstation-078"
+      "description": "API health check or telemetry from server-file-01"
     },
     "conn_05367": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from workstation-055"
+      "description": "API health check or telemetry from workstation-042"
     },
     "conn_05368": {
       "label": "benign",
@@ -17102,7 +17102,7 @@
     "conn_05369": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-web-02"
+      "description": "API health check or telemetry from server-file-01"
     },
     "conn_05370": {
       "label": "benign",
@@ -17112,57 +17112,57 @@
     "conn_05371": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-web-02"
+      "description": "API health check or telemetry from server-file-01"
     },
     "conn_05372": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from workstation-042"
+      "description": "API health check or telemetry from server-db-01"
     },
     "conn_05373": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from laptop-sales-03"
+      "description": "API health check or telemetry from server-file-01"
     },
     "conn_05374": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-db-01"
+      "description": "API health check or telemetry from workstation-042"
     },
     "conn_05375": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-web-02"
+      "description": "API health check or telemetry from laptop-sales-03"
     },
     "conn_05376": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from workstation-078"
+      "description": "API health check or telemetry from laptop-sales-03"
     },
     "conn_05377": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from workstation-078"
+      "description": "API health check or telemetry from laptop-sales-03"
     },
     "conn_05378": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-web-02"
+      "description": "API health check or telemetry from workstation-078"
     },
     "conn_05379": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from laptop-sales-03"
+      "description": "API health check or telemetry from server-file-01"
     },
     "conn_05380": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from laptop-sales-03"
+      "description": "API health check or telemetry from server-web-02"
     },
     "conn_05381": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from workstation-055"
+      "description": "API health check or telemetry from workstation-078"
     },
     "conn_05382": {
       "label": "benign",
@@ -17172,47 +17172,47 @@
     "conn_05383": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from laptop-sales-03"
+      "description": "API health check or telemetry from workstation-055"
     },
     "conn_05384": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-file-01"
+      "description": "API health check or telemetry from server-web-02"
     },
     "conn_05385": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-web-02"
+      "description": "API health check or telemetry from workstation-055"
     },
     "conn_05386": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-file-01"
+      "description": "API health check or telemetry from workstation-078"
     },
     "conn_05387": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from workstation-042"
+      "description": "API health check or telemetry from server-web-02"
     },
     "conn_05388": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-web-02"
+      "description": "API health check or telemetry from workstation-078"
     },
     "conn_05389": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from laptop-sales-03"
+      "description": "API health check or telemetry from server-web-02"
     },
     "conn_05390": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from workstation-055"
+      "description": "API health check or telemetry from laptop-sales-03"
     },
     "conn_05391": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from workstation-055"
+      "description": "API health check or telemetry from server-file-01"
     },
     "conn_05392": {
       "label": "benign",
@@ -17222,12 +17222,12 @@
     "conn_05393": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-web-02"
+      "description": "API health check or telemetry from server-db-01"
     },
     "conn_05394": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from workstation-042"
+      "description": "API health check or telemetry from workstation-078"
     },
     "conn_05395": {
       "label": "benign",
@@ -17237,12 +17237,12 @@
     "conn_05396": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-web-02"
+      "description": "API health check or telemetry from server-db-01"
     },
     "conn_05397": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from laptop-sales-03"
+      "description": "API health check or telemetry from server-db-01"
     },
     "conn_05398": {
       "label": "benign",
@@ -17252,37 +17252,37 @@
     "conn_05399": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-web-02"
+      "description": "API health check or telemetry from server-file-01"
     },
     "conn_05400": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from workstation-055"
+      "description": "API health check or telemetry from server-web-02"
     },
     "conn_05401": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-db-01"
+      "description": "API health check or telemetry from laptop-sales-03"
     },
     "conn_05402": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-file-01"
+      "description": "API health check or telemetry from laptop-sales-03"
     },
     "conn_05403": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from laptop-sales-03"
+      "description": "API health check or telemetry from workstation-042"
     },
     "conn_05404": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from workstation-042"
+      "description": "API health check or telemetry from server-file-01"
     },
     "conn_05405": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from workstation-078"
+      "description": "API health check or telemetry from laptop-sales-03"
     },
     "conn_05406": {
       "label": "benign",
@@ -17292,32 +17292,32 @@
     "conn_05407": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-web-02"
+      "description": "API health check or telemetry from workstation-078"
     },
     "conn_05408": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-web-02"
+      "description": "API health check or telemetry from server-db-01"
     },
     "conn_05409": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from workstation-055"
+      "description": "API health check or telemetry from workstation-078"
     },
     "conn_05410": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-file-01"
+      "description": "API health check or telemetry from workstation-078"
     },
     "conn_05411": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-db-01"
+      "description": "API health check or telemetry from workstation-055"
     },
     "conn_05412": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from workstation-042"
+      "description": "API health check or telemetry from workstation-055"
     },
     "conn_05413": {
       "label": "benign",
@@ -17327,37 +17327,37 @@
     "conn_05414": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from workstation-042"
+      "description": "API health check or telemetry from workstation-078"
     },
     "conn_05415": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from workstation-078"
+      "description": "API health check or telemetry from server-file-01"
     },
     "conn_05416": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-web-02"
+      "description": "API health check or telemetry from server-file-01"
     },
     "conn_05417": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-file-01"
+      "description": "API health check or telemetry from workstation-042"
     },
     "conn_05418": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-web-02"
+      "description": "API health check or telemetry from workstation-042"
     },
     "conn_05419": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-db-01"
+      "description": "API health check or telemetry from workstation-055"
     },
     "conn_05420": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-web-02"
+      "description": "API health check or telemetry from server-file-01"
     },
     "conn_05421": {
       "label": "benign",
@@ -17367,12 +17367,12 @@
     "conn_05422": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-web-02"
+      "description": "API health check or telemetry from server-file-01"
     },
     "conn_05423": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-web-02"
+      "description": "API health check or telemetry from workstation-078"
     },
     "conn_05424": {
       "label": "benign",
@@ -17382,307 +17382,307 @@
     "conn_05425": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from workstation-055"
+      "description": "API health check or telemetry from server-db-01"
     },
     "conn_05426": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from laptop-sales-03"
+      "description": "API health check or telemetry from workstation-055"
     },
     "conn_05427": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from laptop-sales-03"
+      "description": "API health check or telemetry from workstation-055"
     },
     "conn_05428": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from laptop-sales-03"
+      "description": "API health check or telemetry from workstation-042"
     },
     "conn_05429": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-file-01"
+      "description": "API health check or telemetry from laptop-sales-03"
     },
     "conn_05430": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-db-01"
+      "description": "API health check or telemetry from workstation-042"
     },
     "conn_05431": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from workstation-078"
+      "description": "API health check or telemetry from workstation-042"
     },
     "conn_05432": {
       "label": "benign",
       "false_positive_type": "api_call",
-      "description": "API health check or telemetry from server-file-01"
+      "description": "API health check or telemetry from server-web-02"
     },
     "conn_05433": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 190.232.218.196"
+      "description": "Legitimate web traffic from 63.21.195.61"
     },
     "conn_05434": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 190.2.149.164"
+      "description": "Legitimate web traffic from 51.161.214.98"
     },
     "conn_05435": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 60.171.212.131"
+      "description": "Legitimate web traffic from 95.77.62.27"
     },
     "conn_05436": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 56.205.83.162"
+      "description": "Legitimate web traffic from 81.51.0.170"
     },
     "conn_05437": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 196.1.111.170"
+      "description": "Legitimate web traffic from 103.144.103.78"
     },
     "conn_05438": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 56.132.19.237"
+      "description": "Legitimate web traffic from 118.135.92.67"
     },
     "conn_05439": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 113.253.60.150"
+      "description": "Legitimate web traffic from 163.118.133.147"
     },
     "conn_05440": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 135.199.24.123"
+      "description": "Legitimate web traffic from 64.248.211.114"
     },
     "conn_05441": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 156.235.129.50"
+      "description": "Legitimate web traffic from 171.31.191.250"
     },
     "conn_05442": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 50.25.75.128"
+      "description": "Legitimate web traffic from 134.243.195.237"
     },
     "conn_05443": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 194.84.242.13"
+      "description": "Legitimate web traffic from 172.229.32.217"
     },
     "conn_05444": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 189.171.61.232"
+      "description": "Legitimate web traffic from 159.194.160.104"
     },
     "conn_05445": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 106.162.19.224"
+      "description": "Legitimate web traffic from 81.194.202.240"
     },
     "conn_05446": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 111.139.65.25"
+      "description": "Legitimate web traffic from 102.29.238.2"
     },
     "conn_05447": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 55.28.227.237"
+      "description": "Legitimate web traffic from 173.83.111.74"
     },
     "conn_05448": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 190.78.53.88"
+      "description": "Legitimate web traffic from 78.55.127.33"
     },
     "conn_05449": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 178.166.169.55"
+      "description": "Legitimate web traffic from 142.113.218.168"
     },
     "conn_05450": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 138.65.237.215"
+      "description": "Legitimate web traffic from 140.5.239.84"
     },
     "conn_05451": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 143.60.23.129"
+      "description": "Legitimate web traffic from 125.4.154.209"
     },
     "conn_05452": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 115.19.37.123"
+      "description": "Legitimate web traffic from 165.203.127.195"
     },
     "conn_05453": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 85.236.102.133"
+      "description": "Legitimate web traffic from 160.205.226.109"
     },
     "conn_05454": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 198.84.110.148"
+      "description": "Legitimate web traffic from 51.169.24.100"
     },
     "conn_05455": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 121.119.59.72"
+      "description": "Legitimate web traffic from 149.161.244.217"
     },
     "conn_05456": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 92.43.251.29"
+      "description": "Legitimate web traffic from 88.144.6.53"
     },
     "conn_05457": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 120.149.251.122"
+      "description": "Legitimate web traffic from 89.140.219.73"
     },
     "conn_05458": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 140.165.91.203"
+      "description": "Legitimate web traffic from 193.247.250.59"
     },
     "conn_05459": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 169.12.12.186"
+      "description": "Legitimate web traffic from 65.1.38.9"
     },
     "conn_05460": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 134.56.36.119"
+      "description": "Legitimate web traffic from 174.38.208.236"
     },
     "conn_05461": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 160.177.121.154"
+      "description": "Legitimate web traffic from 55.100.165.33"
     },
     "conn_05462": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 157.57.244.187"
+      "description": "Legitimate web traffic from 141.131.18.57"
     },
     "conn_05463": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 80.220.140.27"
+      "description": "Legitimate web traffic from 151.116.142.125"
     },
     "conn_05464": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 126.155.39.127"
+      "description": "Legitimate web traffic from 154.15.188.2"
     },
     "conn_05465": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 159.229.113.61"
+      "description": "Legitimate web traffic from 166.231.181.90"
     },
     "conn_05466": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 141.195.132.114"
+      "description": "Legitimate web traffic from 193.185.59.57"
     },
     "conn_05467": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 170.177.93.156"
+      "description": "Legitimate web traffic from 154.100.173.121"
     },
     "conn_05468": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 92.164.15.143"
+      "description": "Legitimate web traffic from 138.226.25.228"
     },
     "conn_05469": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 184.180.60.79"
+      "description": "Legitimate web traffic from 59.98.71.66"
     },
     "conn_05470": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 94.225.157.191"
+      "description": "Legitimate web traffic from 97.148.175.50"
     },
     "conn_05471": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 114.31.42.162"
+      "description": "Legitimate web traffic from 60.93.233.122"
     },
     "conn_05472": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 80.14.161.59"
+      "description": "Legitimate web traffic from 59.170.234.35"
     },
     "conn_05473": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 164.201.204.254"
+      "description": "Legitimate web traffic from 156.30.129.15"
     },
     "conn_05474": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 96.154.132.53"
+      "description": "Legitimate web traffic from 129.18.140.44"
     },
     "conn_05475": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 164.248.74.99"
+      "description": "Legitimate web traffic from 102.99.237.250"
     },
     "conn_05476": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 164.174.224.145"
+      "description": "Legitimate web traffic from 66.206.51.252"
     },
     "conn_05477": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 67.194.229.199"
+      "description": "Legitimate web traffic from 166.112.54.142"
     },
     "conn_05478": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 147.165.200.30"
+      "description": "Legitimate web traffic from 184.253.85.132"
     },
     "conn_05479": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 59.128.2.234"
+      "description": "Legitimate web traffic from 81.245.25.3"
     },
     "conn_05480": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 55.22.152.25"
+      "description": "Legitimate web traffic from 190.99.37.24"
     },
     "conn_05481": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 185.69.153.85"
+      "description": "Legitimate web traffic from 87.38.207.38"
     },
     "conn_05482": {
       "label": "benign",
       "false_positive_type": "web_traffic",
-      "description": "Legitimate web traffic from 77.59.239.60"
+      "description": "Legitimate web traffic from 60.58.41.219"
     },
     "dns_05483": {
       "label": "benign",
       "false_positive_type": "long_subdomain",
-      "description": "Legitimate CDN/SaaS query: telemetry-collector-v3-prod.datadog.com"
+      "description": "Legitimate CDN/SaaS query: api-v2-production-cluster.salesforce.com"
     },
     "dns_05484": {
       "label": "benign",
       "false_positive_type": "long_subdomain",
-      "description": "Legitimate CDN/SaaS query: login-us-west-2-prod.microsoftonline.com"
+      "description": "Legitimate CDN/SaaS query: cdn-static-assets-prod-us.cloudflare.com"
     },
     "dns_05485": {
       "label": "benign",
       "false_positive_type": "long_subdomain",
-      "description": "Legitimate CDN/SaaS query: us-east-1-prod-api-gateway.amazonaws.com"
+      "description": "Legitimate CDN/SaaS query: telemetry-collector-v3-prod.datadog.com"
     },
     "dns_05486": {
       "label": "benign",
@@ -17692,37 +17692,37 @@
     "dns_05487": {
       "label": "benign",
       "false_positive_type": "long_subdomain",
-      "description": "Legitimate CDN/SaaS query: telemetry-collector-v3-prod.datadog.com"
+      "description": "Legitimate CDN/SaaS query: login-us-west-2-prod.microsoftonline.com"
     },
     "dns_05488": {
       "label": "benign",
       "false_positive_type": "long_subdomain",
-      "description": "Legitimate CDN/SaaS query: us-east-1-prod-api-gateway.amazonaws.com"
+      "description": "Legitimate CDN/SaaS query: api-v2-production-cluster.salesforce.com"
     },
     "dns_05489": {
       "label": "benign",
       "false_positive_type": "long_subdomain",
-      "description": "Legitimate CDN/SaaS query: api-v2-production-cluster.salesforce.com"
+      "description": "Legitimate CDN/SaaS query: us-east-1-prod-api-gateway.amazonaws.com"
     },
     "dns_05490": {
       "label": "benign",
       "false_positive_type": "long_subdomain",
-      "description": "Legitimate CDN/SaaS query: api-v2-production-cluster.salesforce.com"
+      "description": "Legitimate CDN/SaaS query: login-us-west-2-prod.microsoftonline.com"
     },
     "dns_05491": {
       "label": "benign",
       "false_positive_type": "long_subdomain",
-      "description": "Legitimate CDN/SaaS query: auth-service-production-v2.okta.com"
+      "description": "Legitimate CDN/SaaS query: api-v2-production-cluster.salesforce.com"
     },
     "dns_05492": {
       "label": "benign",
       "false_positive_type": "long_subdomain",
-      "description": "Legitimate CDN/SaaS query: cdn-static-assets-prod-us.cloudflare.com"
+      "description": "Legitimate CDN/SaaS query: telemetry-collector-v3-prod.datadog.com"
     },
     "dns_05493": {
       "label": "benign",
       "false_positive_type": "long_subdomain",
-      "description": "Legitimate CDN/SaaS query: login-us-west-2-prod.microsoftonline.com"
+      "description": "Legitimate CDN/SaaS query: telemetry-collector-v3-prod.datadog.com"
     },
     "dns_05494": {
       "label": "benign",
@@ -17732,12 +17732,12 @@
     "dns_05495": {
       "label": "benign",
       "false_positive_type": "long_subdomain",
-      "description": "Legitimate CDN/SaaS query: us-east-1-prod-api-gateway.amazonaws.com"
+      "description": "Legitimate CDN/SaaS query: cdn-static-assets-prod-us.cloudflare.com"
     },
     "dns_05496": {
       "label": "benign",
       "false_positive_type": "long_subdomain",
-      "description": "Legitimate CDN/SaaS query: api-v2-production-cluster.salesforce.com"
+      "description": "Legitimate CDN/SaaS query: auth-service-production-v2.okta.com"
     },
     "dns_05497": {
       "label": "benign",
@@ -17747,32 +17747,32 @@
     "dns_05498": {
       "label": "benign",
       "false_positive_type": "long_subdomain",
-      "description": "Legitimate CDN/SaaS query: telemetry-collector-v3-prod.datadog.com"
+      "description": "Legitimate CDN/SaaS query: api-v2-production-cluster.salesforce.com"
     },
     "dns_05499": {
       "label": "benign",
       "false_positive_type": "long_subdomain",
-      "description": "Legitimate CDN/SaaS query: cdn-static-assets-prod-us.cloudflare.com"
+      "description": "Legitimate CDN/SaaS query: telemetry-collector-v3-prod.datadog.com"
     },
     "dns_05500": {
       "label": "benign",
       "false_positive_type": "long_subdomain",
-      "description": "Legitimate CDN/SaaS query: auth-service-production-v2.okta.com"
+      "description": "Legitimate CDN/SaaS query: telemetry-collector-v3-prod.datadog.com"
     },
     "dns_05501": {
       "label": "benign",
       "false_positive_type": "long_subdomain",
-      "description": "Legitimate CDN/SaaS query: login-us-west-2-prod.microsoftonline.com"
+      "description": "Legitimate CDN/SaaS query: api-v2-production-cluster.salesforce.com"
     },
     "dns_05502": {
       "label": "benign",
       "false_positive_type": "long_subdomain",
-      "description": "Legitimate CDN/SaaS query: us-east-1-prod-api-gateway.amazonaws.com"
+      "description": "Legitimate CDN/SaaS query: auth-service-production-v2.okta.com"
     },
     "dns_05503": {
       "label": "benign",
       "false_positive_type": "long_subdomain",
-      "description": "Legitimate CDN/SaaS query: auth-service-production-v2.okta.com"
+      "description": "Legitimate CDN/SaaS query: api-v2-production-cluster.salesforce.com"
     },
     "dns_05504": {
       "label": "benign",
@@ -17782,12 +17782,12 @@
     "dns_05505": {
       "label": "benign",
       "false_positive_type": "long_subdomain",
-      "description": "Legitimate CDN/SaaS query: login-us-west-2-prod.microsoftonline.com"
+      "description": "Legitimate CDN/SaaS query: cdn-static-assets-prod-us.cloudflare.com"
     },
     "dns_05506": {
       "label": "benign",
       "false_positive_type": "long_subdomain",
-      "description": "Legitimate CDN/SaaS query: auth-service-production-v2.okta.com"
+      "description": "Legitimate CDN/SaaS query: api-v2-production-cluster.salesforce.com"
     },
     "dns_05507": {
       "label": "benign",
@@ -17802,12 +17802,12 @@
     "dns_05509": {
       "label": "benign",
       "false_positive_type": "txt_query",
-      "description": "Email verification TXT query for _spf.google.com"
+      "description": "Email verification TXT query for salesforce.com"
     },
     "dns_05510": {
       "label": "benign",
       "false_positive_type": "txt_query",
-      "description": "Email verification TXT query for _dmarc.company.com"
+      "description": "Email verification TXT query for _spf.google.com"
     },
     "dns_05511": {
       "label": "benign",
@@ -17817,7 +17817,7 @@
     "dns_05512": {
       "label": "benign",
       "false_positive_type": "txt_query",
-      "description": "Email verification TXT query for salesforce.com"
+      "description": "Email verification TXT query for google.com"
     },
     "dns_05513": {
       "label": "benign",
@@ -17827,7 +17827,7 @@
     "dns_05514": {
       "label": "benign",
       "false_positive_type": "txt_query",
-      "description": "Email verification TXT query for microsoft.com"
+      "description": "Email verification TXT query for _spf.google.com"
     },
     "dns_05515": {
       "label": "benign",
@@ -17837,7 +17837,7 @@
     "dns_05516": {
       "label": "benign",
       "false_positive_type": "txt_query",
-      "description": "Email verification TXT query for _spf.google.com"
+      "description": "Email verification TXT query for google.com"
     },
     "dns_05517": {
       "label": "benign",
@@ -17847,12 +17847,12 @@
     "dns_05518": {
       "label": "benign",
       "false_positive_type": "txt_query",
-      "description": "Email verification TXT query for _dmarc.company.com"
+      "description": "Email verification TXT query for microsoft.com"
     },
     "dns_05519": {
       "label": "benign",
       "false_positive_type": "txt_query",
-      "description": "Email verification TXT query for salesforce.com"
+      "description": "Email verification TXT query for google.com"
     },
     "dns_05520": {
       "label": "benign",
@@ -17862,12 +17862,12 @@
     "dns_05521": {
       "label": "benign",
       "false_positive_type": "txt_query",
-      "description": "Email verification TXT query for salesforce.com"
+      "description": "Email verification TXT query for _dmarc.company.com"
     },
     "dns_05522": {
       "label": "benign",
       "false_positive_type": "txt_query",
-      "description": "Email verification TXT query for google.com"
+      "description": "Email verification TXT query for salesforce.com"
     },
     "conn_05523": {
       "label": "benign",
@@ -18631,7 +18631,7 @@
       "label": "malicious",
       "attack_phase": 6,
       "technique": "T1071.001",
-      "description": "C2 via legitimate CDN (52.84.150.23)",
+      "description": "C2 via legitimate CDN (104.18.32.68)",
       "evasive": true,
       "evasion_technique": "Legitimate CDN IP + varied timing + long duration"
     },
@@ -18639,7 +18639,7 @@
       "label": "malicious",
       "attack_phase": 6,
       "technique": "T1071.001",
-      "description": "C2 via legitimate CDN (172.67.182.31)",
+      "description": "C2 via legitimate CDN (52.84.150.23)",
       "evasive": true,
       "evasion_technique": "Legitimate CDN IP + varied timing + long duration"
     },
@@ -18647,7 +18647,7 @@
       "label": "malicious",
       "attack_phase": 6,
       "technique": "T1071.001",
-      "description": "C2 via legitimate CDN (52.84.150.23)",
+      "description": "C2 via legitimate CDN (172.67.182.31)",
       "evasive": true,
       "evasion_technique": "Legitimate CDN IP + varied timing + long duration"
     },
@@ -18655,7 +18655,7 @@
       "label": "malicious",
       "attack_phase": 6,
       "technique": "T1071.001",
-      "description": "C2 via legitimate CDN (151.101.1.140)",
+      "description": "C2 via legitimate CDN (52.84.150.23)",
       "evasive": true,
       "evasion_technique": "Legitimate CDN IP + varied timing + long duration"
     },
@@ -18663,7 +18663,7 @@
       "label": "malicious",
       "attack_phase": 6,
       "technique": "T1071.001",
-      "description": "C2 via legitimate CDN (13.225.78.45)",
+      "description": "C2 via legitimate CDN (104.18.32.68)",
       "evasive": true,
       "evasion_technique": "Legitimate CDN IP + varied timing + long duration"
     },
@@ -18671,7 +18671,7 @@
       "label": "malicious",
       "attack_phase": 6,
       "technique": "T1071.001",
-      "description": "C2 via legitimate CDN (104.18.32.68)",
+      "description": "C2 via legitimate CDN (13.225.78.45)",
       "evasive": true,
       "evasion_technique": "Legitimate CDN IP + varied timing + long duration"
     },
@@ -18687,7 +18687,7 @@
       "label": "malicious",
       "attack_phase": 6,
       "technique": "T1071.001",
-      "description": "C2 via legitimate CDN (104.18.32.68)",
+      "description": "C2 via legitimate CDN (13.225.78.45)",
       "evasive": true,
       "evasion_technique": "Legitimate CDN IP + varied timing + long duration"
     },
@@ -18695,7 +18695,7 @@
       "label": "malicious",
       "attack_phase": 6,
       "technique": "T1071.001",
-      "description": "C2 via legitimate CDN (151.101.1.140)",
+      "description": "C2 via legitimate CDN (13.225.78.45)",
       "evasive": true,
       "evasion_technique": "Legitimate CDN IP + varied timing + long duration"
     },
@@ -18711,7 +18711,7 @@
       "label": "malicious",
       "attack_phase": 6,
       "technique": "T1071.001",
-      "description": "C2 via legitimate CDN (151.101.1.140)",
+      "description": "C2 via legitimate CDN (104.18.32.68)",
       "evasive": true,
       "evasion_technique": "Legitimate CDN IP + varied timing + long duration"
     },
@@ -18719,7 +18719,7 @@
       "label": "malicious",
       "attack_phase": 6,
       "technique": "T1071.001",
-      "description": "C2 via legitimate CDN (13.225.78.45)",
+      "description": "C2 via legitimate CDN (151.101.1.140)",
       "evasive": true,
       "evasion_technique": "Legitimate CDN IP + varied timing + long duration"
     },
@@ -18727,7 +18727,7 @@
       "label": "malicious",
       "attack_phase": 6,
       "technique": "T1071.001",
-      "description": "C2 via legitimate CDN (151.101.1.140)",
+      "description": "C2 via legitimate CDN (172.67.182.31)",
       "evasive": true,
       "evasion_technique": "Legitimate CDN IP + varied timing + long duration"
     },
@@ -18735,7 +18735,7 @@
       "label": "malicious",
       "attack_phase": 6,
       "technique": "T1071.001",
-      "description": "C2 via legitimate CDN (172.67.182.31)",
+      "description": "C2 via legitimate CDN (104.18.32.68)",
       "evasive": true,
       "evasion_technique": "Legitimate CDN IP + varied timing + long duration"
     },
@@ -18743,7 +18743,7 @@
       "label": "malicious",
       "attack_phase": 6,
       "technique": "T1071.001",
-      "description": "C2 via legitimate CDN (52.84.150.23)",
+      "description": "C2 via legitimate CDN (151.101.1.140)",
       "evasive": true,
       "evasion_technique": "Legitimate CDN IP + varied timing + long duration"
     },
@@ -18751,7 +18751,7 @@
       "label": "malicious",
       "attack_phase": 6,
       "technique": "T1071.001",
-      "description": "C2 via legitimate CDN (13.225.78.45)",
+      "description": "C2 via legitimate CDN (151.101.1.140)",
       "evasive": true,
       "evasion_technique": "Legitimate CDN IP + varied timing + long duration"
     },
@@ -18759,7 +18759,7 @@
       "label": "malicious",
       "attack_phase": 6,
       "technique": "T1071.001",
-      "description": "C2 via legitimate CDN (13.225.78.45)",
+      "description": "C2 via legitimate CDN (151.101.1.140)",
       "evasive": true,
       "evasion_technique": "Legitimate CDN IP + varied timing + long duration"
     },
@@ -18783,7 +18783,7 @@
       "label": "malicious",
       "attack_phase": 6,
       "technique": "T1071.001",
-      "description": "C2 via legitimate CDN (151.101.1.140)",
+      "description": "C2 via legitimate CDN (13.225.78.45)",
       "evasive": true,
       "evasion_technique": "Legitimate CDN IP + varied timing + long duration"
     },
@@ -18791,7 +18791,7 @@
       "label": "malicious",
       "attack_phase": 6,
       "technique": "T1071.001",
-      "description": "C2 via legitimate CDN (52.84.150.23)",
+      "description": "C2 via legitimate CDN (151.101.1.140)",
       "evasive": true,
       "evasion_technique": "Legitimate CDN IP + varied timing + long duration"
     },
@@ -18799,7 +18799,7 @@
       "label": "malicious",
       "attack_phase": 6,
       "technique": "T1071.001",
-      "description": "C2 via legitimate CDN (104.18.32.68)",
+      "description": "C2 via legitimate CDN (172.67.182.31)",
       "evasive": true,
       "evasion_technique": "Legitimate CDN IP + varied timing + long duration"
     },
@@ -18807,7 +18807,7 @@
       "label": "malicious",
       "attack_phase": 6,
       "technique": "T1071.001",
-      "description": "C2 via legitimate CDN (104.18.32.68)",
+      "description": "C2 via legitimate CDN (13.225.78.45)",
       "evasive": true,
       "evasion_technique": "Legitimate CDN IP + varied timing + long duration"
     },
@@ -18815,7 +18815,7 @@
       "label": "malicious",
       "attack_phase": 6,
       "technique": "T1071.001",
-      "description": "C2 via legitimate CDN (13.225.78.45)",
+      "description": "C2 via legitimate CDN (172.67.182.31)",
       "evasive": true,
       "evasion_technique": "Legitimate CDN IP + varied timing + long duration"
     },
@@ -18831,7 +18831,7 @@
       "label": "malicious",
       "attack_phase": 6,
       "technique": "T1071.001",
-      "description": "C2 via legitimate CDN (52.84.150.23)",
+      "description": "C2 via legitimate CDN (172.67.182.31)",
       "evasive": true,
       "evasion_technique": "Legitimate CDN IP + varied timing + long duration"
     },
@@ -18839,7 +18839,7 @@
       "label": "malicious",
       "attack_phase": 6,
       "technique": "T1071.001",
-      "description": "C2 via legitimate CDN (104.18.32.68)",
+      "description": "C2 via legitimate CDN (172.67.182.31)",
       "evasive": true,
       "evasion_technique": "Legitimate CDN IP + varied timing + long duration"
     },
@@ -18847,7 +18847,7 @@
       "label": "malicious",
       "attack_phase": 6,
       "technique": "T1071.001",
-      "description": "C2 via legitimate CDN (151.101.1.140)",
+      "description": "C2 via legitimate CDN (52.84.150.23)",
       "evasive": true,
       "evasion_technique": "Legitimate CDN IP + varied timing + long duration"
     },
@@ -18855,7 +18855,7 @@
       "label": "malicious",
       "attack_phase": 6,
       "technique": "T1071.001",
-      "description": "C2 via legitimate CDN (104.18.32.68)",
+      "description": "C2 via legitimate CDN (151.101.1.140)",
       "evasive": true,
       "evasion_technique": "Legitimate CDN IP + varied timing + long duration"
     },
@@ -18863,7 +18863,7 @@
       "label": "malicious",
       "attack_phase": 6,
       "technique": "T1071.001",
-      "description": "C2 via legitimate CDN (52.84.150.23)",
+      "description": "C2 via legitimate CDN (172.67.182.31)",
       "evasive": true,
       "evasion_technique": "Legitimate CDN IP + varied timing + long duration"
     },
@@ -18871,7 +18871,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (141KB chunk)",
+      "description": "Staged exfiltration (191KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -18879,7 +18879,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (176KB chunk)",
+      "description": "Staged exfiltration (137KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -18887,7 +18887,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (187KB chunk)",
+      "description": "Staged exfiltration (80KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -18895,7 +18895,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (85KB chunk)",
+      "description": "Staged exfiltration (178KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -18903,7 +18903,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (77KB chunk)",
+      "description": "Staged exfiltration (166KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -18911,7 +18911,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (102KB chunk)",
+      "description": "Staged exfiltration (134KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -18919,7 +18919,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (137KB chunk)",
+      "description": "Staged exfiltration (189KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -18927,7 +18927,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (126KB chunk)",
+      "description": "Staged exfiltration (95KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -18935,7 +18935,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (62KB chunk)",
+      "description": "Staged exfiltration (56KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -18943,7 +18943,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (82KB chunk)",
+      "description": "Staged exfiltration (158KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -18951,7 +18951,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (174KB chunk)",
+      "description": "Staged exfiltration (108KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -18959,7 +18959,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (152KB chunk)",
+      "description": "Staged exfiltration (83KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -18967,7 +18967,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (110KB chunk)",
+      "description": "Staged exfiltration (61KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -18975,7 +18975,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (103KB chunk)",
+      "description": "Staged exfiltration (200KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -18983,7 +18983,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (166KB chunk)",
+      "description": "Staged exfiltration (108KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -18991,7 +18991,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (123KB chunk)",
+      "description": "Staged exfiltration (118KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -18999,7 +18999,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (51KB chunk)",
+      "description": "Staged exfiltration (145KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19007,7 +19007,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (113KB chunk)",
+      "description": "Staged exfiltration (118KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19015,7 +19015,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (113KB chunk)",
+      "description": "Staged exfiltration (57KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19023,7 +19023,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (155KB chunk)",
+      "description": "Staged exfiltration (171KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19031,7 +19031,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (58KB chunk)",
+      "description": "Staged exfiltration (124KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19039,7 +19039,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (146KB chunk)",
+      "description": "Staged exfiltration (140KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19047,7 +19047,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (97KB chunk)",
+      "description": "Staged exfiltration (70KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19055,7 +19055,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (163KB chunk)",
+      "description": "Staged exfiltration (181KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19063,7 +19063,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (105KB chunk)",
+      "description": "Staged exfiltration (192KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19071,7 +19071,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (148KB chunk)",
+      "description": "Staged exfiltration (60KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19079,7 +19079,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (65KB chunk)",
+      "description": "Staged exfiltration (103KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19087,7 +19087,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (107KB chunk)",
+      "description": "Staged exfiltration (95KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19095,7 +19095,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (160KB chunk)",
+      "description": "Staged exfiltration (144KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19103,7 +19103,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (158KB chunk)",
+      "description": "Staged exfiltration (162KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19111,7 +19111,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (83KB chunk)",
+      "description": "Staged exfiltration (124KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19119,7 +19119,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (159KB chunk)",
+      "description": "Staged exfiltration (147KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19127,7 +19127,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (72KB chunk)",
+      "description": "Staged exfiltration (188KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19135,7 +19135,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (93KB chunk)",
+      "description": "Staged exfiltration (83KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19143,7 +19143,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (60KB chunk)",
+      "description": "Staged exfiltration (140KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19151,7 +19151,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (138KB chunk)",
+      "description": "Staged exfiltration (150KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19159,7 +19159,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (179KB chunk)",
+      "description": "Staged exfiltration (162KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19167,7 +19167,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (53KB chunk)",
+      "description": "Staged exfiltration (160KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19175,7 +19175,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (196KB chunk)",
+      "description": "Staged exfiltration (86KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19183,7 +19183,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (82KB chunk)",
+      "description": "Staged exfiltration (125KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19191,7 +19191,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (52KB chunk)",
+      "description": "Staged exfiltration (160KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19199,7 +19199,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (67KB chunk)",
+      "description": "Staged exfiltration (74KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19207,7 +19207,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (144KB chunk)",
+      "description": "Staged exfiltration (130KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19215,7 +19215,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (86KB chunk)",
+      "description": "Staged exfiltration (171KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19223,7 +19223,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (105KB chunk)",
+      "description": "Staged exfiltration (163KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19231,7 +19231,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (103KB chunk)",
+      "description": "Staged exfiltration (72KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19239,7 +19239,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (86KB chunk)",
+      "description": "Staged exfiltration (61KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19247,7 +19247,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (57KB chunk)",
+      "description": "Staged exfiltration (177KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19255,7 +19255,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (195KB chunk)",
+      "description": "Staged exfiltration (111KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19263,7 +19263,7 @@
       "label": "malicious",
       "attack_phase": 7,
       "technique": "T1048.001",
-      "description": "Staged exfiltration (113KB chunk)",
+      "description": "Staged exfiltration (109KB chunk)",
       "evasive": true,
       "evasion_technique": "Small chunks + legitimate cloud IP"
     },
@@ -19294,34 +19294,34 @@
     "conn_05720": {
       "label": "malicious",
       "attack_phase": 8,
-      "technique": "T1021.006",
-      "description": "WINRM lateral movement to server-db-01",
+      "technique": "T1047",
+      "description": "WMI lateral movement to server-db-01",
       "evasive": true,
-      "evasion_technique": "WINRM instead of RDP/SMB + slow timing"
+      "evasion_technique": "WMI instead of RDP/SMB + slow timing"
     },
     "conn_05721": {
       "label": "malicious",
       "attack_phase": 8,
-      "technique": "T1021.006",
-      "description": "WINRM lateral movement to server-db-01",
+      "technique": "T1047",
+      "description": "WMI lateral movement to server-db-01",
       "evasive": true,
-      "evasion_technique": "WINRM instead of RDP/SMB + slow timing"
+      "evasion_technique": "WMI instead of RDP/SMB + slow timing"
     },
     "conn_05722": {
-      "label": "malicious",
-      "attack_phase": 8,
-      "technique": "T1021.006",
-      "description": "WINRM lateral movement to server-web-02",
-      "evasive": true,
-      "evasion_technique": "WINRM instead of RDP/SMB + slow timing"
-    },
-    "conn_05723": {
       "label": "malicious",
       "attack_phase": 8,
       "technique": "T1047",
       "description": "WMI lateral movement to server-web-02",
       "evasive": true,
       "evasion_technique": "WMI instead of RDP/SMB + slow timing"
+    },
+    "conn_05723": {
+      "label": "malicious",
+      "attack_phase": 8,
+      "technique": "T1021.006",
+      "description": "WINRM lateral movement to server-web-02",
+      "evasive": true,
+      "evasion_technique": "WINRM instead of RDP/SMB + slow timing"
     },
     "conn_05724": {
       "label": "malicious",
@@ -19374,18 +19374,18 @@
     "conn_05730": {
       "label": "malicious",
       "attack_phase": 8,
-      "technique": "T1047",
-      "description": "WMI lateral movement to server-file-01",
-      "evasive": true,
-      "evasion_technique": "WMI instead of RDP/SMB + slow timing"
-    },
-    "conn_05731": {
-      "label": "malicious",
-      "attack_phase": 8,
       "technique": "T1021.006",
       "description": "WINRM lateral movement to server-file-01",
       "evasive": true,
       "evasion_technique": "WINRM instead of RDP/SMB + slow timing"
+    },
+    "conn_05731": {
+      "label": "malicious",
+      "attack_phase": 8,
+      "technique": "T1047",
+      "description": "WMI lateral movement to server-file-01",
+      "evasive": true,
+      "evasion_technique": "WMI instead of RDP/SMB + slow timing"
     }
   },
   "incidents": [
@@ -19436,35 +19436,74 @@
       "phase": 1,
       "name": "Initial Compromise",
       "start_time": "2026-01-09T02:07:48",
-      "event_ids": [],
+      "event_ids": [
+        "conn_05563"
+      ],
       "evasive": false
     },
     {
       "phase": 2,
       "name": "C2 Establishment",
       "start_time": "2026-01-09T02:07:48",
-      "event_ids": [],
+      "event_ids": [
+        "conn_05564",
+        "conn_05565",
+        "conn_05566",
+        "conn_05567",
+        "conn_05568",
+        "conn_05569",
+        "conn_05570",
+        "conn_05571",
+        "conn_05572",
+        "conn_05573",
+        "conn_05574",
+        "conn_05575",
+        "conn_05576",
+        "conn_05577",
+        "conn_05578",
+        "dns_05579",
+        "dns_05580",
+        "dns_05581",
+        "dns_05582",
+        "dns_05583"
+      ],
       "evasive": false
     },
     {
       "phase": 3,
       "name": "Lateral Movement",
       "start_time": "2026-01-09T02:12:00",
-      "event_ids": [],
+      "event_ids": [
+        "conn_05584",
+        "conn_05585"
+      ],
       "evasive": false
     },
     {
       "phase": 4,
       "name": "Data Access & Exfiltration",
       "start_time": "2026-01-09T02:40:12",
-      "event_ids": [],
+      "event_ids": [
+        "conn_05586"
+      ],
       "evasive": false
     },
     {
       "phase": 5,
       "name": "Persistence & Continued Access",
       "start_time": "2026-01-09T04:16:48",
-      "event_ids": [],
+      "event_ids": [
+        "conn_05587",
+        "conn_05588",
+        "conn_05589",
+        "conn_05590",
+        "conn_05591",
+        "conn_05592",
+        "conn_05593",
+        "conn_05594",
+        "conn_05595",
+        "conn_05596"
+      ],
       "evasive": false
     },
     {
@@ -19472,6 +19511,76 @@
       "name": "Low-and-Slow C2 (Evasive)",
       "start_time": "2026-01-09T01:00:00",
       "event_ids": [
+        "dns_05597",
+        "dns_05598",
+        "dns_05599",
+        "dns_05600",
+        "dns_05601",
+        "dns_05602",
+        "dns_05603",
+        "dns_05604",
+        "dns_05605",
+        "dns_05606",
+        "dns_05607",
+        "dns_05608",
+        "dns_05609",
+        "dns_05610",
+        "dns_05611",
+        "dns_05612",
+        "dns_05613",
+        "dns_05614",
+        "dns_05615",
+        "dns_05616",
+        "dns_05617",
+        "dns_05618",
+        "dns_05619",
+        "dns_05620",
+        "dns_05621",
+        "dns_05622",
+        "dns_05623",
+        "dns_05624",
+        "dns_05625",
+        "dns_05626",
+        "dns_05627",
+        "dns_05628",
+        "dns_05629",
+        "dns_05630",
+        "dns_05631",
+        "dns_05632",
+        "dns_05633",
+        "dns_05634",
+        "dns_05635",
+        "dns_05636",
+        "conn_05637",
+        "conn_05638",
+        "conn_05639",
+        "conn_05640",
+        "conn_05641",
+        "conn_05642",
+        "conn_05643",
+        "conn_05644",
+        "conn_05645",
+        "conn_05646",
+        "conn_05647",
+        "conn_05648",
+        "conn_05649",
+        "conn_05650",
+        "conn_05651",
+        "conn_05652",
+        "conn_05653",
+        "conn_05654",
+        "conn_05655",
+        "conn_05656",
+        "conn_05657",
+        "conn_05658",
+        "conn_05659",
+        "conn_05660",
+        "conn_05661",
+        "conn_05662",
+        "conn_05663",
+        "conn_05664",
+        "conn_05665",
+        "conn_05666",
         "dns_05597",
         "dns_05598",
         "dns_05599",
@@ -19599,6 +19708,56 @@
         "conn_05713",
         "conn_05714",
         "conn_05715",
+        "conn_05716",
+        "conn_05667",
+        "conn_05668",
+        "conn_05669",
+        "conn_05670",
+        "conn_05671",
+        "conn_05672",
+        "conn_05673",
+        "conn_05674",
+        "conn_05675",
+        "conn_05676",
+        "conn_05677",
+        "conn_05678",
+        "conn_05679",
+        "conn_05680",
+        "conn_05681",
+        "conn_05682",
+        "conn_05683",
+        "conn_05684",
+        "conn_05685",
+        "conn_05686",
+        "conn_05687",
+        "conn_05688",
+        "conn_05689",
+        "conn_05690",
+        "conn_05691",
+        "conn_05692",
+        "conn_05693",
+        "conn_05694",
+        "conn_05695",
+        "conn_05696",
+        "conn_05697",
+        "conn_05698",
+        "conn_05699",
+        "conn_05700",
+        "conn_05701",
+        "conn_05702",
+        "conn_05703",
+        "conn_05704",
+        "conn_05705",
+        "conn_05706",
+        "conn_05707",
+        "conn_05708",
+        "conn_05709",
+        "conn_05710",
+        "conn_05711",
+        "conn_05712",
+        "conn_05713",
+        "conn_05714",
+        "conn_05715",
         "conn_05716"
       ],
       "evasive": true
@@ -19608,6 +19767,21 @@
       "name": "Living-off-the-Land Lateral Movement (Evasive)",
       "start_time": "2026-01-09T06:00:00",
       "event_ids": [
+        "conn_05717",
+        "conn_05718",
+        "conn_05719",
+        "conn_05720",
+        "conn_05721",
+        "conn_05722",
+        "conn_05723",
+        "conn_05724",
+        "conn_05725",
+        "conn_05726",
+        "conn_05727",
+        "conn_05728",
+        "conn_05729",
+        "conn_05730",
+        "conn_05731",
         "conn_05717",
         "conn_05718",
         "conn_05719",
