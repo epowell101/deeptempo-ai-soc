@@ -80,16 +80,62 @@ class MCPServer:
     
     def is_running(self) -> bool:
         """Check if the server is running."""
-        if self.process is None:
-            return False
+        # First check if we have a process object and it's still alive
+        if self.process is not None:
+            if self.process.poll() is None:
+                # Process is still running
+                return True
+            else:
+                # Process has terminated
+                self.status = "stopped"
+                self.process = None
+                return False
         
-        # Check if process is still alive
-        if self.process.poll() is not None:
-            self.status = "stopped"
-            self.process = None
-            return False
+        # If no process object, check if the process is running externally
+        # by checking for the process by command line arguments
+        try:
+            # Extract module name from args (e.g., "mcp_servers.deeptempo_findings_server.server" -> "deeptempo_findings_server")
+            module_name = None
+            for arg in self.args:
+                if arg.startswith("mcp_servers."):
+                    parts = arg.split(".")
+                    if len(parts) >= 2:
+                        module_name = parts[1]  # Get the module name (e.g., deeptempo_findings_server)
+                    break
+            
+            if module_name:
+                # On Unix systems (macOS, Linux), use pgrep
+                if platform.system() != "Windows":
+                    try:
+                        result = subprocess.run(
+                            ["pgrep", "-f", f"mcp_servers.*{module_name}"],
+                            capture_output=True,
+                            text=True,
+                            timeout=2
+                        )
+                        if result.returncode == 0 and result.stdout.strip():
+                            self.status = "running"
+                            return True
+                    except (subprocess.TimeoutExpired, FileNotFoundError, Exception):
+                        pass
+                else:
+                    # On Windows, use tasklist with findstr
+                    try:
+                        result = subprocess.run(
+                            ["tasklist", "/FI", f"IMAGENAME eq python.exe", "/FO", "CSV"],
+                            capture_output=True,
+                            text=True,
+                            timeout=2
+                        )
+                        if result.returncode == 0 and module_name in result.stdout:
+                            self.status = "running"
+                            return True
+                    except (subprocess.TimeoutExpired, FileNotFoundError, Exception):
+                        pass
+        except Exception as e:
+            logger.debug(f"Error checking external process status: {e}")
         
-        return True
+        return False
     
     def get_status(self) -> str:
         """Get server status."""
@@ -99,8 +145,8 @@ class MCPServer:
     
     def get_log_path(self) -> Path:
         """Get the log file path for this server."""
-        log_name = self.name.replace("-", "_")
-        return Path(f"/tmp/{log_name}.log")
+        # Keep hyphens as servers log to files with hyphens (e.g., deeptempo-findings.log)
+        return Path(f"/tmp/{self.name}.log")
 
 
 class MCPService:

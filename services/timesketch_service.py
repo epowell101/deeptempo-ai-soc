@@ -14,7 +14,8 @@ class TimesketchService:
     """Service for interacting with Timesketch API."""
     
     def __init__(self, server_url: str, username: Optional[str] = None, 
-                 password: Optional[str] = None, api_token: Optional[str] = None):
+                 password: Optional[str] = None, api_token: Optional[str] = None,
+                 verify_ssl: bool = True):
         """
         Initialize Timesketch service.
         
@@ -23,6 +24,7 @@ class TimesketchService:
             username: Username for authentication (if using password auth)
             password: Password for authentication
             api_token: API token for authentication (alternative to username/password)
+            verify_ssl: Whether to verify SSL certificates (default: True)
         """
         self.server_url = server_url.rstrip('/')
         self.api_base = f"{self.server_url}/api/v1"
@@ -31,7 +33,7 @@ class TimesketchService:
         self.api_token = api_token
         self.session_token: Optional[str] = None
         self.session = requests.Session()
-        self.session.verify = True  # SSL verification
+        self.session.verify = verify_ssl  # SSL verification
         
         # Set default headers
         self.session.headers.update({

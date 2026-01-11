@@ -1,5 +1,6 @@
 """Sketch manager widget for managing Timesketch sketches."""
 
+import logging
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QTableWidget, QTableWidgetItem,
     QPushButton, QLabel, QMessageBox, QGroupBox
@@ -12,6 +13,8 @@ from services.timesketch_service import TimesketchService
 from services.timeline_service import TimelineService
 from ui.timesketch_config import TimesketchConfigDialog
 
+logger = logging.getLogger(__name__)
+
 
 class SketchManagerWidget(QWidget):
     """Widget for managing Timesketch sketches."""
@@ -22,6 +25,7 @@ class SketchManagerWidget(QWidget):
         self.data_service = DataService()
         self.timeline_service = TimelineService()
         self.timesketch_service = None
+        self.connection_status = "unknown"
         
         self._setup_ui()
         self.refresh()
@@ -29,6 +33,25 @@ class SketchManagerWidget(QWidget):
     def _setup_ui(self):
         """Set up the UI."""
         layout = QVBoxLayout()
+        
+        # Status bar
+        status_group = QGroupBox("Connection Status")
+        status_layout = QVBoxLayout()
+        
+        self.status_label = QLabel("Checking connection...")
+        self.status_label.setWordWrap(True)
+        status_layout.addWidget(self.status_label)
+        
+        test_btn = QPushButton("Test Connection")
+        test_btn.clicked.connect(self._test_connection)
+        status_layout.addWidget(test_btn)
+        
+        config_btn = QPushButton("Configure Timesketch...")
+        config_btn.clicked.connect(self._open_config)
+        status_layout.addWidget(config_btn)
+        
+        status_group.setLayout(status_layout)
+        layout.addWidget(status_group)
         
         # Info
         info_label = QLabel(
@@ -64,18 +87,86 @@ class SketchManagerWidget(QWidget):
         
         layout.addWidget(self.table)
         
+        # Empty state message
+        self.empty_label = QLabel("No sketch mappings found. Create a mapping by syncing a case to Timesketch.")
+        self.empty_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.empty_label.setStyleSheet("color: gray; padding: 20px;")
+        self.empty_label.setVisible(False)
+        layout.addWidget(self.empty_label)
+        
         self.setLayout(layout)
+    
+    def _test_connection(self):
+        """Test Timesketch connection."""
+        self.timesketch_service = TimesketchConfigDialog.load_service()
+        
+        if not self.timesketch_service:
+            self._update_status("error", "Timesketch is not configured. Please configure it first.")
+            return
+        
+        self._update_status("checking", "Testing connection...")
+        
+        try:
+            success, message = self.timesketch_service.test_connection()
+            if success:
+                self._update_status("connected", f"✅ Connected successfully!\n{message}")
+            else:
+                self._update_status("error", f"❌ Connection failed:\n{message}")
+        except Exception as e:
+            logger.error(f"Error testing connection: {e}", exc_info=True)
+            self._update_status("error", f"❌ Error testing connection:\n{str(e)}")
+    
+    def _update_status(self, status: str, message: str):
+        """Update connection status display."""
+        self.connection_status = status
+        
+        if status == "connected":
+            self.status_label.setText(f"<b style='color: green;'>{message}</b>")
+        elif status == "error":
+            self.status_label.setText(f"<b style='color: red;'>{message}</b>")
+        elif status == "checking":
+            self.status_label.setText(f"<b>{message}</b>")
+        else:
+            self.status_label.setText(message)
+    
+    def _open_config(self):
+        """Open Timesketch configuration dialog."""
+        dialog = TimesketchConfigDialog(self)
+        if dialog.exec() == dialog.DialogCode.Accepted:
+            self.refresh()
     
     def refresh(self):
         """Refresh sketch mappings."""
-        # Load Timesketch service
+        # Load Timesketch service and test connection
         self.timesketch_service = TimesketchConfigDialog.load_service()
+        
+        if not self.timesketch_service:
+            self._update_status("error", "Timesketch is not configured. Click 'Configure Timesketch...' to set it up.")
+        else:
+            # Test connection in background (non-blocking)
+            try:
+                success, message = self.timesketch_service.test_connection()
+                if success:
+                    self._update_status("connected", f"✅ Connected to Timesketch")
+                else:
+                    self._update_status("error", f"⚠️ Connection issue: {message}")
+            except Exception as e:
+                logger.error(f"Error during refresh connection test: {e}")
+                self._update_status("error", f"⚠️ Error: {str(e)}")
         
         mappings = self.sketch_manager.list_all_mappings()
         cases = self.data_service.get_cases()
         
         # Create case lookup
         case_lookup = {case.get('case_id'): case for case in cases}
+        
+        # Show/hide empty state
+        if len(mappings) == 0:
+            self.table.setVisible(False)
+            self.empty_label.setVisible(True)
+        else:
+            self.table.setVisible(True)
+            self.empty_label.setVisible(False)
         
         self.table.setRowCount(len(mappings))
         

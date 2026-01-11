@@ -288,7 +288,8 @@ class TimesketchConfigDialog(QDialog):
                 server_url=server_url,
                 username=username,
                 password=password,
-                api_token=api_token
+                api_token=api_token,
+                verify_ssl=self.verify_ssl_checkbox.isChecked()
             )
             
             success, message = service.test_connection()
@@ -386,6 +387,7 @@ class TimesketchConfigDialog(QDialog):
             server_url=config.get('server_url', ''),
             username=config.get('username'),
             password=config.get('password'),
-            api_token=config.get('api_token')
+            api_token=config.get('api_token'),
+            verify_ssl=config.get('verify_ssl', True)
         )
 
