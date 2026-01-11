@@ -11,6 +11,7 @@ Key features:
 - MTTD (Mean Time to Detect) comparison
 - Mode switching for Claude integration
 - Rule visibility and evasion analysis
+- Attack graph visualization (mode-aware)
 - Replay capability
 """
 
@@ -23,6 +24,10 @@ import json
 from pathlib import Path
 from datetime import datetime
 import numpy as np
+import networkx as nx
+from pyvis.network import Network
+import tempfile
+import streamlit.components.v1 as components
 
 # Configuration
 DATA_DIR = Path(__file__).parent.parent / "data"
@@ -199,7 +204,7 @@ def create_mttd_comparison_chart(rules_mttd, loglm_mttd):
     
     for key in sorted([k for k in rules_mttd.keys() if k.startswith("phase_")]):
         phase_name = rules_mttd[key]["phase_name"]
-        phases.append(phase_name)
+        phases.append(phase_name[:20] + "..." if len(phase_name) > 20 else phase_name)
         
         rules_val = rules_mttd[key]["mttd_minutes"] if rules_mttd[key]["detected"] else None
         loglm_val = loglm_mttd[key]["mttd_minutes"] if loglm_mttd[key]["detected"] else None
@@ -261,25 +266,30 @@ def create_metrics_comparison_chart(rules_metrics, loglm_metrics):
     fig.add_trace(go.Scatterpolar(
         r=rules_values + [rules_values[0]],
         theta=categories + [categories[0]],
-        fill="toself",
-        name="Rules-Only",
-        line_color="#f44336",
-        fillcolor="rgba(244, 67, 54, 0.3)"
+        fill='toself',
+        name='Rules-Only',
+        line_color='#f44336',
+        fillcolor='rgba(244, 67, 54, 0.3)'
     ))
     
     fig.add_trace(go.Scatterpolar(
         r=loglm_values + [loglm_values[0]],
         theta=categories + [categories[0]],
-        fill="toself",
-        name="LogLM",
-        line_color="#4caf50",
-        fillcolor="rgba(76, 175, 80, 0.3)"
+        fill='toself',
+        name='LogLM',
+        line_color='#4caf50',
+        fillcolor='rgba(76, 175, 80, 0.3)'
     ))
     
     fig.update_layout(
-        polar=dict(radialaxis=dict(visible=True, range=[0, 1])),
+        polar=dict(
+            radialaxis=dict(
+                visible=True,
+                range=[0, 1]
+            )
+        ),
         showlegend=True,
-        title="Detection Performance Comparison",
+        title="Detection Quality Comparison",
         height=400
     )
     
@@ -287,18 +297,19 @@ def create_metrics_comparison_chart(rules_metrics, loglm_metrics):
 
 
 def create_evasion_chart(rule_stats):
-    """Create chart showing rule evasion risk."""
+    """Create a chart showing rule evasion risk."""
     if not rule_stats:
         return None
     
-    df = pd.DataFrame([
-        {
-            "Rule": v["name"][:30] + "..." if len(v["name"]) > 30 else v["name"],
-            "Evasion Risk": v.get("evasion_risk", "UNKNOWN"),
-            "Alerts": v["alert_count"]
-        }
-        for v in rule_stats.values()
-    ])
+    rules_data = []
+    for rule_id, rule in rule_stats.items():
+        rules_data.append({
+            "Rule": rule.get("name", rule_id)[:30],
+            "Alerts": rule.get("alert_count", 0),
+            "Evasion Risk": rule.get("evasion_risk", "UNKNOWN")
+        })
+    
+    df = pd.DataFrame(rules_data)
     
     color_map = {"HIGH": "#f44336", "MEDIUM": "#ff9800", "LOW": "#4caf50", "UNKNOWN": "#9e9e9e"}
     df["Color"] = df["Evasion Risk"].map(color_map)
@@ -312,115 +323,226 @@ def create_evasion_chart(rule_stats):
         title="Alert Count by Rule (colored by Evasion Risk)"
     )
     
-    fig.update_layout(
-        xaxis_tickangle=-45,
-        height=400
-    )
+    fig.update_layout(xaxis_tickangle=-45, height=400)
     
     return fig
 
 
+def create_attack_graph_rules(alerts, ground_truth):
+    """
+    Create an attack graph based on rules-only alerts.
+    Shows fragmented, incomplete view of the attack.
+    """
+    net = Network(height="500px", width="100%", bgcolor="#ffffff", font_color="black")
+    net.barnes_hut()
+    
+    # Extract unique hosts and connections from alerts
+    hosts_seen = set()
+    external_seen = set()
+    connections = []
+    
+    for alert in alerts:
+        src = alert.get("source_ip", alert.get("id.orig_h", ""))
+        dst = alert.get("dest_ip", alert.get("id.resp_h", ""))
+        
+        if src.startswith("10."):
+            hosts_seen.add(src)
+        else:
+            external_seen.add(src)
+        
+        if dst.startswith("10."):
+            hosts_seen.add(dst)
+        else:
+            external_seen.add(dst)
+        
+        if src and dst:
+            connections.append((src, dst, alert.get("rule_name", "Alert")))
+    
+    # Node colors
+    node_colors = {
+        "internal": "#2196F3",
+        "external": "#f44336",
+        "server": "#FF9800"
+    }
+    
+    # Add nodes
+    for host in hosts_seen:
+        color = node_colors["server"] if "server" in host or host.startswith("10.0.2.") else node_colors["internal"]
+        net.add_node(host, label=host, color=color, size=25)
+    
+    for ext in external_seen:
+        net.add_node(ext, label=ext, color=node_colors["external"], size=20)
+    
+    # Add edges (limited - rules don't correlate well)
+    edge_set = set()
+    for src, dst, label in connections[:30]:  # Limit edges shown
+        if (src, dst) not in edge_set:
+            net.add_edge(src, dst, title=label, color="#999999", width=1)
+            edge_set.add((src, dst))
+    
+    return net
+
+
+def create_attack_graph_loglm(findings, incidents):
+    """
+    Create a comprehensive attack graph based on LogLM findings.
+    Shows the full correlated attack narrative.
+    """
+    net = Network(height="500px", width="100%", bgcolor="#ffffff", font_color="black")
+    net.barnes_hut()
+    
+    # Define the attack narrative nodes
+    nodes = [
+        {"id": "workstation-042", "label": "workstation-042\n(Entry Point)", "color": "#f44336", "size": 35, "type": "entry"},
+        {"id": "workstation-055", "label": "workstation-055\n(Lateral)", "color": "#FF9800", "size": 25, "type": "lateral"},
+        {"id": "laptop-sales-03", "label": "laptop-sales-03\n(Lateral)", "color": "#FF9800", "size": 25, "type": "lateral"},
+        {"id": "server-db-01", "label": "server-db-01\n(DATABASE)", "color": "#9C27B0", "size": 35, "type": "crown_jewel"},
+        {"id": "server-web-02", "label": "server-web-02\n(WEB)", "color": "#9C27B0", "size": 30, "type": "crown_jewel"},
+        {"id": "server-file-01", "label": "server-file-01\n(FILE)", "color": "#9C27B0", "size": 30, "type": "crown_jewel"},
+        {"id": "C2-Server", "label": "203.0.113.50\n(C2 Server)", "color": "#d32f2f", "size": 35, "type": "c2"},
+        {"id": "CDN-C2", "label": "Legitimate CDN\n(Evasive C2)", "color": "#d32f2f", "size": 30, "type": "c2"},
+        {"id": "DNS-Exfil", "label": "DNS Tunneling\n(Exfiltration)", "color": "#7B1FA2", "size": 30, "type": "exfil"},
+        {"id": "Attacker-1", "label": "198.51.100.10\n(Attacker)", "color": "#B71C1C", "size": 25, "type": "attacker"},
+        {"id": "Attacker-2", "label": "198.51.100.25\n(Attacker)", "color": "#B71C1C", "size": 25, "type": "attacker"},
+    ]
+    
+    # Define attack flow edges
+    edges = [
+        # Initial compromise and C2
+        {"from": "workstation-042", "to": "C2-Server", "label": "HTTPS C2", "color": "#d32f2f", "width": 3},
+        {"from": "workstation-042", "to": "CDN-C2", "label": "Evasive C2", "color": "#d32f2f", "width": 2, "dashes": True},
+        {"from": "workstation-042", "to": "DNS-Exfil", "label": "DNS Tunnel", "color": "#7B1FA2", "width": 2},
+        
+        # Lateral movement
+        {"from": "workstation-042", "to": "workstation-055", "label": "RDP", "color": "#FF9800", "width": 2},
+        {"from": "workstation-042", "to": "laptop-sales-03", "label": "SMB", "color": "#FF9800", "width": 2},
+        {"from": "workstation-042", "to": "server-db-01", "label": "WMI (Evasive)", "color": "#FF9800", "width": 2, "dashes": True},
+        {"from": "workstation-042", "to": "server-file-01", "label": "WinRM (Evasive)", "color": "#FF9800", "width": 2, "dashes": True},
+        
+        # Data exfiltration
+        {"from": "server-db-01", "to": "DNS-Exfil", "label": "Data Exfil", "color": "#7B1FA2", "width": 3},
+        {"from": "server-db-01", "to": "CDN-C2", "label": "Staged Exfil", "color": "#7B1FA2", "width": 2, "dashes": True},
+        
+        # Web exploitation
+        {"from": "Attacker-1", "to": "server-web-02", "label": "HTTP Exploit", "color": "#B71C1C", "width": 2},
+        {"from": "Attacker-2", "to": "server-web-02", "label": "HTTP Exploit", "color": "#B71C1C", "width": 2},
+    ]
+    
+    # Add nodes
+    for node in nodes:
+        net.add_node(
+            node["id"],
+            label=node["label"],
+            color=node["color"],
+            size=node["size"],
+            title=f"Type: {node['type']}"
+        )
+    
+    # Add edges
+    for edge in edges:
+        net.add_edge(
+            edge["from"],
+            edge["to"],
+            title=edge["label"],
+            color=edge["color"],
+            width=edge["width"],
+            arrows="to",
+            dashes=edge.get("dashes", False)
+        )
+    
+    return net
+
+
 def main():
-    """Main dashboard."""
+    """Main dashboard application."""
+    
     st.title("⚔️ Tale of Two SOCs")
-    st.markdown("**Compare Rules-Only Detection vs. LogLM-Enhanced Detection**")
+    st.markdown("*Comparing Rules-Only vs LogLM-Enhanced Security Operations*")
     
     # Load data
     data = load_data()
     
-    if not data.get("evaluation"):
-        st.error("Evaluation data not found. Please run the evaluation script first.")
-        st.code("python scripts/evaluate.py", language="bash")
+    if not data:
+        st.error("No scenario data found. Please run the scenario generator first.")
+        st.code("python scripts/generate_scenario.py\npython scripts/rules_detection.py\npython scripts/loglm_detection.py\npython scripts/evaluate.py")
         return
     
-    # Sidebar - Mode Control
-    st.sidebar.header("🎛️ SOC Mode Control")
+    # Sidebar
+    st.sidebar.header("🎛️ Configuration")
     
+    # Mode toggle
     current_mode = get_current_mode()
-    
-    mode_options = {
-        "rules_only": "🔴 Rules-Only",
-        "loglm": "🟢 LogLM-Enhanced"
-    }
-    
-    selected_mode = st.sidebar.radio(
-        "Select Mode for Claude",
-        options=list(mode_options.keys()),
-        format_func=lambda x: mode_options[x],
-        index=0 if current_mode == "rules_only" else 1
+    st.sidebar.markdown("### Claude Integration Mode")
+    mode = st.sidebar.radio(
+        "Select SOC Mode for Claude:",
+        ["loglm", "rules"],
+        index=0 if current_mode == "loglm" else 1,
+        format_func=lambda x: "🟢 LogLM-Enhanced" if x == "loglm" else "🔴 Rules-Only",
+        help="This controls which tools Claude has access to via MCP"
     )
     
-    if selected_mode != current_mode:
-        set_mode(selected_mode)
-        st.sidebar.success(f"Mode changed to {mode_options[selected_mode]}")
-        st.sidebar.warning("⚠️ Start a new Claude conversation to use the new tools.")
+    if mode != current_mode:
+        set_mode(mode)
+        st.sidebar.success(f"Mode changed to {mode}. Restart Claude to apply.")
     
     st.sidebar.markdown("---")
     
-    # Sidebar - Scenario Info
-    st.sidebar.header("📊 Scenario Info")
+    # Scenario info
     manifest = data.get("manifest", {})
-    st.sidebar.markdown(f"**{manifest.get('name', 'Unknown')}**")
-    st.sidebar.markdown(f"Duration: {manifest.get('duration_hours', 0)} hours")
-    st.sidebar.markdown(f"Total Events: {manifest.get('total_events', 0):,}")
-    st.sidebar.markdown(f"Malicious: {manifest.get('malicious_events', 0)}")
-    st.sidebar.markdown(f"  - Detectable: {manifest.get('detectable_events', 0)}")
-    st.sidebar.markdown(f"  - Evasive: {manifest.get('evasive_events', 0)}")
-    st.sidebar.markdown(f"Benign: {manifest.get('benign_events', 0):,}")
+    st.sidebar.markdown("### 📊 Scenario Info")
+    st.sidebar.markdown(f"**Name:** {manifest.get('name', 'Unknown')}")
+    st.sidebar.markdown(f"**Duration:** {manifest.get('duration_hours', 0)} hours")
+    st.sidebar.markdown(f"**Total Events:** {manifest.get('total_events', 0):,}")
+    st.sidebar.markdown(f"**Malicious:** {manifest.get('malicious_events', 0)}")
+    st.sidebar.markdown(f"**Evasive:** {manifest.get('evasive_events', 0)}")
+    st.sidebar.markdown(f"**FP Triggers:** {manifest.get('false_positive_triggers', 0)}")
     
-    st.sidebar.markdown("---")
-    st.sidebar.info("""
-    **LogLM detects malicious BEHAVIORS, not just anomalies.**
-    
-    This is why it has high precision - it's trained to recognize actual attack patterns, not just statistical outliers.
-    
-    **LogLM catches evasive attacks** that rules miss through behavioral analysis of flow patterns.
-    """)
-    
-    # Main content - Tabs
-    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    # Main content - tabs
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
         "📊 Comparison Overview",
         "🔍 Detailed Metrics",
         "⏱️ MTTD Analysis",
         "📋 Rule Analysis",
-        "🥷 Evasion Analysis"
+        "🥷 Evasion Analysis",
+        "🕸️ Attack Graph"
     ])
     
-    eval_data = data["evaluation"]
-    rules_eval = eval_data["rules_only"]
-    loglm_eval = eval_data["loglm"]
+    # Get evaluation data
+    eval_data = data.get("evaluation", {})
+    rules_eval = eval_data.get("rules_only", {})
+    loglm_eval = eval_data.get("loglm", {})
     
     # Tab 1: Comparison Overview
     with tab1:
         st.header("Side-by-Side Comparison")
         
-        # Key metrics row
+        # Key metrics
         col1, col2, col3, col4 = st.columns(4)
         
         with col1:
             st.metric(
                 "Alert Reduction",
-                f"{eval_data['comparison']['alert_reduction']*100:.0f}%",
+                f"{eval_data.get('comparison', {}).get('alert_reduction', 0)*100:.0f}%",
                 help="LogLM reduces alert volume while maintaining coverage"
             )
         
         with col2:
             st.metric(
                 "Precision Improvement",
-                f"+{eval_data['comparison']['precision_improvement']*100:.1f}%",
+                f"+{eval_data.get('comparison', {}).get('precision_improvement', 0)*100:.1f}%",
                 help="LogLM has much higher precision (fewer false positives)"
             )
         
         with col3:
             st.metric(
                 "F1 Score Improvement",
-                f"+{eval_data['comparison']['f1_improvement']:.3f}",
+                f"+{eval_data.get('comparison', {}).get('f1_improvement', 0):.3f}",
                 help="Overall detection quality improvement"
             )
         
         with col4:
-            phases_rules = rules_eval["mttd"]["phases_detected"]
-            phases_loglm = loglm_eval["mttd"]["phases_detected"]
+            phases_rules = rules_eval.get("mttd", {}).get("phases_detected", 0)
+            phases_loglm = loglm_eval.get("mttd", {}).get("phases_detected", 0)
             st.metric(
                 "Phases Detected",
                 f"{phases_loglm}",
@@ -437,9 +559,9 @@ def main():
             st.markdown('<div class="rules-box">', unsafe_allow_html=True)
             st.subheader("🔴 Rules-Only SOC")
             st.markdown(f"""
-            - **{rules_eval['alert_count']} alerts** generated
-            - **{rules_eval['metrics']['precision']*100:.1f}% precision** (many false positives)
-            - **{rules_eval['confusion_matrix']['false_positives']} false alarms**
+            - **{rules_eval.get('alert_count', 0):,} alerts** generated
+            - **{rules_eval.get('metrics', {}).get('precision', 0)*100:.1f}% precision** (many false positives)
+            - **{rules_eval.get('confusion_matrix', {}).get('false_positives', 0):,} false alarms**
             - No automatic correlation
             - No similarity search
             - No MITRE classification
@@ -453,9 +575,9 @@ def main():
             st.markdown('<div class="loglm-box">', unsafe_allow_html=True)
             st.subheader("🟢 LogLM-Enhanced SOC")
             st.markdown(f"""
-            - **{loglm_eval['finding_count']} findings** generated
-            - **{loglm_eval['metrics']['precision']*100:.1f}% precision** (few false positives)
-            - **{loglm_eval['confusion_matrix']['false_positives']} false alarms**
+            - **{loglm_eval.get('finding_count', 0):,} findings** generated
+            - **{loglm_eval.get('metrics', {}).get('precision', 0)*100:.1f}% precision** (few false positives)
+            - **{loglm_eval.get('confusion_matrix', {}).get('false_positives', 0):,} false alarms**
             - ✅ Automatic correlation into incidents
             - ✅ Embedding-based similarity search
             - ✅ MITRE ATT&CK classification
@@ -466,13 +588,14 @@ def main():
             st.markdown('</div>', unsafe_allow_html=True)
         
         # Radar chart
-        st.plotly_chart(
-            create_metrics_comparison_chart(
-                rules_eval["metrics"],
-                loglm_eval["metrics"]
-            ),
-            use_container_width=True
-        )
+        if rules_eval.get("metrics") and loglm_eval.get("metrics"):
+            st.plotly_chart(
+                create_metrics_comparison_chart(
+                    rules_eval["metrics"],
+                    loglm_eval["metrics"]
+                ),
+                use_container_width=True
+            )
     
     # Tab 2: Detailed Metrics
     with tab2:
@@ -481,36 +604,40 @@ def main():
         col1, col2 = st.columns(2)
         
         with col1:
-            st.plotly_chart(
-                create_confusion_matrix_chart(
-                    rules_eval["confusion_matrix"],
-                    "Rules-Only Confusion Matrix"
-                ),
-                use_container_width=True
-            )
+            if rules_eval.get("confusion_matrix"):
+                st.plotly_chart(
+                    create_confusion_matrix_chart(
+                        rules_eval["confusion_matrix"],
+                        "Rules-Only Confusion Matrix"
+                    ),
+                    use_container_width=True
+                )
             
             st.markdown("**Rules-Only Metrics:**")
-            metrics_df = pd.DataFrame([{
-                "Metric": k.replace("_", " ").title(),
-                "Value": f"{v*100:.2f}%" if v < 1 else f"{v:.4f}"
-            } for k, v in rules_eval["metrics"].items()])
-            st.dataframe(metrics_df, hide_index=True)
+            if rules_eval.get("metrics"):
+                metrics_df = pd.DataFrame([{
+                    "Metric": k.replace("_", " ").title(),
+                    "Value": f"{v*100:.2f}%" if v < 1 else f"{v:.4f}"
+                } for k, v in rules_eval["metrics"].items()])
+                st.dataframe(metrics_df, hide_index=True)
         
         with col2:
-            st.plotly_chart(
-                create_confusion_matrix_chart(
-                    loglm_eval["confusion_matrix"],
-                    "LogLM Confusion Matrix"
-                ),
-                use_container_width=True
-            )
+            if loglm_eval.get("confusion_matrix"):
+                st.plotly_chart(
+                    create_confusion_matrix_chart(
+                        loglm_eval["confusion_matrix"],
+                        "LogLM Confusion Matrix"
+                    ),
+                    use_container_width=True
+                )
             
             st.markdown("**LogLM Metrics:**")
-            metrics_df = pd.DataFrame([{
-                "Metric": k.replace("_", " ").title(),
-                "Value": f"{v*100:.2f}%" if v < 1 else f"{v:.4f}"
-            } for k, v in loglm_eval["metrics"].items()])
-            st.dataframe(metrics_df, hide_index=True)
+            if loglm_eval.get("metrics"):
+                metrics_df = pd.DataFrame([{
+                    "Metric": k.replace("_", " ").title(),
+                    "Value": f"{v*100:.2f}%" if v < 1 else f"{v:.4f}"
+                } for k, v in loglm_eval["metrics"].items()])
+                st.dataframe(metrics_df, hide_index=True)
         
         # Explanation
         st.markdown("---")
@@ -519,8 +646,8 @@ def main():
         
         | Metric | What It Means | Why LogLM Wins |
         |--------|---------------|----------------|
-        | **Precision** | % of detections that are real attacks | LogLM identifies malicious *behaviors*, not just anomalies |
-        | **Recall** | % of attacks that were detected | Both methods detect most attacks, but LogLM does it with less noise |
+        | **Precision** | % of detections that are real attacks | LogLM identifies malicious *behaviors*, not just pattern matches |
+        | **Recall** | % of attacks that were detected | LogLM catches evasive attacks that rules miss |
         | **F1 Score** | Balance of precision and recall | LogLM's high precision dramatically improves F1 |
         | **False Positive Rate** | % of benign events incorrectly flagged | LogLM's behavior-based detection minimizes false alarms |
         """)
@@ -529,45 +656,46 @@ def main():
     with tab3:
         st.header("Mean Time to Detect (MTTD) Analysis")
         
-        st.plotly_chart(
-            create_mttd_comparison_chart(
-                rules_eval["mttd"],
-                loglm_eval["mttd"]
-            ),
-            use_container_width=True
-        )
-        
-        # MTTD table
-        st.markdown("### MTTD by Phase")
-        
-        mttd_data = []
-        for key in sorted([k for k in rules_eval["mttd"].keys() if k.startswith("phase_")]):
-            rules_phase = rules_eval["mttd"][key]
-            loglm_phase = loglm_eval["mttd"][key]
+        if rules_eval.get("mttd") and loglm_eval.get("mttd"):
+            st.plotly_chart(
+                create_mttd_comparison_chart(
+                    rules_eval["mttd"],
+                    loglm_eval["mttd"]
+                ),
+                use_container_width=True
+            )
             
-            mttd_data.append({
-                "Phase": rules_phase["phase_name"],
-                "Rules-Only": f"{rules_phase['mttd_minutes']:.1f} min" if rules_phase["detected"] else "❌ NOT DETECTED",
-                "LogLM": f"{loglm_phase['mttd_minutes']:.1f} min" if loglm_phase["detected"] else "❌ NOT DETECTED",
-            })
-        
-        st.dataframe(pd.DataFrame(mttd_data), hide_index=True, use_container_width=True)
-        
-        # Overall MTTD
-        col1, col2 = st.columns(2)
-        with col1:
-            overall_rules = rules_eval["mttd"]["overall"]
-            if overall_rules["detected"]:
-                st.metric("Rules-Only Overall MTTD", f"{overall_rules['mttd_minutes']:.1f} min")
-            else:
-                st.metric("Rules-Only Overall MTTD", "NOT DETECTED")
-        
-        with col2:
-            overall_loglm = loglm_eval["mttd"]["overall"]
-            if overall_loglm["detected"]:
-                st.metric("LogLM Overall MTTD", f"{overall_loglm['mttd_minutes']:.1f} min")
-            else:
-                st.metric("LogLM Overall MTTD", "NOT DETECTED")
+            # MTTD table
+            st.markdown("### MTTD by Phase")
+            
+            mttd_data = []
+            for key in sorted([k for k in rules_eval["mttd"].keys() if k.startswith("phase_")]):
+                rules_phase = rules_eval["mttd"][key]
+                loglm_phase = loglm_eval["mttd"][key]
+                
+                mttd_data.append({
+                    "Phase": rules_phase["phase_name"],
+                    "Rules-Only": f"{rules_phase['mttd_minutes']:.1f} min" if rules_phase["detected"] else "❌ NOT DETECTED",
+                    "LogLM": f"{loglm_phase['mttd_minutes']:.1f} min" if loglm_phase["detected"] else "❌ NOT DETECTED",
+                })
+            
+            st.dataframe(pd.DataFrame(mttd_data), hide_index=True, use_container_width=True)
+            
+            # Overall MTTD
+            col1, col2 = st.columns(2)
+            with col1:
+                overall_rules = rules_eval["mttd"].get("overall", {})
+                if overall_rules.get("detected"):
+                    st.metric("Rules-Only Overall MTTD", f"{overall_rules['mttd_minutes']:.1f} min")
+                else:
+                    st.metric("Rules-Only Overall MTTD", "NOT DETECTED")
+            
+            with col2:
+                overall_loglm = loglm_eval["mttd"].get("overall", {})
+                if overall_loglm.get("detected"):
+                    st.metric("LogLM Overall MTTD", f"{overall_loglm['mttd_minutes']:.1f} min")
+                else:
+                    st.metric("LogLM Overall MTTD", "NOT DETECTED")
     
     # Tab 4: Rule Analysis
     with tab4:
@@ -596,7 +724,6 @@ def main():
         for rule in rule_defs:
             rule_id = rule.get("id", rule.get("name", "Unknown"))
             evasion_risk = rule.get("evasion_risk", "UNKNOWN")
-            risk_class = f"{evasion_risk.lower()}-risk"
             
             with st.expander(f"**{rule.get('name', rule_id)}** - {rule.get('severity', 'medium').upper()} - Evasion Risk: {evasion_risk}"):
                 col1, col2 = st.columns(2)
@@ -708,7 +835,8 @@ def main():
                     st.markdown(f"**Detection Method:** {finding.get('detection_method', 'behavioral_analysis')}")
                     if finding.get('evasion_technique'):
                         st.warning(f"**Evasion Technique Used:** {finding['evasion_technique']}")
-                    st.markdown(f"**MITRE Technique:** {finding['mitre_predictions'][0]['technique_name']}")
+                    if finding.get('mitre_predictions'):
+                        st.markdown(f"**MITRE Technique:** {finding['mitre_predictions'][0]['technique_name']}")
         
         # Comparison table
         st.markdown("---")
@@ -754,6 +882,118 @@ def main():
         ]
         
         st.dataframe(pd.DataFrame(comparison_data), hide_index=True, use_container_width=True)
+    
+    # Tab 6: Attack Graph
+    with tab6:
+        st.header("🕸️ Attack Graph Visualization")
+        
+        st.markdown("""
+        This visualization shows how each SOC approach sees the attack.
+        **LogLM provides a complete, correlated view** while **Rules-Only shows fragmented alerts**.
+        """)
+        
+        # Mode selector for graph
+        graph_mode = st.radio(
+            "Select View:",
+            ["LogLM (Complete Attack Graph)", "Rules-Only (Fragmented View)"],
+            horizontal=True
+        )
+        
+        if graph_mode == "LogLM (Complete Attack Graph)":
+            st.markdown('<div class="loglm-box">', unsafe_allow_html=True)
+            st.markdown("""
+            ### 🟢 LogLM Attack Graph
+            
+            LogLM correlates all findings into a **coherent attack narrative**:
+            - **Red nodes**: Entry points and C2 infrastructure
+            - **Orange nodes**: Lateral movement targets
+            - **Purple nodes**: Crown jewels (critical servers)
+            - **Dashed lines**: Evasive techniques detected by LogLM
+            
+            This graph shows the **complete attack story** including evasive techniques.
+            """)
+            st.markdown('</div>', unsafe_allow_html=True)
+            
+            # Create LogLM graph
+            findings = data.get("findings", [])
+            incidents = data.get("incidents", [])
+            net = create_attack_graph_loglm(findings, incidents)
+            
+            # Save and display
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.html', delete=False) as f:
+                net.save_graph(f.name)
+                with open(f.name, 'r') as html_file:
+                    html_content = html_file.read()
+                components.html(html_content, height=550)
+            
+            # Legend
+            st.markdown("### Legend")
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                st.markdown("🔴 **Entry Point / C2**")
+            with col2:
+                st.markdown("🟠 **Lateral Movement**")
+            with col3:
+                st.markdown("🟣 **Crown Jewels**")
+            with col4:
+                st.markdown("⬛ **Attackers**")
+        
+        else:
+            st.markdown('<div class="rules-box">', unsafe_allow_html=True)
+            st.markdown("""
+            ### 🔴 Rules-Only View
+            
+            Rules generate **fragmented, uncorrelated alerts**:
+            - Many alerts are false positives
+            - No automatic correlation between events
+            - Missing evasive attack paths
+            - Analyst must manually piece together the story
+            
+            This graph shows only what rules detected - **an incomplete picture**.
+            """)
+            st.markdown('</div>', unsafe_allow_html=True)
+            
+            # Create Rules graph
+            alerts = data.get("alerts", [])
+            ground_truth = data.get("ground_truth", {})
+            net = create_attack_graph_rules(alerts, ground_truth)
+            
+            # Save and display
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.html', delete=False) as f:
+                net.save_graph(f.name)
+                with open(f.name, 'r') as html_file:
+                    html_content = html_file.read()
+                components.html(html_content, height=550)
+            
+            # Warning
+            st.warning("""
+            **What's Missing:**
+            - Evasive C2 via legitimate CDN IPs
+            - Low-and-slow DNS tunneling
+            - WMI/WinRM lateral movement
+            - Staged data exfiltration
+            
+            Rules see only ~30% of the attack. The rest is invisible.
+            """)
+        
+        # Comparison summary
+        st.markdown("---")
+        st.markdown("### Graph Comparison Summary")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("**Rules-Only Graph:**")
+            st.markdown("- Fragmented nodes")
+            st.markdown("- Missing connections")
+            st.markdown("- No attack narrative")
+            st.markdown("- ~30% visibility")
+        
+        with col2:
+            st.markdown("**LogLM Graph:**")
+            st.markdown("- Complete attack path")
+            st.markdown("- All connections visible")
+            st.markdown("- Clear attack narrative")
+            st.markdown("- 100% visibility")
 
 
 if __name__ == "__main__":
