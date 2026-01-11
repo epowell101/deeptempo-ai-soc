@@ -1,158 +1,158 @@
-{
-  "rule_001": {
+[
+  {
+    "id": "rule_001",
     "name": "Outbound Connection to Rare External IP",
     "description": "Detects connections to external IPs not in whitelist",
     "severity": "medium",
     "tactic": "Command and Control",
     "technique": "T1071.001",
-    "alert_count": 18,
     "false_positive_rate": 0.15,
     "evasion_risk": "HIGH",
     "evasion_method": "Use legitimate cloud infrastructure IPs (AWS, Azure, Cloudflare)",
     "logic_human": "IF destination IP is external AND NOT in known-good list THEN alert",
     "threshold": "Any single connection"
   },
-  "rule_002": {
+  {
+    "id": "rule_002",
     "name": "Suspicious DNS Query - Long Subdomain",
     "description": "Detects DNS queries with unusually long subdomains (potential tunneling)",
     "severity": "medium",
     "tactic": "Command and Control",
     "technique": "T1071.004",
-    "alert_count": 10,
     "false_positive_rate": 0.05,
     "evasion_risk": "MEDIUM",
     "evasion_method": "Keep subdomains under 20 characters, use multiple short queries",
     "logic_human": "IF DNS query subdomain length > 20 characters THEN alert",
     "threshold": "Subdomain > 20 chars"
   },
-  "rule_003": {
+  {
+    "id": "rule_003",
     "name": "Suspicious DNS Query - TXT Record",
     "description": "Detects TXT record queries which may indicate DNS tunneling",
     "severity": "low",
     "tactic": "Command and Control",
     "technique": "T1071.004",
-    "alert_count": 10,
     "false_positive_rate": 0.08,
     "evasion_risk": "LOW",
     "evasion_method": "Use A/AAAA records instead of TXT, encode data in subdomain",
     "logic_human": "IF DNS query type = TXT THEN alert",
     "threshold": "Any TXT query"
   },
-  "rule_004": {
+  {
+    "id": "rule_004",
     "name": "Internal RDP Connection",
     "description": "Detects RDP connections between internal hosts",
     "severity": "low",
     "tactic": "Lateral Movement",
     "technique": "T1021.001",
-    "alert_count": 2,
     "false_positive_rate": 0.2,
     "evasion_risk": "MEDIUM",
     "evasion_method": "Use WMI, WinRM, or PowerShell Remoting instead of RDP",
     "logic_human": "IF destination port = 3389 AND both IPs are internal THEN alert",
     "threshold": "Any RDP connection"
   },
-  "rule_005": {
+  {
+    "id": "rule_005",
     "name": "Internal SMB Connection",
     "description": "Detects SMB connections between internal hosts",
     "severity": "low",
     "tactic": "Lateral Movement",
     "technique": "T1021.002",
-    "alert_count": 132,
     "false_positive_rate": 0.25,
     "evasion_risk": "MEDIUM",
     "evasion_method": "Use WMI (port 135), WinRM (5985/5986), or SSH",
     "logic_human": "IF destination port = 445 AND both IPs are internal THEN alert",
     "threshold": "Any SMB connection"
   },
-  "rule_006": {
+  {
+    "id": "rule_006",
     "name": "Large Outbound Data Transfer",
     "description": "Detects connections with large outbound byte count",
     "severity": "medium",
     "tactic": "Exfiltration",
     "technique": "T1041",
-    "alert_count": 3,
     "false_positive_rate": 0.1,
     "evasion_risk": "HIGH",
     "evasion_method": "Chunk data into transfers < 500KB, spread over hours/days",
     "logic_human": "IF outbound bytes > 500KB AND destination is external THEN alert",
     "threshold": "> 500,000 bytes"
   },
-  "rule_007": {
+  {
+    "id": "rule_007",
     "name": "Connection to Known Bad Port",
     "description": "Detects connections to suspicious ports commonly used by malware",
     "severity": "high",
     "tactic": "Command and Control",
     "technique": "T1571",
-    "alert_count": 0,
     "false_positive_rate": 0.03,
     "evasion_risk": "LOW",
     "evasion_method": "Use standard ports (443, 80, 53) for C2 communication",
     "logic_human": "IF destination port IN [4444, 5555, 6666, 8888, 9999, 1337] THEN alert",
     "threshold": "Any connection to listed ports"
   },
-  "rule_008": {
+  {
+    "id": "rule_008",
     "name": "Periodic Beaconing Pattern",
     "description": "Detects regular interval connections (potential C2)",
     "severity": "medium",
     "tactic": "Command and Control",
     "technique": "T1071.001",
-    "alert_count": 18,
     "false_positive_rate": 0.12,
     "evasion_risk": "HIGH",
     "evasion_method": "Add jitter to beacon intervals, vary connection duration",
     "logic_human": "IF SSL connection AND duration < 5s AND small payload AND external THEN alert",
     "threshold": "Duration < 5s, payload < 1KB"
   },
-  "rule_009": {
+  {
+    "id": "rule_009",
     "name": "DNS Query to Suspicious Domain Pattern",
     "description": "Detects DNS queries to domains matching suspicious naming patterns",
     "severity": "high",
     "tactic": "Command and Control",
     "technique": "T1071.004",
-    "alert_count": 10,
     "false_positive_rate": 0.02,
     "evasion_risk": "MEDIUM",
     "evasion_method": "Use innocuous domain names that mimic legitimate services",
     "logic_human": "IF DNS query contains patterns like 'data-sync', 'cdn-update' THEN alert",
     "threshold": "Pattern match in domain"
   },
-  "rule_010": {
+  {
+    "id": "rule_010",
     "name": "Workstation to Server Direct Connection",
     "description": "Detects direct connections from workstations to servers",
     "severity": "low",
     "tactic": "Lateral Movement",
     "technique": "T1021",
-    "alert_count": 141,
     "false_positive_rate": 0.3,
     "evasion_risk": "HIGH",
     "evasion_method": "Route through jump hosts, use legitimate admin tools",
     "logic_human": "IF source hostname starts with 'workstation' AND dest is server subnet THEN alert",
     "threshold": "Any direct connection"
   },
-  "rule_011": {
+  {
+    "id": "rule_011",
     "name": "External Connection to Web Server",
     "description": "Detects external connections to internal web servers",
     "severity": "low",
     "tactic": "Initial Access",
     "technique": "T1190",
-    "alert_count": 20,
     "false_positive_rate": 0.4,
     "evasion_risk": "LOW",
     "evasion_method": "Blend with legitimate web traffic, use common user agents",
     "logic_human": "IF source is external AND dest is web server AND port is HTTP/HTTPS THEN alert",
     "threshold": "Any external web connection"
   },
-  "rule_012": {
+  {
+    "id": "rule_012",
     "name": "Failed Connection Attempt",
     "description": "Detects rejected or reset connections (potential scanning)",
     "severity": "low",
     "tactic": "Discovery",
     "technique": "T1046",
-    "alert_count": 12,
     "false_positive_rate": 0.15,
     "evasion_risk": "MEDIUM",
     "evasion_method": "Slow down scanning, use passive reconnaissance",
     "logic_human": "IF connection state is REJ, RSTO, or RSTOS0 THEN alert",
     "threshold": "Any failed connection"
   }
-}
+]

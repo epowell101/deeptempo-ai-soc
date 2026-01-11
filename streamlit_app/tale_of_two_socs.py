@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Tale of Two SOCs - Comparison Dashboard
 
@@ -11,6 +10,7 @@ Key features:
 - Confusion matrix visualization
 - MTTD (Mean Time to Detect) comparison
 - Mode switching for Claude integration
+- Rule visibility and evasion analysis
 - Replay capability
 """
 
@@ -53,6 +53,13 @@ st.markdown("""
         border-radius: 5px;
         margin: 10px 0;
     }
+    .evasion-box {
+        background-color: #fff3e0;
+        border-left: 4px solid #ff9800;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 10px 0;
+    }
     .metric-card {
         background-color: #f5f5f5;
         padding: 20px;
@@ -67,6 +74,18 @@ st.markdown("""
         font-size: 24px;
         font-weight: bold;
         margin-bottom: 20px;
+    }
+    .high-risk {
+        color: #f44336;
+        font-weight: bold;
+    }
+    .medium-risk {
+        color: #ff9800;
+        font-weight: bold;
+    }
+    .low-risk {
+        color: #4caf50;
+        font-weight: bold;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -100,6 +119,12 @@ def load_data():
     if rule_stats_file.exists():
         with open(rule_stats_file) as f:
             data["rule_stats"] = json.load(f)
+    
+    # Load rule definitions
+    rule_defs_file = SCENARIO_DIR / "rules_output" / "rule_definitions.json"
+    if rule_defs_file.exists():
+        with open(rule_defs_file) as f:
+            data["rule_definitions"] = json.load(f)
     
     # Load LogLM findings
     findings_file = SCENARIO_DIR / "loglm_output" / "findings.json"
@@ -261,44 +286,35 @@ def create_metrics_comparison_chart(rules_metrics, loglm_metrics):
     return fig
 
 
-def create_alert_timeline(alerts, findings):
-    """Create timeline comparison of alerts vs findings."""
-    # Process alerts
-    alert_times = [datetime.fromisoformat(a["timestamp"]) for a in alerts]
-    alert_df = pd.DataFrame({
-        "timestamp": alert_times,
-        "type": "Rules Alert",
-        "severity": [a["severity"] for a in alerts]
-    })
+def create_evasion_chart(rule_stats):
+    """Create chart showing rule evasion risk."""
+    if not rule_stats:
+        return None
     
-    # Process findings
-    finding_times = [datetime.fromisoformat(f["timestamp"]) for f in findings]
-    finding_df = pd.DataFrame({
-        "timestamp": finding_times,
-        "type": "LogLM Finding",
-        "severity": [f["severity"] for f in findings]
-    })
+    df = pd.DataFrame([
+        {
+            "Rule": v["name"][:30] + "..." if len(v["name"]) > 30 else v["name"],
+            "Evasion Risk": v.get("evasion_risk", "UNKNOWN"),
+            "Alerts": v["alert_count"]
+        }
+        for v in rule_stats.values()
+    ])
     
-    # Combine
-    df = pd.concat([alert_df, finding_df])
+    color_map = {"HIGH": "#f44336", "MEDIUM": "#ff9800", "LOW": "#4caf50", "UNKNOWN": "#9e9e9e"}
+    df["Color"] = df["Evasion Risk"].map(color_map)
     
-    # Create hourly counts
-    df["hour"] = df["timestamp"].dt.floor("H")
-    counts = df.groupby(["hour", "type"]).size().reset_index(name="count")
-    
-    fig = px.line(
-        counts,
-        x="hour",
-        y="count",
-        color="type",
-        title="Detection Volume Over Time",
-        color_discrete_map={"Rules Alert": "#f44336", "LogLM Finding": "#4caf50"}
+    fig = px.bar(
+        df,
+        x="Rule",
+        y="Alerts",
+        color="Evasion Risk",
+        color_discrete_map=color_map,
+        title="Alert Count by Rule (colored by Evasion Risk)"
     )
     
     fig.update_layout(
-        xaxis_title="Time",
-        yaxis_title="Detection Count",
-        height=350
+        xaxis_tickangle=-45,
+        height=400
     )
     
     return fig
@@ -348,6 +364,8 @@ def main():
     st.sidebar.markdown(f"Duration: {manifest.get('duration_hours', 0)} hours")
     st.sidebar.markdown(f"Total Events: {manifest.get('total_events', 0):,}")
     st.sidebar.markdown(f"Malicious: {manifest.get('malicious_events', 0)}")
+    st.sidebar.markdown(f"  - Detectable: {manifest.get('detectable_events', 0)}")
+    st.sidebar.markdown(f"  - Evasive: {manifest.get('evasive_events', 0)}")
     st.sidebar.markdown(f"Benign: {manifest.get('benign_events', 0):,}")
     
     st.sidebar.markdown("---")
@@ -355,14 +373,17 @@ def main():
     **LogLM detects malicious BEHAVIORS, not just anomalies.**
     
     This is why it has high precision - it's trained to recognize actual attack patterns, not just statistical outliers.
+    
+    **LogLM catches evasive attacks** that rules miss through behavioral analysis of flow patterns.
     """)
     
     # Main content - Tabs
-    tab1, tab2, tab3, tab4 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5 = st.tabs([
         "📊 Comparison Overview",
         "🔍 Detailed Metrics",
         "⏱️ MTTD Analysis",
-        "📋 Detection Details"
+        "📋 Rule Analysis",
+        "🥷 Evasion Analysis"
     ])
     
     eval_data = data["evaluation"]
@@ -422,6 +443,7 @@ def main():
             - No automatic correlation
             - No similarity search
             - No MITRE classification
+            - ❌ **Misses evasive attacks**
             
             *Analyst must manually review each alert and correlate them.*
             """)
@@ -437,6 +459,7 @@ def main():
             - ✅ Automatic correlation into incidents
             - ✅ Embedding-based similarity search
             - ✅ MITRE ATT&CK classification
+            - ✅ **Catches evasive attacks**
             
             *Analyst gets a clear attack narrative with correlated evidence.*
             """)
@@ -546,88 +569,191 @@ def main():
             else:
                 st.metric("LogLM Overall MTTD", "NOT DETECTED")
     
-    # Tab 4: Detection Details
+    # Tab 4: Rule Analysis
     with tab4:
-        st.header("Detection Details")
+        st.header("📋 Detection Rule Analysis")
         
-        detail_view = st.radio(
-            "View",
-            ["Rules Alerts", "LogLM Findings", "LogLM Incidents"],
-            horizontal=True
-        )
+        st.markdown("""
+        This section shows the Sigma-like rules used in the Rules-Only SOC, 
+        including their logic, thresholds, and **evasion risk**.
+        """)
         
-        if detail_view == "Rules Alerts":
-            alerts = data.get("alerts", [])
-            st.markdown(f"**{len(alerts)} alerts from {len(data.get('rule_stats', {}))} rules**")
+        rule_stats = data.get("rule_stats", {})
+        rule_defs = data.get("rule_definitions", [])
+        
+        # Rule evasion chart
+        if rule_stats:
+            evasion_chart = create_evasion_chart(rule_stats)
+            if evasion_chart:
+                st.plotly_chart(evasion_chart, use_container_width=True)
+        
+        st.markdown("### Rule Definitions")
+        
+        # Create rule definitions from stats if not available
+        if not rule_defs and rule_stats:
+            rule_defs = list(rule_stats.values())
+        
+        for rule in rule_defs:
+            rule_id = rule.get("id", rule.get("name", "Unknown"))
+            evasion_risk = rule.get("evasion_risk", "UNKNOWN")
+            risk_class = f"{evasion_risk.lower()}-risk"
             
-            # Rule breakdown
-            rule_stats = data.get("rule_stats", {})
-            if rule_stats:
-                rule_df = pd.DataFrame([
-                    {
-                        "Rule": v["name"],
-                        "Alerts": v["alert_count"],
-                        "Severity": v["severity"],
-                        "Tactic": v["tactic"]
-                    }
-                    for v in rule_stats.values()
-                ]).sort_values("Alerts", ascending=False)
+            with st.expander(f"**{rule.get('name', rule_id)}** - {rule.get('severity', 'medium').upper()} - Evasion Risk: {evasion_risk}"):
+                col1, col2 = st.columns(2)
                 
-                st.dataframe(rule_df, hide_index=True, use_container_width=True)
-            
-            # Sample alerts
-            st.markdown("### Sample Alerts")
-            sample_alerts = alerts[:10]
-            for alert in sample_alerts:
-                with st.expander(f"{alert['rule_name']} - {alert['severity'].upper()}"):
-                    st.json({k: v for k, v in alert.items() if k != "raw_event"})
-        
-        elif detail_view == "LogLM Findings":
-            findings = data.get("findings", [])
-            st.markdown(f"**{len(findings)} findings with MITRE classification**")
-            
-            # Technique breakdown
-            technique_counts = {}
-            for f in findings:
-                for pred in f.get("mitre_predictions", []):
-                    tech = pred["technique_name"]
-                    technique_counts[tech] = technique_counts.get(tech, 0) + 1
-            
-            if technique_counts:
-                tech_df = pd.DataFrame([
-                    {"Technique": k, "Count": v}
-                    for k, v in technique_counts.items()
-                ]).sort_values("Count", ascending=False)
+                with col1:
+                    st.markdown(f"**Description:** {rule.get('description', 'N/A')}")
+                    st.markdown(f"**Tactic:** {rule.get('tactic', 'N/A')}")
+                    st.markdown(f"**Technique:** {rule.get('technique', 'N/A')}")
+                    st.markdown(f"**Threshold:** {rule.get('threshold', 'N/A')}")
                 
-                fig = px.bar(tech_df, x="Technique", y="Count", title="Findings by MITRE Technique")
-                st.plotly_chart(fig, use_container_width=True)
-            
-            # Sample findings
-            st.markdown("### Sample Findings")
-            sample_findings = findings[:10]
-            for finding in sample_findings:
-                with st.expander(f"{finding['title']} - {finding['severity'].upper()} ({finding['confidence']:.0%} confidence)"):
-                    display_finding = {k: v for k, v in finding.items() if k not in ["raw_event", "embedding"]}
-                    st.json(display_finding)
-        
-        else:  # Incidents
-            incidents = data.get("incidents", [])
-            st.markdown(f"**{len(incidents)} correlated incidents**")
-            
-            for incident in incidents:
-                severity_color = {
-                    "critical": "🔴",
-                    "high": "🟠",
-                    "medium": "🟡",
-                    "low": "🟢"
-                }.get(incident["severity"], "⚪")
+                with col2:
+                    st.markdown(f"**Alert Count:** {rule.get('alert_count', 0)}")
+                    st.markdown(f"**Expected FP Rate:** {rule.get('false_positive_rate', 0)*100:.0f}%")
+                    
+                    if evasion_risk == "HIGH":
+                        st.error(f"**Evasion Risk:** {evasion_risk}")
+                    elif evasion_risk == "MEDIUM":
+                        st.warning(f"**Evasion Risk:** {evasion_risk}")
+                    else:
+                        st.success(f"**Evasion Risk:** {evasion_risk}")
                 
-                with st.expander(f"{severity_color} {incident['title']} ({incident['finding_count']} findings)"):
-                    st.markdown(f"**Severity:** {incident['severity'].upper()}")
-                    st.markdown(f"**Summary:** {incident.get('summary', 'N/A')}")
-                    st.markdown(f"**Techniques:** {', '.join(incident.get('techniques', []))}")
-                    st.markdown(f"**Affected Hosts:** {', '.join(incident.get('affected_hosts', []))}")
-                    st.markdown(f"**Phases Detected:** {incident.get('phases_detected', [])}")
+                st.markdown("---")
+                st.markdown(f"**Rule Logic:** `{rule.get('logic_human', 'N/A')}`")
+                st.markdown(f"**How to Evade:** {rule.get('evasion_method', 'N/A')}")
+        
+        # Summary stats
+        st.markdown("---")
+        st.markdown("### Rule Summary")
+        
+        if rule_stats:
+            high_risk = len([r for r in rule_stats.values() if r.get("evasion_risk") == "HIGH"])
+            med_risk = len([r for r in rule_stats.values() if r.get("evasion_risk") == "MEDIUM"])
+            low_risk = len([r for r in rule_stats.values() if r.get("evasion_risk") == "LOW"])
+            
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.metric("HIGH Evasion Risk", high_risk, help="Rules that are easily evaded")
+            with col2:
+                st.metric("MEDIUM Evasion Risk", med_risk)
+            with col3:
+                st.metric("LOW Evasion Risk", low_risk, help="Rules that are harder to evade")
+    
+    # Tab 5: Evasion Analysis
+    with tab5:
+        st.header("🥷 Signature Evasion Analysis")
+        
+        st.markdown("""
+        This section analyzes how attackers can evade signature-based rules 
+        and how LogLM catches these evasive attacks through behavioral analysis.
+        """)
+        
+        manifest = data.get("manifest", {})
+        ground_truth = data.get("ground_truth", {})
+        findings = data.get("findings", [])
+        
+        # Evasion summary
+        evasive_events = manifest.get("evasive_events", 0)
+        detectable_events = manifest.get("detectable_events", 0)
+        total_malicious = manifest.get("malicious_events", 0)
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Total Malicious Events", total_malicious)
+        with col2:
+            st.metric("Detectable by Rules", detectable_events)
+        with col3:
+            st.metric("Evasive (Rules Miss)", evasive_events, 
+                     delta=f"{evasive_events/total_malicious*100:.0f}% of attacks" if total_malicious > 0 else "0%")
+        
+        st.markdown("---")
+        
+        # Evasion techniques used
+        evasion_techniques = manifest.get("evasion_techniques", [])
+        if evasion_techniques:
+            st.markdown("### Evasion Techniques Used in This Scenario")
+            
+            for i, technique in enumerate(evasion_techniques, 1):
+                st.markdown(f"**{i}.** {technique}")
+        
+        st.markdown("---")
+        
+        # How LogLM catches evasive attacks
+        st.markdown("### How LogLM Catches Evasive Attacks")
+        
+        st.markdown('<div class="evasion-box">', unsafe_allow_html=True)
+        st.markdown("""
+        **LogLM doesn't rely on signatures or thresholds.** Instead, it:
+        
+        1. **Analyzes flow patterns** - Even "low and slow" attacks have behavioral fingerprints
+        2. **Recognizes malicious sequences** - The order of actions reveals intent
+        3. **Uses embeddings** - Similar attacks cluster together, even if they look different on the surface
+        4. **Trained on security data** - Knows what real attacks look like, not just statistical anomalies
+        
+        **Result:** LogLM catches attacks that rules miss, while maintaining high precision.
+        """)
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+        # Evasive findings from LogLM
+        evasive_findings = [f for f in findings if f.get("evasive", False)]
+        
+        if evasive_findings:
+            st.markdown("### Evasive Attacks Detected by LogLM")
+            st.markdown(f"**{len(evasive_findings)} evasive findings** that rules would have missed:")
+            
+            for finding in evasive_findings[:10]:
+                with st.expander(f"🥷 {finding['title']}"):
+                    st.markdown(f"**Description:** {finding['description']}")
+                    st.markdown(f"**Confidence:** {finding['confidence']*100:.0f}%")
+                    st.markdown(f"**Detection Method:** {finding.get('detection_method', 'behavioral_analysis')}")
+                    if finding.get('evasion_technique'):
+                        st.warning(f"**Evasion Technique Used:** {finding['evasion_technique']}")
+                    st.markdown(f"**MITRE Technique:** {finding['mitre_predictions'][0]['technique_name']}")
+        
+        # Comparison table
+        st.markdown("---")
+        st.markdown("### Detection Comparison: Rules vs LogLM")
+        
+        comparison_data = [
+            {
+                "Attack Type": "Standard C2 Beaconing",
+                "Rules": "✅ Detected",
+                "LogLM": "✅ Detected",
+                "Notes": "Both methods catch obvious patterns"
+            },
+            {
+                "Attack Type": "DNS Tunneling (long subdomain)",
+                "Rules": "✅ Detected",
+                "LogLM": "✅ Detected",
+                "Notes": "Signature matches long subdomain"
+            },
+            {
+                "Attack Type": "Low-and-Slow DNS C2",
+                "Rules": "❌ Missed",
+                "LogLM": "✅ Detected",
+                "Notes": "Short subdomains, A records, spread over hours"
+            },
+            {
+                "Attack Type": "C2 via Legitimate CDN",
+                "Rules": "❌ Missed",
+                "LogLM": "✅ Detected",
+                "Notes": "Uses AWS/Cloudflare IPs with jitter"
+            },
+            {
+                "Attack Type": "Staged Exfiltration",
+                "Rules": "❌ Missed",
+                "LogLM": "✅ Detected",
+                "Notes": "Small chunks under threshold"
+            },
+            {
+                "Attack Type": "WMI/WinRM Lateral Movement",
+                "Rules": "❌ Missed",
+                "LogLM": "✅ Detected",
+                "Notes": "Uses ports not monitored by RDP/SMB rules"
+            },
+        ]
+        
+        st.dataframe(pd.DataFrame(comparison_data), hide_index=True, use_container_width=True)
 
 
 if __name__ == "__main__":

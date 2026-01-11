@@ -6,6 +6,7 @@ Calculates:
 - Confusion matrix (TP, FP, FN, TN)
 - Precision, Recall, F1 Score
 - Mean Time to Detect (MTTD) per phase and overall
+- Evasion analysis (what rules miss vs what LogLM catches)
 """
 
 import json
@@ -44,10 +45,23 @@ def evaluate_detection(detected_event_ids: Set[str], ground_truth: Dict) -> Dict
         if info["label"] == "benign"
     }
     
+    # Also track evasive events separately
+    evasive_events = {
+        eid for eid, info in ground_truth["events"].items()
+        if info.get("evasive", False)
+    }
+    non_evasive_malicious = malicious_events - evasive_events
+    
     tp = len(detected_event_ids & malicious_events)  # Correctly detected attacks
     fp = len(detected_event_ids & benign_events)     # False alarms
     fn = len(malicious_events - detected_event_ids)  # Missed attacks
     tn = len(benign_events - detected_event_ids)     # Correctly ignored benign
+    
+    # Evasive detection breakdown
+    evasive_detected = len(detected_event_ids & evasive_events)
+    evasive_missed = len(evasive_events - detected_event_ids)
+    non_evasive_detected = len(detected_event_ids & non_evasive_malicious)
+    non_evasive_missed = len(non_evasive_malicious - detected_event_ids)
     
     precision = tp / (tp + fp) if (tp + fp) > 0 else 0
     recall = tp / (tp + fn) if (tp + fn) > 0 else 0
@@ -72,6 +86,15 @@ def evaluate_detection(detected_event_ids: Set[str], ground_truth: Dict) -> Dict
             "total_detected": len(detected_event_ids),
             "total_malicious": len(malicious_events),
             "total_benign": len(benign_events)
+        },
+        "evasion_analysis": {
+            "total_evasive": len(evasive_events),
+            "evasive_detected": evasive_detected,
+            "evasive_missed": evasive_missed,
+            "evasive_detection_rate": round(evasive_detected / len(evasive_events), 4) if evasive_events else 0,
+            "non_evasive_detected": non_evasive_detected,
+            "non_evasive_missed": non_evasive_missed,
+            "non_evasive_detection_rate": round(non_evasive_detected / len(non_evasive_malicious), 4) if non_evasive_malicious else 0
         }
     }
 
@@ -109,6 +132,7 @@ def calculate_mttd(detections: List[Dict], ground_truth: Dict, event_id_field: s
         phase_num = phase_info["phase"]
         phase_start = parse_timestamp(phase_info["start_time"])
         phase_events = set(phase_info["event_ids"])
+        is_evasive = phase_info.get("evasive", False)
         
         if overall_attack_start is None or phase_start < overall_attack_start:
             overall_attack_start = phase_start
@@ -128,7 +152,8 @@ def calculate_mttd(detections: List[Dict], ground_truth: Dict, event_id_field: s
                 "detected": True,
                 "mttd_minutes": round(max(0, mttd_minutes), 1),
                 "phase_start": phase_start.isoformat(),
-                "first_detection": first_detection.isoformat()
+                "first_detection": first_detection.isoformat(),
+                "evasive": is_evasive
             }
             
             if overall_first_detection is None or first_detection < overall_first_detection:
@@ -139,7 +164,8 @@ def calculate_mttd(detections: List[Dict], ground_truth: Dict, event_id_field: s
                 "detected": False,
                 "mttd_minutes": None,
                 "phase_start": phase_start.isoformat(),
-                "first_detection": None
+                "first_detection": None,
+                "evasive": is_evasive
             }
     
     # Overall MTTD
@@ -167,17 +193,23 @@ def calculate_mttd(detections: List[Dict], ground_truth: Dict, event_id_field: s
     else:
         results["average_phase_mttd"] = None
     
-    # Count phases detected
+    # Count phases detected (separate evasive and non-evasive)
     phases_detected = sum(1 for k, v in results.items() if k.startswith("phase_") and v["detected"])
     total_phases = sum(1 for k in results.keys() if k.startswith("phase_"))
+    evasive_phases_detected = sum(1 for k, v in results.items() if k.startswith("phase_") and v["detected"] and v.get("evasive"))
+    total_evasive_phases = sum(1 for k, v in results.items() if k.startswith("phase_") and v.get("evasive"))
+    
     results["phases_detected"] = f"{phases_detected}/{total_phases}"
+    results["evasive_phases_detected"] = f"{evasive_phases_detected}/{total_evasive_phases}" if total_evasive_phases > 0 else "N/A"
     
     return results
 
 
 def run_evaluation():
     """Run full evaluation comparing both detection methods."""
-    print("Running evaluation...")
+    print("=" * 60)
+    print("Running Evaluation")
+    print("=" * 60)
     
     # Load ground truth
     with open(SCENARIO_DIR / "ground_truth.json") as f:
@@ -202,8 +234,8 @@ def run_evaluation():
         for eid in finding.get("event_ids", []):
             loglm_detected.add(eid)
     
-    print(f"  Rules detected {len(rules_detected)} unique events")
-    print(f"  LogLM detected {len(loglm_detected)} unique events")
+    print(f"\nRules detected {len(rules_detected)} unique events")
+    print(f"LogLM detected {len(loglm_detected)} unique events")
     
     # Calculate confusion matrices
     rules_eval = evaluate_detection(rules_detected, ground_truth)
@@ -232,7 +264,11 @@ def run_evaluation():
             "alert_reduction": round(1 - len(loglm_findings) / len(rules_alerts), 4) if rules_alerts else 0,
             "mttd_improvement_minutes": round(
                 (rules_mttd["overall"]["mttd_minutes"] or 999) - (loglm_mttd["overall"]["mttd_minutes"] or 999), 1
-            ) if rules_mttd["overall"]["detected"] and loglm_mttd["overall"]["detected"] else None
+            ) if rules_mttd["overall"]["detected"] and loglm_mttd["overall"]["detected"] else None,
+            "evasion_detection_improvement": round(
+                loglm_eval["evasion_analysis"]["evasive_detection_rate"] - 
+                rules_eval["evasion_analysis"]["evasive_detection_rate"], 4
+            )
         }
     }
     
@@ -263,9 +299,20 @@ def run_evaluation():
     print(f"{'F1 Score':<25} {rules_eval['metrics']['f1_score']:.3f}{'':<11} {loglm_eval['metrics']['f1_score']:.3f}")
     print(f"{'False Positive Rate':<25} {rules_eval['metrics']['false_positive_rate']*100:.1f}%{'':<10} {loglm_eval['metrics']['false_positive_rate']*100:.1f}%")
     
+    print("\n🥷 EVASION ANALYSIS")
+    print("-"*60)
+    print(f"{'Metric':<25} {'Rules-Only':<15} {'LogLM':<15}")
+    print("-"*60)
+    rules_evasion = rules_eval["evasion_analysis"]
+    loglm_evasion = loglm_eval["evasion_analysis"]
+    print(f"{'Total Evasive Events':<25} {rules_evasion['total_evasive']:<15} {loglm_evasion['total_evasive']:<15}")
+    print(f"{'Evasive Detected':<25} {rules_evasion['evasive_detected']:<15} {loglm_evasion['evasive_detected']:<15}")
+    print(f"{'Evasive Missed':<25} {rules_evasion['evasive_missed']:<15} {loglm_evasion['evasive_missed']:<15}")
+    print(f"{'Evasive Detection Rate':<25} {rules_evasion['evasive_detection_rate']*100:.1f}%{'':<10} {loglm_evasion['evasive_detection_rate']*100:.1f}%")
+    
     print("\n⏱️ MEAN TIME TO DETECT (MTTD)")
     print("-"*60)
-    print(f"{'Phase':<30} {'Rules-Only':<15} {'LogLM':<15}")
+    print(f"{'Phase':<35} {'Rules-Only':<15} {'LogLM':<15}")
     print("-"*60)
     
     for phase_key in sorted([k for k in rules_mttd.keys() if k.startswith("phase_")]):
@@ -275,13 +322,15 @@ def run_evaluation():
         rules_val = f"{rules_phase['mttd_minutes']} min" if rules_phase['detected'] else "NOT DETECTED"
         loglm_val = f"{loglm_phase['mttd_minutes']} min" if loglm_phase['detected'] else "NOT DETECTED"
         
-        print(f"{rules_phase['phase_name']:<30} {rules_val:<15} {loglm_val:<15}")
+        evasive_marker = " [EVASIVE]" if rules_phase.get("evasive") else ""
+        print(f"{rules_phase['phase_name'][:30]}{evasive_marker:<5} {rules_val:<15} {loglm_val:<15}")
     
     print("-"*60)
     rules_overall = f"{rules_mttd['overall']['mttd_minutes']} min" if rules_mttd['overall']['detected'] else "NOT DETECTED"
     loglm_overall = f"{loglm_mttd['overall']['mttd_minutes']} min" if loglm_mttd['overall']['detected'] else "NOT DETECTED"
-    print(f"{'OVERALL':<30} {rules_overall:<15} {loglm_overall:<15}")
-    print(f"{'Phases Detected':<30} {rules_mttd['phases_detected']:<15} {loglm_mttd['phases_detected']:<15}")
+    print(f"{'OVERALL':<35} {rules_overall:<15} {loglm_overall:<15}")
+    print(f"{'Phases Detected':<35} {rules_mttd['phases_detected']:<15} {loglm_mttd['phases_detected']:<15}")
+    print(f"{'Evasive Phases Detected':<35} {rules_mttd['evasive_phases_detected']:<15} {loglm_mttd['evasive_phases_detected']:<15}")
     
     print("\n🎯 SUMMARY")
     print("-"*60)
@@ -289,8 +338,13 @@ def run_evaluation():
     print(f"LogLM:      {len(loglm_findings)} findings, {loglm_eval['metrics']['precision']*100:.1f}% precision")
     print(f"\nLogLM reduces alerts by {results['comparison']['alert_reduction']*100:.0f}% while improving precision by {results['comparison']['precision_improvement']*100:.1f} percentage points")
     
+    print(f"\n🥷 EVASION DETECTION:")
+    print(f"  Rules-Only catches {rules_evasion['evasive_detection_rate']*100:.0f}% of evasive attacks")
+    print(f"  LogLM catches {loglm_evasion['evasive_detection_rate']*100:.0f}% of evasive attacks")
+    print(f"  Improvement: +{results['comparison']['evasion_detection_improvement']*100:.0f} percentage points")
+    
     if results['comparison']['mttd_improvement_minutes']:
-        print(f"LogLM detects attacks {results['comparison']['mttd_improvement_minutes']:.0f} minutes faster on average")
+        print(f"\nLogLM detects attacks {results['comparison']['mttd_improvement_minutes']:.0f} minutes faster on average")
     
     return results
 

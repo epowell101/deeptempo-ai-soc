@@ -1,1 +1,0 @@
-"""Case Store MCP Server."""

@@ -7,6 +7,11 @@ Generates alerts that are:
 - Noisy (many false positives)
 - Uncorrelated (each alert is independent)
 - Missing context (no attack narrative)
+
+Also exposes detailed rule information including:
+- Rule logic (human-readable)
+- Thresholds and conditions
+- Evasion risk assessment
 """
 
 import json
@@ -18,7 +23,7 @@ from typing import List, Dict, Any, Optional
 SCENARIO_DIR = Path(__file__).parent.parent / "data" / "scenarios" / "default_attack"
 
 
-# Sigma-like detection rules
+# Sigma-like detection rules with detailed metadata
 DETECTION_RULES = [
     {
         "id": "rule_001",
@@ -26,7 +31,12 @@ DETECTION_RULES = [
         "description": "Detects connections to external IPs not in whitelist",
         "severity": "medium",
         "tactic": "Command and Control",
-        "false_positive_rate": 0.15,  # 15% of benign traffic triggers this
+        "technique": "T1071.001",
+        "false_positive_rate": 0.15,
+        "evasion_risk": "HIGH",
+        "evasion_method": "Use legitimate cloud infrastructure IPs (AWS, Azure, Cloudflare)",
+        "logic_human": "IF destination IP is external AND NOT in known-good list THEN alert",
+        "threshold": "Any single connection",
         "condition": lambda e: (
             e.get("service") in ["ssl", "http"] and
             not e.get("id.resp_h", "").startswith("10.") and
@@ -37,6 +47,9 @@ DETECTION_RULES = [
                 "157.240.1.35", "157.240.1.63",
                 "52.94.236.248", "54.239.28.85",
                 "13.107.42.14", "20.190.151.68",
+                # Legitimate cloud IPs that attackers abuse
+                "13.225.78.45", "104.18.32.68", "151.101.1.140",
+                "52.84.150.23", "172.67.182.31",
             ]
         )
     },
@@ -46,7 +59,12 @@ DETECTION_RULES = [
         "description": "Detects DNS queries with unusually long subdomains (potential tunneling)",
         "severity": "medium",
         "tactic": "Command and Control",
+        "technique": "T1071.004",
         "false_positive_rate": 0.05,
+        "evasion_risk": "MEDIUM",
+        "evasion_method": "Keep subdomains under 20 characters, use multiple short queries",
+        "logic_human": "IF DNS query subdomain length > 20 characters THEN alert",
+        "threshold": "Subdomain > 20 chars",
         "condition": lambda e: (
             "query" in e and
             len(e.get("query", "").split(".")[0]) > 20
@@ -57,8 +75,13 @@ DETECTION_RULES = [
         "name": "Suspicious DNS Query - TXT Record",
         "description": "Detects TXT record queries which may indicate DNS tunneling",
         "severity": "low",
-        "tactic": "Command and Control", 
+        "tactic": "Command and Control",
+        "technique": "T1071.004",
         "false_positive_rate": 0.08,
+        "evasion_risk": "LOW",
+        "evasion_method": "Use A/AAAA records instead of TXT, encode data in subdomain",
+        "logic_human": "IF DNS query type = TXT THEN alert",
+        "threshold": "Any TXT query",
         "condition": lambda e: e.get("qtype") == "TXT"
     },
     {
@@ -67,7 +90,12 @@ DETECTION_RULES = [
         "description": "Detects RDP connections between internal hosts",
         "severity": "low",
         "tactic": "Lateral Movement",
-        "false_positive_rate": 0.20,  # IT admins use RDP legitimately
+        "technique": "T1021.001",
+        "false_positive_rate": 0.20,
+        "evasion_risk": "MEDIUM",
+        "evasion_method": "Use WMI, WinRM, or PowerShell Remoting instead of RDP",
+        "logic_human": "IF destination port = 3389 AND both IPs are internal THEN alert",
+        "threshold": "Any RDP connection",
         "condition": lambda e: (
             e.get("id.resp_p") == 3389 and
             e.get("id.orig_h", "").startswith("10.") and
@@ -80,7 +108,12 @@ DETECTION_RULES = [
         "description": "Detects SMB connections between internal hosts",
         "severity": "low",
         "tactic": "Lateral Movement",
-        "false_positive_rate": 0.25,  # Very common in enterprise
+        "technique": "T1021.002",
+        "false_positive_rate": 0.25,
+        "evasion_risk": "MEDIUM",
+        "evasion_method": "Use WMI (port 135), WinRM (5985/5986), or SSH",
+        "logic_human": "IF destination port = 445 AND both IPs are internal THEN alert",
+        "threshold": "Any SMB connection",
         "condition": lambda e: (
             e.get("id.resp_p") == 445 and
             e.get("id.orig_h", "").startswith("10.") and
@@ -93,7 +126,12 @@ DETECTION_RULES = [
         "description": "Detects connections with large outbound byte count",
         "severity": "medium",
         "tactic": "Exfiltration",
+        "technique": "T1041",
         "false_positive_rate": 0.10,
+        "evasion_risk": "HIGH",
+        "evasion_method": "Chunk data into transfers < 500KB, spread over hours/days",
+        "logic_human": "IF outbound bytes > 500KB AND destination is external THEN alert",
+        "threshold": "> 500,000 bytes",
         "condition": lambda e: (
             e.get("orig_bytes", 0) > 500000 and
             not e.get("id.resp_h", "").startswith("10.")
@@ -102,10 +140,15 @@ DETECTION_RULES = [
     {
         "id": "rule_007",
         "name": "Connection to Known Bad Port",
-        "description": "Detects connections to suspicious ports",
+        "description": "Detects connections to suspicious ports commonly used by malware",
         "severity": "high",
         "tactic": "Command and Control",
+        "technique": "T1571",
         "false_positive_rate": 0.03,
+        "evasion_risk": "LOW",
+        "evasion_method": "Use standard ports (443, 80, 53) for C2 communication",
+        "logic_human": "IF destination port IN [4444, 5555, 6666, 8888, 9999, 1337] THEN alert",
+        "threshold": "Any connection to listed ports",
         "condition": lambda e: e.get("id.resp_p") in [4444, 5555, 6666, 8888, 9999, 1337]
     },
     {
@@ -114,7 +157,12 @@ DETECTION_RULES = [
         "description": "Detects regular interval connections (potential C2)",
         "severity": "medium",
         "tactic": "Command and Control",
-        "false_positive_rate": 0.12,  # Many apps beacon legitimately
+        "technique": "T1071.001",
+        "false_positive_rate": 0.12,
+        "evasion_risk": "HIGH",
+        "evasion_method": "Add jitter to beacon intervals, vary connection duration",
+        "logic_human": "IF SSL connection AND duration < 5s AND small payload AND external THEN alert",
+        "threshold": "Duration < 5s, payload < 1KB",
         "condition": lambda e: (
             e.get("service") == "ssl" and
             e.get("duration", 0) < 5 and
@@ -124,11 +172,16 @@ DETECTION_RULES = [
     },
     {
         "id": "rule_009",
-        "name": "DNS Query to Suspicious Domain",
-        "description": "Detects DNS queries to domains matching suspicious patterns",
+        "name": "DNS Query to Suspicious Domain Pattern",
+        "description": "Detects DNS queries to domains matching suspicious naming patterns",
         "severity": "high",
         "tactic": "Command and Control",
+        "technique": "T1071.004",
         "false_positive_rate": 0.02,
+        "evasion_risk": "MEDIUM",
+        "evasion_method": "Use innocuous domain names that mimic legitimate services",
+        "logic_human": "IF DNS query contains patterns like 'data-sync', 'cdn-update' THEN alert",
+        "threshold": "Pattern match in domain",
         "condition": lambda e: (
             "query" in e and
             any(pattern in e.get("query", "") for pattern in [
@@ -139,11 +192,16 @@ DETECTION_RULES = [
     },
     {
         "id": "rule_010",
-        "name": "Workstation to Server Connection",
+        "name": "Workstation to Server Direct Connection",
         "description": "Detects direct connections from workstations to servers",
         "severity": "low",
         "tactic": "Lateral Movement",
-        "false_positive_rate": 0.30,  # Very common
+        "technique": "T1021",
+        "false_positive_rate": 0.30,
+        "evasion_risk": "HIGH",
+        "evasion_method": "Route through jump hosts, use legitimate admin tools",
+        "logic_human": "IF source hostname starts with 'workstation' AND dest is server subnet THEN alert",
+        "threshold": "Any direct connection",
         "condition": lambda e: (
             e.get("hostname", "").startswith("workstation") and
             e.get("id.resp_h", "").startswith("10.0.2.")
@@ -155,7 +213,12 @@ DETECTION_RULES = [
         "description": "Detects external connections to internal web servers",
         "severity": "low",
         "tactic": "Initial Access",
-        "false_positive_rate": 0.40,  # Web servers get lots of traffic
+        "technique": "T1190",
+        "false_positive_rate": 0.40,
+        "evasion_risk": "LOW",
+        "evasion_method": "Blend with legitimate web traffic, use common user agents",
+        "logic_human": "IF source is external AND dest is web server AND port is HTTP/HTTPS THEN alert",
+        "threshold": "Any external web connection",
         "condition": lambda e: (
             not e.get("id.orig_h", "").startswith("10.") and
             e.get("id.resp_h") == "10.0.2.20" and
@@ -165,13 +228,38 @@ DETECTION_RULES = [
     {
         "id": "rule_012",
         "name": "Failed Connection Attempt",
-        "description": "Detects rejected or reset connections",
+        "description": "Detects rejected or reset connections (potential scanning)",
         "severity": "low",
         "tactic": "Discovery",
+        "technique": "T1046",
         "false_positive_rate": 0.15,
+        "evasion_risk": "MEDIUM",
+        "evasion_method": "Slow down scanning, use passive reconnaissance",
+        "logic_human": "IF connection state is REJ, RSTO, or RSTOS0 THEN alert",
+        "threshold": "Any failed connection",
         "condition": lambda e: e.get("conn_state") in ["REJ", "RSTO", "RSTOS0"]
     },
 ]
+
+
+def get_rule_details() -> List[Dict]:
+    """Get detailed information about all rules (without lambda functions)."""
+    rules_info = []
+    for rule in DETECTION_RULES:
+        rules_info.append({
+            "id": rule["id"],
+            "name": rule["name"],
+            "description": rule["description"],
+            "severity": rule["severity"],
+            "tactic": rule["tactic"],
+            "technique": rule.get("technique", "Unknown"),
+            "false_positive_rate": rule["false_positive_rate"],
+            "evasion_risk": rule["evasion_risk"],
+            "evasion_method": rule["evasion_method"],
+            "logic_human": rule["logic_human"],
+            "threshold": rule["threshold"]
+        })
+    return rules_info
 
 
 def apply_rules(events: List[Dict], rules: List[Dict]) -> List[Dict]:
@@ -195,6 +283,7 @@ def apply_rules(events: List[Dict], rules: List[Dict]) -> List[Dict]:
                         "description": rule["description"],
                         "severity": rule["severity"],
                         "tactic": rule["tactic"],
+                        "technique": rule.get("technique", "Unknown"),
                         "timestamp": event.get("ts"),
                         "source_ip": event.get("id.orig_h"),
                         "dest_ip": event.get("id.resp_h"),
@@ -214,7 +303,9 @@ def apply_rules(events: List[Dict], rules: List[Dict]) -> List[Dict]:
 
 def generate_rules_output():
     """Generate alerts from rules and save to rules_output directory."""
-    print("Running rules-only detection...")
+    print("=" * 60)
+    print("Running Rules-Only Detection")
+    print("=" * 60)
     
     # Load raw logs
     conn_file = SCENARIO_DIR / "raw_logs" / "zeek_conn.json"
@@ -227,11 +318,11 @@ def generate_rules_output():
         dns_events = json.load(f)
     
     all_events = conn_events + dns_events
-    print(f"  Loaded {len(all_events)} events")
+    print(f"\nLoaded {len(all_events)} events")
     
     # Apply rules
     alerts = apply_rules(all_events, DETECTION_RULES)
-    print(f"  Generated {len(alerts)} alerts")
+    print(f"Generated {len(alerts)} alerts")
     
     # Calculate rule statistics
     rule_stats = {}
@@ -239,10 +330,16 @@ def generate_rules_output():
         rule_alerts = [a for a in alerts if a["rule_id"] == rule["id"]]
         rule_stats[rule["id"]] = {
             "name": rule["name"],
+            "description": rule["description"],
             "severity": rule["severity"],
             "tactic": rule["tactic"],
+            "technique": rule.get("technique", "Unknown"),
             "alert_count": len(rule_alerts),
-            "false_positive_rate": rule["false_positive_rate"]
+            "false_positive_rate": rule["false_positive_rate"],
+            "evasion_risk": rule["evasion_risk"],
+            "evasion_method": rule["evasion_method"],
+            "logic_human": rule["logic_human"],
+            "threshold": rule["threshold"]
         }
     
     # Sort alerts by timestamp
@@ -258,15 +355,45 @@ def generate_rules_output():
     with open(output_dir / "rule_stats.json", "w") as f:
         json.dump(rule_stats, f, indent=2)
     
-    # Print summary
-    print(f"\nRules-Only Detection Summary:")
-    print(f"  Total alerts: {len(alerts)}")
-    print(f"  Rules triggered: {len([r for r in rule_stats.values() if r['alert_count'] > 0])}")
-    print(f"\n  Top alerting rules:")
+    # Save detailed rule definitions
+    with open(output_dir / "rule_definitions.json", "w") as f:
+        json.dump(get_rule_details(), f, indent=2)
     
+    # Print summary
+    print(f"\n" + "=" * 60)
+    print("Rules-Only Detection Summary")
+    print("=" * 60)
+    print(f"\nTotal alerts: {len(alerts)}")
+    print(f"Rules triggered: {len([r for r in rule_stats.values() if r['alert_count'] > 0])}/{len(DETECTION_RULES)}")
+    
+    print(f"\nTop alerting rules:")
     sorted_rules = sorted(rule_stats.items(), key=lambda x: x[1]["alert_count"], reverse=True)
     for rule_id, stats in sorted_rules[:5]:
-        print(f"    {stats['name']}: {stats['alert_count']} alerts")
+        print(f"  {stats['name']}: {stats['alert_count']} alerts")
+    
+    print(f"\nRules by evasion risk:")
+    high_risk = [r for r in rule_stats.values() if r["evasion_risk"] == "HIGH"]
+    med_risk = [r for r in rule_stats.values() if r["evasion_risk"] == "MEDIUM"]
+    low_risk = [r for r in rule_stats.values() if r["evasion_risk"] == "LOW"]
+    print(f"  HIGH risk (easily evaded): {len(high_risk)} rules")
+    print(f"  MEDIUM risk: {len(med_risk)} rules")
+    print(f"  LOW risk: {len(low_risk)} rules")
+    
+    # Check for evasive events
+    gt_file = SCENARIO_DIR / "ground_truth.json"
+    if gt_file.exists():
+        with open(gt_file) as f:
+            ground_truth = json.load(f)
+        
+        evasive_events = [eid for eid, info in ground_truth["events"].items() 
+                         if info.get("evasive", False)]
+        detected_evasive = [a for a in alerts if a["event_id"] in evasive_events]
+        
+        print(f"\nEvasive attack detection:")
+        print(f"  Total evasive events: {len(evasive_events)}")
+        print(f"  Detected by rules: {len(detected_evasive)}")
+        print(f"  Missed by rules: {len(evasive_events) - len(detected_evasive)}")
+        print(f"  Evasion success rate: {(len(evasive_events) - len(detected_evasive)) / len(evasive_events) * 100:.1f}%")
     
     return alerts, rule_stats
 

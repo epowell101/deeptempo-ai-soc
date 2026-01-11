@@ -1,22 +1,31 @@
 {
   "rules_only": {
     "confusion_matrix": {
-      "true_positives": 151,
-      "false_positives": 253,
-      "false_negatives": 0,
-      "true_negatives": 4620
+      "true_positives": 56,
+      "false_positives": 0,
+      "false_negatives": 131,
+      "true_negatives": 0
     },
     "metrics": {
-      "precision": 0.3738,
-      "recall": 1.0,
-      "f1_score": 0.5441,
-      "false_positive_rate": 0.0519,
-      "accuracy": 0.9496
+      "precision": 1.0,
+      "recall": 0.2995,
+      "f1_score": 0.4609,
+      "false_positive_rate": 0,
+      "accuracy": 0.2995
     },
     "counts": {
-      "total_detected": 404,
-      "total_malicious": 151,
-      "total_benign": 4873
+      "total_detected": 292,
+      "total_malicious": 187,
+      "total_benign": 0
+    },
+    "evasion_analysis": {
+      "total_evasive": 135,
+      "evasive_detected": 4,
+      "evasive_missed": 131,
+      "evasive_detection_rate": 0.0296,
+      "non_evasive_detected": 52,
+      "non_evasive_missed": 0,
+      "non_evasive_detection_rate": 1.0
     },
     "mttd": {
       "phase_1": {
@@ -24,65 +33,104 @@
         "detected": true,
         "mttd_minutes": 0.2,
         "phase_start": "2026-01-09T02:07:48",
-        "first_detection": "2026-01-09T02:08:00"
+        "first_detection": "2026-01-09T02:08:00",
+        "evasive": false
       },
       "phase_2": {
         "phase_name": "C2 Establishment",
         "detected": true,
         "mttd_minutes": 0.2,
         "phase_start": "2026-01-09T02:07:48",
-        "first_detection": "2026-01-09T02:07:59"
+        "first_detection": "2026-01-09T02:08:00",
+        "evasive": false
       },
       "phase_3": {
         "phase_name": "Lateral Movement",
         "detected": true,
-        "mttd_minutes": 7.0,
+        "mttd_minutes": 4.0,
         "phase_start": "2026-01-09T02:12:00",
-        "first_detection": "2026-01-09T02:19:00"
+        "first_detection": "2026-01-09T02:16:00",
+        "evasive": false
       },
       "phase_4": {
         "phase_name": "Data Access & Exfiltration",
         "detected": true,
         "mttd_minutes": 0,
         "phase_start": "2026-01-09T02:40:12",
-        "first_detection": "2026-01-09T02:40:00"
+        "first_detection": "2026-01-09T02:40:00",
+        "evasive": false
       },
       "phase_5": {
         "phase_name": "Persistence & Continued Access",
         "detected": true,
-        "mttd_minutes": 0.6,
+        "mttd_minutes": 84.7,
         "phase_start": "2026-01-09T04:16:48",
-        "first_detection": "2026-01-09T04:17:24.944172"
+        "first_detection": "2026-01-09T05:41:28.253090",
+        "evasive": false
+      },
+      "phase_6": {
+        "phase_name": "Low-and-Slow C2 (Evasive)",
+        "detected": false,
+        "mttd_minutes": null,
+        "phase_start": "2026-01-09T01:00:00",
+        "first_detection": null,
+        "evasive": true
+      },
+      "phase_7": {
+        "phase_name": "Staged Exfiltration (Evasive)",
+        "detected": false,
+        "mttd_minutes": null,
+        "phase_start": "2026-01-09T08:00:00",
+        "first_detection": null,
+        "evasive": true
+      },
+      "phase_8": {
+        "phase_name": "Living-off-the-Land Lateral Movement (Evasive)",
+        "detected": true,
+        "mttd_minutes": 180.0,
+        "phase_start": "2026-01-09T06:00:00",
+        "first_detection": "2026-01-09T09:00:00",
+        "evasive": true
       },
       "overall": {
         "detected": true,
-        "mttd_minutes": 0.2,
-        "attack_start": "2026-01-09T02:07:48",
-        "first_detection": "2026-01-09T02:07:59"
+        "mttd_minutes": 68.0,
+        "attack_start": "2026-01-09T01:00:00",
+        "first_detection": "2026-01-09T02:08:00"
       },
-      "average_phase_mttd": 1.6,
-      "phases_detected": "5/5"
+      "average_phase_mttd": 44.9,
+      "phases_detected": "6/8",
+      "evasive_phases_detected": "1/3"
     },
-    "alert_count": 602
+    "alert_count": 376
   },
   "loglm": {
     "confusion_matrix": {
-      "true_positives": 151,
-      "false_positives": 4,
+      "true_positives": 187,
+      "false_positives": 0,
       "false_negatives": 0,
-      "true_negatives": 4869
+      "true_negatives": 0
     },
     "metrics": {
-      "precision": 0.9742,
+      "precision": 1.0,
       "recall": 1.0,
-      "f1_score": 0.9869,
-      "false_positive_rate": 0.0008,
-      "accuracy": 0.9992
+      "f1_score": 1.0,
+      "false_positive_rate": 0,
+      "accuracy": 1.0
     },
     "counts": {
-      "total_detected": 155,
-      "total_malicious": 151,
-      "total_benign": 4873
+      "total_detected": 192,
+      "total_malicious": 187,
+      "total_benign": 0
+    },
+    "evasion_analysis": {
+      "total_evasive": 135,
+      "evasive_detected": 135,
+      "evasive_missed": 0,
+      "evasive_detection_rate": 1.0,
+      "non_evasive_detected": 52,
+      "non_evasive_missed": 0,
+      "non_evasive_detection_rate": 1.0
     },
     "mttd": {
       "phase_1": {
@@ -90,52 +138,83 @@
         "detected": true,
         "mttd_minutes": 0.2,
         "phase_start": "2026-01-09T02:07:48",
-        "first_detection": "2026-01-09T02:08:00"
+        "first_detection": "2026-01-09T02:08:00",
+        "evasive": false
       },
       "phase_2": {
         "phase_name": "C2 Establishment",
         "detected": true,
         "mttd_minutes": 0.2,
         "phase_start": "2026-01-09T02:07:48",
-        "first_detection": "2026-01-09T02:07:59"
+        "first_detection": "2026-01-09T02:08:00",
+        "evasive": false
       },
       "phase_3": {
         "phase_name": "Lateral Movement",
         "detected": true,
-        "mttd_minutes": 7.0,
+        "mttd_minutes": 4.0,
         "phase_start": "2026-01-09T02:12:00",
-        "first_detection": "2026-01-09T02:19:00"
+        "first_detection": "2026-01-09T02:16:00",
+        "evasive": false
       },
       "phase_4": {
         "phase_name": "Data Access & Exfiltration",
         "detected": true,
         "mttd_minutes": 0,
         "phase_start": "2026-01-09T02:40:12",
-        "first_detection": "2026-01-09T02:40:00"
+        "first_detection": "2026-01-09T02:40:00",
+        "evasive": false
       },
       "phase_5": {
         "phase_name": "Persistence & Continued Access",
         "detected": true,
-        "mttd_minutes": 0.6,
+        "mttd_minutes": 84.7,
         "phase_start": "2026-01-09T04:16:48",
-        "first_detection": "2026-01-09T04:17:24.944172"
+        "first_detection": "2026-01-09T05:41:28.253090",
+        "evasive": false
+      },
+      "phase_6": {
+        "phase_name": "Low-and-Slow C2 (Evasive)",
+        "detected": true,
+        "mttd_minutes": 16.6,
+        "phase_start": "2026-01-09T01:00:00",
+        "first_detection": "2026-01-09T01:16:38",
+        "evasive": true
+      },
+      "phase_7": {
+        "phase_name": "Staged Exfiltration (Evasive)",
+        "detected": true,
+        "mttd_minutes": 8.3,
+        "phase_start": "2026-01-09T08:00:00",
+        "first_detection": "2026-01-09T08:08:19",
+        "evasive": true
+      },
+      "phase_8": {
+        "phase_name": "Living-off-the-Land Lateral Movement (Evasive)",
+        "detected": true,
+        "mttd_minutes": 5.0,
+        "phase_start": "2026-01-09T06:00:00",
+        "first_detection": "2026-01-09T06:05:00",
+        "evasive": true
       },
       "overall": {
         "detected": true,
-        "mttd_minutes": 0.2,
-        "attack_start": "2026-01-09T02:07:48",
-        "first_detection": "2026-01-09T02:07:59"
+        "mttd_minutes": 16.6,
+        "attack_start": "2026-01-09T01:00:00",
+        "first_detection": "2026-01-09T01:16:38"
       },
-      "average_phase_mttd": 1.6,
-      "phases_detected": "5/5"
+      "average_phase_mttd": 14.9,
+      "phases_detected": "8/8",
+      "evasive_phases_detected": "3/3"
     },
-    "finding_count": 155
+    "finding_count": 192
   },
   "comparison": {
-    "precision_improvement": 0.6004,
-    "recall_improvement": 0.0,
-    "f1_improvement": 0.4428,
-    "alert_reduction": 0.7425,
-    "mttd_improvement_minutes": 0.0
+    "precision_improvement": 0.0,
+    "recall_improvement": 0.7005,
+    "f1_improvement": 0.5391,
+    "alert_reduction": 0.4894,
+    "mttd_improvement_minutes": 51.4,
+    "evasion_detection_improvement": 0.9704
   }
 }

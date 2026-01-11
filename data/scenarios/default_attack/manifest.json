@@ -1,15 +1,24 @@
 {
-  "name": "Multi-Stage Attack: C2 and Data Exfiltration",
-  "description": "16-hour attack scenario demonstrating credential theft, C2 establishment, lateral movement, and data exfiltration via DNS tunneling",
+  "name": "Multi-Stage Attack with Evasive Patterns",
+  "description": "Attack scenario including both detectable and signature-evading patterns. Demonstrates how LogLM catches low-and-slow attacks that evade traditional rules.",
   "log_types": [
     "zeek_conn",
     "zeek_dns"
   ],
-  "duration_hours": 16,
-  "total_events": 5024,
-  "malicious_events": 151,
+  "duration_hours": 20,
+  "total_events": 5060,
+  "malicious_events": 187,
+  "detectable_events": 52,
+  "evasive_events": 135,
   "benign_events": 4873,
-  "attack_phases": 5,
-  "created": "2026-01-11T00:33:55.420464",
-  "author": "DeepTempo AI SOC Demo"
+  "incidents": 2,
+  "evasion_techniques": [
+    "Small chunks + legitimate cloud IP",
+    "Short subdomain + A record + low volume",
+    "WinRM instead of RDP/SMB",
+    "Legitimate CDN IP + varied timing + long duration",
+    "WMI instead of RDP/SMB + slow timing"
+  ],
+  "created": "2026-01-11T01:13:05.029099",
+  "version": "2.0"
 }
