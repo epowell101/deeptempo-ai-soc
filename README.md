@@ -1,87 +1,61 @@
-# DeepTempo AI SOC
+# AI SOC Experimentation Framework
 
-An **embeddings-first AI Security Operations Center** that leverages DeepTempo's LogLM for threat detection and Claude for intelligent orchestration via MCP (Model Context Protocol).
+An open-source framework for comparing threat detection methods, including traditional rules-based approaches and modern embeddings-first techniques using LogLM.
 
 ## Overview
 
-This project demonstrates how to build an AI-powered SOC where:
+This project provides a hands-on environment for security practitioners to:
 
-- **DeepTempo LogLM** handles log analysis, embedding generation, and MITRE ATT&CK classification
-- **Claude** serves as the primary analyst interface, orchestrating investigations through natural conversation
-- **MCP Servers** provide the bridge, exposing SOC tools that Claude can invoke
-- **Streamlit** provides rich, interactive dashboards for visualizing attack flows and comparing detection methods
-- **Timesketch** provides timeline visualization for forensic analysis
+1.  **Compare Detection Methods**: Run a side-by-side comparison of a traditional rules-based SOC vs. an AI-enhanced SOC using the same log data.
+2.  **Evaluate Performance**: Quantify the performance of each approach using metrics like precision, recall, and Mean Time to Detect (MTTD).
+3.  **Experiment with AI**: Explore how embeddings-first models like DeepTempo's LogLM can augment security operations.
+4.  **Integrate with Your Tools**: Use the provided MCP servers to connect with Claude for conversational investigation.
 
-### The Vision: Claude as Your SOC Analyst
+This framework is designed to be educational and vendor-neutral, allowing you to form your own conclusions about the best approach for your environment.
 
-Instead of clicking through dashboards, you have conversations:
+## Tale of Two SOCs: A Comparison Framework
 
-```
-You: "Show me today's high-severity findings"
-Claude: [queries findings] "I found 18 high-severity findings. 15 are clustered 
-        as C2 beaconing from workstation-042..."
+The core of this project is the "Tale of Two SOCs" comparison, which lets you analyze the same attack scenario through two different lenses.
 
-You: "Find similar activity across the network"
-Claude: [runs embedding search] "Found 47 similar findings across 3 hosts, 
-        all showing the same beacon pattern to 203.0.113.50..."
-
-You: "Create a timeline view in Timesketch"
-Claude: [syncs to Timesketch] "Created sketch with 50 events. 
-        View at: http://localhost:5000/sketch/1/"
-```
-
-## 🆕 Tale of Two SOCs: Rules vs. LogLM
-
-This project now includes a **side-by-side comparison** demonstrating the difference between traditional rules-based detection and LogLM-enhanced detection.
-
-### The Key Insight
-
-**Same 5,000 logs → Two completely different experiences**
-
-| | Rules-Only SOC | LogLM-Enhanced SOC |
+| | **Rules-Only SOC** | **LogLM-Enhanced SOC** |
 |---|---|---|
-| **Detections** | 602 alerts | 155 findings |
-| **Precision** | 37.4% | 97.4% |
-| **False Positives** | 253 | 4 |
-| **Correlation** | Manual | Automatic |
-| **Similarity Search** | ❌ | ✅ |
-| **MITRE Classification** | ❌ | ✅ |
+| **Detection Engine** | Sigma-like rules | Embeddings-first model |
+| **Output** | Discrete alerts | Correlated findings |
+| **Analyst Experience** | Manual triage and correlation | Automated correlation and narrative |
 
-**LogLM detects malicious BEHAVIORS, not just anomalies.** This is why it has high precision - it's trained to recognize actual attack patterns, not just statistical outliers.
-
-### Run the Comparison Dashboard
+### Run the Comparison
 
 ```bash
-# Generate scenario data
+# 1. Generate the attack scenario with ground truth
 python scripts/generate_scenario.py
 
-# Run detection pipelines
+# 2. Run both detection pipelines
 python scripts/rules_detection.py
 python scripts/loglm_detection.py
 
-# Evaluate both methods
+# 3. Evaluate the results
 python scripts/evaluate.py
 
-# Launch the comparison dashboard
+# 4. Launch the comparison dashboard
 streamlit run streamlit_app/tale_of_two_socs.py
 ```
 
-### Switch Modes for Claude
+### The Dashboard
 
-The dashboard includes a **mode toggle** that controls which tools Claude can access:
+The Streamlit dashboard provides a comprehensive view of the results, including:
 
-- **Rules-Only Mode**: Claude only sees `list_alerts`, `filter_alerts_by_rule`, `get_alert_details`
-- **LogLM Mode**: Claude sees `list_findings`, `nearest_neighbors`, `get_attack_narrative`, `technique_rollup`
-
-This lets you experience the difference firsthand - ask Claude the same questions in both modes!
+*   **Side-by-side metrics**: Precision, recall, and false positive rates.
+*   **MTTD Analysis**: See how quickly each approach detects different attack phases.
+*   **Attack Graph**: Visualize the attack flow as seen by each system.
+*   **Rule Analysis**: Inspect the rules used in the rules-only approach.
 
 ## Quick Start
 
 ### Prerequisites
 
-- **Python 3.10+** (required for MCP SDK)
-- **Claude Desktop** ([download here](https://claude.ai/download))
-- **Docker** (optional, for Timesketch visualization)
+*   **Python 3.10+**
+*   **Claude Desktop** (Optional, for conversational investigation)
+*   **Docker** (Optional, for Timesketch visualization)
 
 ### Step 1: Clone and Set Up
 
@@ -92,243 +66,56 @@ cd deeptempo-ai-soc
 python3 -m venv venv
 source venv/bin/activate
 
+# Install dependencies
 pip install -r requirements.txt
+# Install streamlit app dependencies
+pip install -r streamlit_app/requirements.txt
 ```
 
-### Step 2: Generate Sample Data
+### Step 2: Generate Data and Run Pipelines
 
 ```bash
-# For the Tale of Two SOCs comparison:
 python scripts/generate_scenario.py
 python scripts/rules_detection.py
 python scripts/loglm_detection.py
 python scripts/evaluate.py
-
-# For the original demo:
-python scripts/demo.py
 ```
 
-### Step 3: Configure Claude Desktop
-
-Find your config file:
-- **Mac**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
-
-**For Tale of Two SOCs (Unified Server):**
-
-```json
-{
-  "mcpServers": {
-    "ai-soc": {
-      "command": "/path/to/deeptempo-ai-soc/venv/bin/python",
-      "args": ["-m", "mcp_servers.unified_soc_server.server"],
-      "cwd": "/path/to/deeptempo-ai-soc",
-      "env": {
-        "PYTHONPATH": "/path/to/deeptempo-ai-soc",
-        "DATA_DIR": "/path/to/deeptempo-ai-soc/data"
-      }
-    }
-  }
-}
-```
-
-**For Original Demo (Multiple Servers):**
-
-```json
-{
-  "mcpServers": {
-    "deeptempo-findings": {
-      "command": "/path/to/deeptempo-ai-soc/venv/bin/python",
-      "args": ["-m", "mcp_servers.deeptempo_findings_server.server"],
-      "cwd": "/path/to/deeptempo-ai-soc",
-      "env": {
-        "PYTHONPATH": "/path/to/deeptempo-ai-soc"
-      }
-    },
-    "evidence-snippets": {
-      "command": "/path/to/deeptempo-ai-soc/venv/bin/python",
-      "args": ["-m", "mcp_servers.evidence_snippets_server.server"],
-      "cwd": "/path/to/deeptempo-ai-soc",
-      "env": {
-        "PYTHONPATH": "/path/to/deeptempo-ai-soc"
-      }
-    },
-    "case-store": {
-      "command": "/path/to/deeptempo-ai-soc/venv/bin/python",
-      "args": ["-m", "mcp_servers.case_store_server.server"],
-      "cwd": "/path/to/deeptempo-ai-soc",
-      "env": {
-        "PYTHONPATH": "/path/to/deeptempo-ai-soc"
-      }
-    }
-  }
-}
-```
-
-### Step 4: Restart Claude Desktop
-Quit completely (Cmd+Q on Mac, Alt+F4 on Windows) and reopen.
-
-### Step 5: Start Investigating!
-
-**Tale of Two SOCs prompts:**
-```
-"What mode am I in?"
-"List all alerts" (in rules-only mode)
-"List all findings" (in LogLM mode)
-"Find similar findings to finding_00001"
-"Show me the attack narrative"
-"What are the evaluation metrics?"
-```
-
-**Original demo prompts:**
-```
-"Show me all high severity findings"
-"Find findings similar to f-20260109-9bfe5ba7"
-"What MITRE ATT&CK techniques are detected?"
-"Create a case for the beaconing cluster"
-```
-
-## Dashboards
-
-### Tale of Two SOCs Dashboard
+### Step 3: Launch Dashboard
 
 ```bash
 streamlit run streamlit_app/tale_of_two_socs.py
 ```
 
-Features:
-- **Side-by-side comparison** of Rules vs. LogLM detection
-- **Confusion matrix visualization** showing precision/recall
-- **MTTD (Mean Time to Detect)** analysis by attack phase
-- **Mode toggle** for Claude integration
-- **Radar chart** comparing detection performance
+## Extending the Framework
 
-### Attack Flow Visualization
+This project is designed to be a starting point. Here are some ways you can extend it:
 
-```bash
-streamlit run streamlit_app/app.py
-```
-
-Features:
-- **Attack Graph**: Interactive network graph of all entities
-- **Kill Chain Timeline**: Visual timeline of attack phases
-- **Data Exfiltration Flow**: Sankey diagram of data movement
-- **MITRE ATT&CK Heatmap**: Bar chart of detected techniques
-
-## Timesketch Integration
-
-### Mock Mode (Default)
-
-The Timesketch server runs in mock mode by default, simulating functionality without requiring a real server.
-
-### Live Timesketch Server
-
-```bash
-cd docker
-docker compose up -d
-# Wait 2-3 minutes for services to start
-# Access at http://localhost:5000 (login: dev / dev)
-```
-
-## MCP Tools Reference
-
-### Unified SOC Server (Tale of Two SOCs)
-
-**Rules-Only Mode:**
-| Tool | Description |
-|------|-------------|
-| `list_alerts` | List security alerts from Sigma rule matches |
-| `get_alert_details` | Get details for a specific alert |
-| `get_rule_statistics` | Get statistics about which rules are firing |
-
-**LogLM Mode:**
-| Tool | Description |
-|------|-------------|
-| `list_findings` | List findings with LogLM enrichment |
-| `get_finding_details` | Get details including MITRE predictions |
-| `list_incidents` | List correlated security incidents |
-| `nearest_neighbors` | Find similar findings using embeddings |
-| `technique_rollup` | Get MITRE ATT&CK technique statistics |
-| `get_attack_narrative` | Get human-readable attack summary |
-
-**Common Tools (Both Modes):**
-| Tool | Description |
-|------|-------------|
-| `get_soc_mode` | Get current mode (rules_only or loglm) |
-| `get_raw_logs` | Get raw log events |
-| `get_evaluation_metrics` | Get confusion matrix and MTTD metrics |
-
-### Original Servers
-
-| Server | Tools |
-|--------|-------|
-| Findings | `list_findings`, `get_finding`, `nearest_neighbors`, `technique_rollup` |
-| Evidence | `get_evidence`, `search_evidence` |
-| Case Store | `list_cases`, `get_case`, `create_case`, `update_case` |
-| Timesketch | `sync_findings_to_timesketch`, `create_timesketch_sketch`, `search_timesketch` |
+*   **Add Your Own Rules**: Modify `scripts/rules_detection.py` to add your own Sigma rules.
+*   **Use Your Own Logs**: Place your own log files in `data/scenarios/custom/` and adapt the scripts to parse them.
+*   **Integrate Other Tools**: Use the MCP server framework to connect other security tools to Claude.
 
 ## Project Structure
 
 ```
 deeptempo-ai-soc/
-├── streamlit_app/               # Streamlit dashboards
-│   ├── app.py                   # Attack flow visualization
-│   ├── tale_of_two_socs.py      # Rules vs LogLM comparison
-│   └── replay.py                # Scenario replay module
-├── mcp_servers/                 # MCP server implementations
-│   ├── unified_soc_server/      # Tale of Two SOCs server
-│   ├── deeptempo_findings_server/
-│   ├── evidence_snippets_server/
-│   ├── case_store_server/
-│   └── timesketch_server/
-├── scripts/                     # Data generation and evaluation
-│   ├── generate_scenario.py     # Generate attack scenario
-│   ├── rules_detection.py       # Sigma-like rule detection
-│   ├── loglm_detection.py       # LogLM detection simulation
-│   └── evaluate.py              # Calculate metrics
-├── data/
-│   └── scenarios/               # Attack scenarios with ground truth
-│       └── default_attack/
-├── adapters/                    # External system adapters
-├── docker/                      # Docker Compose for Timesketch
-└── config/                      # Configuration templates
+├── streamlit_app/         # Streamlit dashboards
+├── mcp_servers/           # MCP servers for Claude integration
+├── scripts/               # Data generation and detection pipelines
+├── data/                  # Attack scenarios and ground truth
+└── ...
 ```
 
-## Roadmap
+## Related Open-Source Projects
 
-- [x] v0.1: File-based MCP servers with sample data
-- [x] v0.2: Timesketch integration for timeline visualization
-- [x] v0.3: Streamlit dashboard for attack flow visualization
-- [x] v0.4: Tale of Two SOCs - Rules vs LogLM comparison with evaluation metrics
-- [ ] v0.5: Real DeepTempo LogLM integration
-- [ ] v1.0: Full SaaS API integration
+For practitioners looking to build out a more comprehensive open-source security stack, we recommend exploring:
 
-## Troubleshooting
-
-### Python Version
-MCP requires Python 3.10+:
-```bash
-python3 --version
-```
-
-### Test Server Manually
-```bash
-source venv/bin/activate
-python -m mcp_servers.unified_soc_server.server
-```
-
-### Check Logs
-```bash
-cat ~/Library/Logs/Claude/mcp-server-ai-soc.log
-```
+*   **Wazuh**: An open-source XDR and SIEM platform.
+*   **Security Onion**: A full-featured SIEM with a focus on network security monitoring.
+*   **Sigma**: A vendor-agnostic format for detection rules, with a large community repository.
+*   **Timesketch**: A collaborative forensic timeline analysis tool (already integrated here).
+*   **DFIR-IRIS**: An open-source incident response platform for case management.
 
 ## License
 
-Apache 2.0 - See [LICENSE](LICENSE) for details.
-
-## References
-
-- [Timesketch](https://timesketch.org/) - Timeline analysis platform
-- [ATT&CK Navigator](https://mitre-attack.github.io/attack-navigator/) - MITRE ATT&CK visualization
-- [Model Context Protocol](https://modelcontextprotocol.io/) - MCP specification
-- [DeepTempo](https://deeptempo.ai) - LogLM for security
+Apache 2.0
