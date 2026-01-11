@@ -25,8 +25,9 @@ class ConfigManager(QDialog):
         self._setup_ui()
         self._load_config()
     
-    def _get_claude_config_path(self) -> Path:
-        """Get the Claude Desktop config file path."""
+    @staticmethod
+    def get_config_path() -> Path:
+        """Get the Claude Desktop config file path (static method)."""
         system = platform.system()
         
         if system == "Darwin":  # macOS
@@ -37,6 +38,10 @@ class ConfigManager(QDialog):
             config_dir = Path.home() / ".config" / "claude"
         
         return config_dir / "claude_desktop_config.json"
+    
+    def _get_claude_config_path(self) -> Path:
+        """Get the Claude Desktop config file path (instance method)."""
+        return self.get_config_path()
     
     def _setup_ui(self):
         """Set up the UI."""

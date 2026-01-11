@@ -4,16 +4,23 @@
 # Core dependencies
 numpy>=1.24.0
 
-# MCP SDK (for running MCP servers)
-# Uncomment when MCP SDK is publicly available:
-# mcp[cli]>=0.1.0
+# MCP SDK (for running MCP servers and client)
+# Note: Install with: pip install mcp
+# mcp>=0.1.0
 
 # Desktop UI dependencies
 PyQt6>=6.6.0
+PyQt6-WebEngine>=6.6.0
 anthropic>=0.18.0
 qdarkstyle>=3.2.0
 keyring>=24.0.0
 reportlab>=4.0.0
+
+# Timesketch integration
+requests>=2.31.0
+
+# AWS S3 integration
+boto3>=1.34.0
 
 # Optional: FastAPI for REST API (not required for basic usage)
 # fastapi>=0.100.0
@@ -21,6 +28,12 @@ reportlab>=4.0.0
 
 # Optional: For enhanced vector search
 # faiss-cpu>=1.7.4
+
+# Visualization dependencies (from Streamlit UI)
+networkx>=3.0
+pyvis>=0.3.0
+plotly>=5.17.0
+pandas>=2.0.0
 
 # Development dependencies
 # pytest>=7.0.0

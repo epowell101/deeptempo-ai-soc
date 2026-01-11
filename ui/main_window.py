@@ -17,6 +17,8 @@ from ui.claude_chat import ClaudeChat
 from ui.mcp_manager import MCPManager
 from ui.setup_wizard import SetupWizard
 from ui.config_manager import ConfigManager
+from ui.timesketch_config import TimesketchConfigDialog
+from ui.settings_console import SettingsConsole
 from services.data_service import DataService
 from services.report_service import ReportService
 
@@ -33,6 +35,8 @@ class MainWindow(QMainWindow):
         self.dashboard = None
         self.claude_chat = None
         self.mcp_manager = None
+        self.timesketch_manager = None
+        self.search_widget = None
         
         self._setup_ui()
         self._setup_menu()
@@ -62,6 +66,15 @@ class MainWindow(QMainWindow):
         config_action = QAction("&Configure Claude Desktop...", self)
         config_action.triggered.connect(self._show_config_manager)
         file_menu.addAction(config_action)
+        
+        ts_config_action = QAction("&Configure Timesketch...", self)
+        ts_config_action.triggered.connect(self._show_timesketch_config)
+        file_menu.addAction(ts_config_action)
+        
+        settings_action = QAction("&Settings Console...", self)
+        settings_action.setShortcut("Ctrl+,")
+        settings_action.triggered.connect(self._show_settings_console)
+        file_menu.addAction(settings_action)
         
         file_menu.addSeparator()
         
@@ -95,6 +108,11 @@ class MainWindow(QMainWindow):
         mcp_action.triggered.connect(self._show_mcp_manager)
         view_menu.addAction(mcp_action)
         
+        ts_manager_action = QAction("&Timesketch Manager", self)
+        ts_manager_action.setShortcut("Ctrl+T")
+        ts_manager_action.triggered.connect(self._show_timesketch_manager)
+        view_menu.addAction(ts_manager_action)
+        
         # Help menu
         help_menu = menubar.addMenu("&Help")
         
@@ -125,6 +143,20 @@ class MainWindow(QMainWindow):
         mcp_action = QAction("MCP Manager", self)
         mcp_action.triggered.connect(self._show_mcp_manager)
         toolbar.addAction(mcp_action)
+        
+        toolbar.addSeparator()
+        
+        # Timesketch Manager button
+        ts_action = QAction("Timesketch", self)
+        ts_action.triggered.connect(self._show_timesketch_manager)
+        toolbar.addAction(ts_action)
+        
+        toolbar.addSeparator()
+        
+        # Settings Console button
+        settings_action = QAction("Settings", self)
+        settings_action.triggered.connect(self._show_settings_console)
+        toolbar.addAction(settings_action)
     
     def _setup_statusbar(self):
         """Set up the status bar."""
@@ -169,6 +201,16 @@ class MainWindow(QMainWindow):
         manager = ConfigManager(self)
         manager.exec()
     
+    def _show_timesketch_config(self):
+        """Show the Timesketch configuration dialog."""
+        dialog = TimesketchConfigDialog(self)
+        dialog.exec()
+    
+    def _show_settings_console(self):
+        """Show the unified settings console."""
+        console = SettingsConsole(self)
+        console.exec()
+    
     def _show_dashboard(self):
         """Show the dashboard."""
         # Always create a new dashboard to avoid deleted widget issues
@@ -186,6 +228,39 @@ class MainWindow(QMainWindow):
         # Always create a new manager widget to avoid deleted widget issues
         self.mcp_manager = MCPManager(self)
         self.setCentralWidget(self.mcp_manager)
+    
+    def _show_timesketch_manager(self):
+        """Show the Timesketch manager."""
+        from ui.widgets.sketch_manager_widget import SketchManagerWidget
+        # Always create a new manager widget to avoid deleted widget issues
+        self.timesketch_manager = SketchManagerWidget(self)
+        self.setCentralWidget(self.timesketch_manager)
+    
+    def _show_search(self):
+        """Show the enhanced search widget."""
+        from ui.widgets.search_widget import SearchWidget
+        # Always create a new search widget to avoid deleted widget issues
+        self.search_widget = SearchWidget(self)
+        self.setCentralWidget(self.search_widget)
+    
+    def _start_auto_sync(self):
+        """Start auto-sync service if configured."""
+        try:
+            from services.auto_sync_service import get_auto_sync_service
+            from ui.timesketch_config import TimesketchConfigDialog
+            import json
+            
+            auto_sync_service = get_auto_sync_service()
+            config_file = TimesketchConfigDialog.CONFIG_FILE
+            
+            if config_file.exists():
+                with open(config_file, 'r') as f:
+                    config = json.load(f)
+                    if config.get('auto_sync', False):
+                        sync_interval = config.get('sync_interval', 300)
+                        auto_sync_service.start(sync_interval)
+        except Exception:
+            pass  # Auto-sync will start when configured
     
     def _generate_overall_report(self):
         """Generate overall PDF report."""
