@@ -8,7 +8,6 @@ This dashboard demonstrates the difference between:
 Key features:
 - Side-by-side comparison view
 - Confusion matrix visualization
-- MTTD (Mean Time to Detect) comparison
 - Mode switching for Claude integration
 - Rule visibility and evasion analysis
 - Attack graph visualization (mode-aware)
@@ -313,52 +312,6 @@ def extract_entities(findings, alerts):
     return entities
 
 
-def create_mttd_chart(rules_mttd, loglm_mttd):
-    """Create MTTD comparison bar chart."""
-    phases = []
-    rules_values = []
-    loglm_values = []
-    
-    for key in sorted([k for k in rules_mttd.keys() if k.startswith("phase_")]):
-        phase_name = rules_mttd[key]["phase_name"]
-        phases.append(phase_name[:20] + "..." if len(phase_name) > 20 else phase_name)
-        
-        rules_val = rules_mttd[key]["mttd_minutes"] if rules_mttd[key]["detected"] else None
-        loglm_val = loglm_mttd[key]["mttd_minutes"] if loglm_mttd[key]["detected"] else None
-        
-        rules_values.append(rules_val)
-        loglm_values.append(loglm_val)
-    
-    fig = go.Figure()
-    
-    fig.add_trace(go.Bar(
-        name="Rules-Only",
-        x=phases,
-        y=rules_values,
-        marker_color="#f44336",
-        text=[f"{v:.1f} min" if v else "NOT DETECTED" for v in rules_values],
-        textposition="outside"
-    ))
-    
-    fig.add_trace(go.Bar(
-        name="LogLM",
-        x=phases,
-        y=loglm_values,
-        marker_color="#4caf50",
-        text=[f"{v:.1f} min" if v else "NOT DETECTED" for v in loglm_values],
-        textposition="outside"
-    ))
-    
-    fig.update_layout(
-        title="Mean Time to Detect (MTTD) by Attack Phase",
-        xaxis_title="Attack Phase",
-        yaxis_title="Minutes to Detect",
-        barmode="group",
-        height=400
-    )
-    
-    return fig
-
 
 def create_metrics_comparison_chart(rules_metrics, loglm_metrics):
     """Create metrics comparison radar chart."""
@@ -585,12 +538,11 @@ def main():
     st.sidebar.markdown(f"**FP Triggers:** {manifest.get('false_positive_triggers', 0)}")
     
     # Main content - tabs
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
         "📊 Overview",
         "🔍 Findings",
         "🏢 Entities",
         "📋 Workflow",
-        "⏱️ MTTD",
         "📜 Rules",
         "🥷 Evasion",
         "🕸️ Attack Graph",
@@ -925,51 +877,8 @@ def main():
                         st.success("Saved!")
                         st.rerun()
     
-    # Tab 5: MTTD Analysis
+    # Tab 5: Rule Analysis
     with tab5:
-        st.header("⏱️ Mean Time to Detect (MTTD) Analysis")
-        
-        rules_mttd = rules_eval.get("mttd", {})
-        loglm_mttd = loglm_eval.get("mttd", {})
-        
-        if rules_mttd and loglm_mttd:
-            # Summary metrics
-            col1, col2 = st.columns(2)
-            with col1:
-                st.metric(
-                    "Rules-Only Overall MTTD",
-                    f"{rules_mttd.get('overall_mttd_minutes', 0):.1f} min",
-                    help="Average time to detect across all phases"
-                )
-            with col2:
-                st.metric(
-                    "LogLM Overall MTTD",
-                    f"{loglm_mttd.get('overall_mttd_minutes', 0):.1f} min",
-                    help="Average time to detect across all phases"
-                )
-            
-            # MTTD chart
-            mttd_chart = create_mttd_chart(rules_mttd, loglm_mttd)
-            st.plotly_chart(mttd_chart, use_container_width=True)
-            
-            # Detailed table
-            st.markdown("### Phase-by-Phase Detection")
-            
-            phase_data = []
-            for key in sorted([k for k in rules_mttd.keys() if k.startswith("phase_")]):
-                rules_phase = rules_mttd[key]
-                loglm_phase = loglm_mttd.get(key, {})
-                
-                phase_data.append({
-                    "Phase": rules_phase["phase_name"],
-                    "Rules-Only": f"{rules_phase['mttd_minutes']:.1f} min" if rules_phase["detected"] else "❌ NOT DETECTED",
-                    "LogLM": f"{loglm_phase.get('mttd_minutes', 0):.1f} min" if loglm_phase.get("detected") else "❌ NOT DETECTED"
-                })
-            
-            st.dataframe(pd.DataFrame(phase_data), hide_index=True, use_container_width=True)
-    
-    # Tab 6: Rule Analysis
-    with tab6:
         st.header("📜 Detection Rule Analysis")
         
         st.markdown("""
@@ -1020,8 +929,8 @@ def main():
                 st.markdown(f"**Rule Logic:** `{rule.get('logic_human', 'N/A')}`")
                 st.markdown(f"**How to Evade:** {rule.get('evasion_method', 'N/A')}")
     
-    # Tab 7: Evasion Analysis
-    with tab7:
+    # Tab 6: Evasion Analysis
+    with tab6:
         st.header("🥷 Signature Evasion Analysis")
         
         st.markdown("""
@@ -1060,8 +969,8 @@ def main():
         
         st.dataframe(pd.DataFrame(evasion_data), hide_index=True, use_container_width=True)
     
-    # Tab 8: Attack Graph
-    with tab8:
+    # Tab 7: Attack Graph
+    with tab7:
         st.header("🕸️ Attack Graph Visualization")
         
         st.markdown("""
@@ -1101,8 +1010,8 @@ def main():
                     html_content = html_file.read()
                 components.html(html_content, height=550)
     
-    # Tab 9: Replay
-    with tab9:
+    # Tab 8: Replay
+    with tab8:
         st.header("▶️ Scenario Replay")
         
         st.markdown("""
