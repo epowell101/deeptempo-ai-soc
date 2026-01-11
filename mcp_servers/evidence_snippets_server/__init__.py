@@ -1,0 +1,1 @@
+"""Evidence Snippets MCP Server."""

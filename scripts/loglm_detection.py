@@ -18,6 +18,12 @@ from pathlib import Path
 from typing import List, Dict, Any, Set
 import hashlib
 
+# Import explanation generator
+try:
+    from scripts.explanation_generator import generate_explanation, add_explanations_to_findings
+except ImportError:
+    from explanation_generator import generate_explanation, add_explanations_to_findings
+
 SCENARIO_DIR = Path(__file__).parent.parent / "data" / "scenarios" / "default_attack"
 
 # MITRE ATT&CK technique details
@@ -487,6 +493,10 @@ def generate_loglm_output():
     # Correlate into incidents
     incidents = correlate_into_incidents(findings, ground_truth)
     print(f"Correlated into {len(incidents)} incidents")
+    
+    # Add AI-generated explanations to findings
+    findings = add_explanations_to_findings(findings)
+    print("Added AI-generated explanations to findings")
     
     # Sort findings by timestamp
     findings.sort(key=lambda x: x["timestamp"])

@@ -20,7 +20,7 @@
     "technique_name": "Valid Accounts",
     "tactic": "Initial Access",
     "count": 1,
-    "avg_confidence": 0.8,
+    "avg_confidence": 0.82,
     "evasive_count": 0
   },
   "T1021.001": {
@@ -36,7 +36,7 @@
     "technique_name": "Exfiltration Over C2 Channel",
     "tactic": "Exfiltration",
     "count": 1,
-    "avg_confidence": 0.85,
+    "avg_confidence": 0.83,
     "evasive_count": 0
   },
   "T1190": {
@@ -52,7 +52,7 @@
     "technique_name": "Windows Remote Management",
     "tactic": "Lateral Movement",
     "count": 10,
-    "avg_confidence": 0.79,
+    "avg_confidence": 0.78,
     "evasive_count": 10
   },
   "T1047": {
