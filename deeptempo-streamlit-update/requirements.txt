@@ -1,0 +1,26 @@
+# DeepTempo AI SOC - Requirements
+# Python 3.10+ required
+
+# Core dependencies
+numpy>=1.24.0
+
+# MCP SDK (for running MCP servers)
+mcp[cli]>=1.0.0
+
+# Timesketch Integration (optional - for live Timesketch connection)
+# Uncomment these if connecting to a real Timesketch server:
+# timesketch-api-client>=20231201
+# timesketch-import-client>=20231201
+
+# Optional: FastAPI for REST API (not required for basic usage)
+# fastapi>=0.100.0
+# uvicorn>=0.22.0
+
+# Optional: For enhanced vector search
+# faiss-cpu>=1.7.4
+
+# Development dependencies
+# pytest>=7.0.0
+# pytest-asyncio>=0.21.0
+# black>=23.0.0
+# ruff>=0.0.270
