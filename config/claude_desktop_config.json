@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "ai-soc": {
+      "command": "python",
+      "args": ["-m", "mcp_servers.unified_soc_server.server"],
+      "env": {
+        "DATA_DIR": "/path/to/deeptempo-ai-soc/data"
+      }
+    }
+  }
+}

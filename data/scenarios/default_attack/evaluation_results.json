@@ -1,0 +1,141 @@
+{
+  "rules_only": {
+    "confusion_matrix": {
+      "true_positives": 151,
+      "false_positives": 253,
+      "false_negatives": 0,
+      "true_negatives": 4620
+    },
+    "metrics": {
+      "precision": 0.3738,
+      "recall": 1.0,
+      "f1_score": 0.5441,
+      "false_positive_rate": 0.0519,
+      "accuracy": 0.9496
+    },
+    "counts": {
+      "total_detected": 404,
+      "total_malicious": 151,
+      "total_benign": 4873
+    },
+    "mttd": {
+      "phase_1": {
+        "phase_name": "Initial Compromise",
+        "detected": true,
+        "mttd_minutes": 0.2,
+        "phase_start": "2026-01-09T02:07:48",
+        "first_detection": "2026-01-09T02:08:00"
+      },
+      "phase_2": {
+        "phase_name": "C2 Establishment",
+        "detected": true,
+        "mttd_minutes": 0.2,
+        "phase_start": "2026-01-09T02:07:48",
+        "first_detection": "2026-01-09T02:07:59"
+      },
+      "phase_3": {
+        "phase_name": "Lateral Movement",
+        "detected": true,
+        "mttd_minutes": 7.0,
+        "phase_start": "2026-01-09T02:12:00",
+        "first_detection": "2026-01-09T02:19:00"
+      },
+      "phase_4": {
+        "phase_name": "Data Access & Exfiltration",
+        "detected": true,
+        "mttd_minutes": 0,
+        "phase_start": "2026-01-09T02:40:12",
+        "first_detection": "2026-01-09T02:40:00"
+      },
+      "phase_5": {
+        "phase_name": "Persistence & Continued Access",
+        "detected": true,
+        "mttd_minutes": 0.6,
+        "phase_start": "2026-01-09T04:16:48",
+        "first_detection": "2026-01-09T04:17:24.944172"
+      },
+      "overall": {
+        "detected": true,
+        "mttd_minutes": 0.2,
+        "attack_start": "2026-01-09T02:07:48",
+        "first_detection": "2026-01-09T02:07:59"
+      },
+      "average_phase_mttd": 1.6,
+      "phases_detected": "5/5"
+    },
+    "alert_count": 602
+  },
+  "loglm": {
+    "confusion_matrix": {
+      "true_positives": 151,
+      "false_positives": 4,
+      "false_negatives": 0,
+      "true_negatives": 4869
+    },
+    "metrics": {
+      "precision": 0.9742,
+      "recall": 1.0,
+      "f1_score": 0.9869,
+      "false_positive_rate": 0.0008,
+      "accuracy": 0.9992
+    },
+    "counts": {
+      "total_detected": 155,
+      "total_malicious": 151,
+      "total_benign": 4873
+    },
+    "mttd": {
+      "phase_1": {
+        "phase_name": "Initial Compromise",
+        "detected": true,
+        "mttd_minutes": 0.2,
+        "phase_start": "2026-01-09T02:07:48",
+        "first_detection": "2026-01-09T02:08:00"
+      },
+      "phase_2": {
+        "phase_name": "C2 Establishment",
+        "detected": true,
+        "mttd_minutes": 0.2,
+        "phase_start": "2026-01-09T02:07:48",
+        "first_detection": "2026-01-09T02:07:59"
+      },
+      "phase_3": {
+        "phase_name": "Lateral Movement",
+        "detected": true,
+        "mttd_minutes": 7.0,
+        "phase_start": "2026-01-09T02:12:00",
+        "first_detection": "2026-01-09T02:19:00"
+      },
+      "phase_4": {
+        "phase_name": "Data Access & Exfiltration",
+        "detected": true,
+        "mttd_minutes": 0,
+        "phase_start": "2026-01-09T02:40:12",
+        "first_detection": "2026-01-09T02:40:00"
+      },
+      "phase_5": {
+        "phase_name": "Persistence & Continued Access",
+        "detected": true,
+        "mttd_minutes": 0.6,
+        "phase_start": "2026-01-09T04:16:48",
+        "first_detection": "2026-01-09T04:17:24.944172"
+      },
+      "overall": {
+        "detected": true,
+        "mttd_minutes": 0.2,
+        "attack_start": "2026-01-09T02:07:48",
+        "first_detection": "2026-01-09T02:07:59"
+      },
+      "average_phase_mttd": 1.6,
+      "phases_detected": "5/5"
+    },
+    "finding_count": 155
+  },
+  "comparison": {
+    "precision_improvement": 0.6004,
+    "recall_improvement": 0.0,
+    "f1_improvement": 0.4428,
+    "alert_reduction": 0.7425,
+    "mttd_improvement_minutes": 0.0
+  }
+}

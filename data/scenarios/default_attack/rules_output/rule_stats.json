@@ -1,0 +1,86 @@
+{
+  "rule_001": {
+    "name": "Outbound Connection to Rare External IP",
+    "severity": "medium",
+    "tactic": "Command and Control",
+    "alert_count": 82,
+    "false_positive_rate": 0.15
+  },
+  "rule_002": {
+    "name": "Suspicious DNS Query - Long Subdomain",
+    "severity": "medium",
+    "tactic": "Command and Control",
+    "alert_count": 30,
+    "false_positive_rate": 0.05
+  },
+  "rule_003": {
+    "name": "Suspicious DNS Query - TXT Record",
+    "severity": "low",
+    "tactic": "Command and Control",
+    "alert_count": 30,
+    "false_positive_rate": 0.08
+  },
+  "rule_004": {
+    "name": "Internal RDP Connection",
+    "severity": "low",
+    "tactic": "Lateral Movement",
+    "alert_count": 3,
+    "false_positive_rate": 0.2
+  },
+  "rule_005": {
+    "name": "Internal SMB Connection",
+    "severity": "low",
+    "tactic": "Lateral Movement",
+    "alert_count": 148,
+    "false_positive_rate": 0.25
+  },
+  "rule_006": {
+    "name": "Large Outbound Data Transfer",
+    "severity": "medium",
+    "tactic": "Exfiltration",
+    "alert_count": 3,
+    "false_positive_rate": 0.1
+  },
+  "rule_007": {
+    "name": "Connection to Known Bad Port",
+    "severity": "high",
+    "tactic": "Command and Control",
+    "alert_count": 0,
+    "false_positive_rate": 0.03
+  },
+  "rule_008": {
+    "name": "Periodic Beaconing Pattern",
+    "severity": "medium",
+    "tactic": "Command and Control",
+    "alert_count": 80,
+    "false_positive_rate": 0.12
+  },
+  "rule_009": {
+    "name": "DNS Query to Suspicious Domain",
+    "severity": "high",
+    "tactic": "Command and Control",
+    "alert_count": 30,
+    "false_positive_rate": 0.02
+  },
+  "rule_010": {
+    "name": "Workstation to Server Connection",
+    "severity": "low",
+    "tactic": "Lateral Movement",
+    "alert_count": 145,
+    "false_positive_rate": 0.3
+  },
+  "rule_011": {
+    "name": "External Connection to Web Server",
+    "severity": "low",
+    "tactic": "Initial Access",
+    "alert_count": 30,
+    "false_positive_rate": 0.4
+  },
+  "rule_012": {
+    "name": "Failed Connection Attempt",
+    "severity": "low",
+    "tactic": "Discovery",
+    "alert_count": 21,
+    "false_positive_rate": 0.15
+  }
+}

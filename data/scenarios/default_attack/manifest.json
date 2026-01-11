@@ -1,0 +1,15 @@
+{
+  "name": "Multi-Stage Attack: C2 and Data Exfiltration",
+  "description": "16-hour attack scenario demonstrating credential theft, C2 establishment, lateral movement, and data exfiltration via DNS tunneling",
+  "log_types": [
+    "zeek_conn",
+    "zeek_dns"
+  ],
+  "duration_hours": 16,
+  "total_events": 5024,
+  "malicious_events": 151,
+  "benign_events": 4873,
+  "attack_phases": 5,
+  "created": "2026-01-11T00:33:55.420464",
+  "author": "DeepTempo AI SOC Demo"
+}

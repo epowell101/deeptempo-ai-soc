@@ -1,0 +1,58 @@
+{
+  "T1071.001": {
+    "technique_id": "T1071.001",
+    "technique_name": "Web Protocols",
+    "tactic": "Command and Control",
+    "count": 83,
+    "avg_confidence": 0.87
+  },
+  "T1078": {
+    "technique_id": "T1078",
+    "technique_name": "Valid Accounts",
+    "tactic": "Initial Access",
+    "count": 1,
+    "avg_confidence": 0.81
+  },
+  "T1071.004": {
+    "technique_id": "T1071.004",
+    "technique_name": "DNS",
+    "tactic": "Command and Control",
+    "count": 10,
+    "avg_confidence": 0.81
+  },
+  "T1021.002": {
+    "technique_id": "T1021.002",
+    "technique_name": "SMB/Windows Admin Shares",
+    "tactic": "Lateral Movement",
+    "count": 7,
+    "avg_confidence": 0.84
+  },
+  "T1021.001": {
+    "technique_id": "T1021.001",
+    "technique_name": "Remote Desktop Protocol",
+    "tactic": "Lateral Movement",
+    "count": 1,
+    "avg_confidence": 0.81
+  },
+  "T1041": {
+    "technique_id": "T1041",
+    "technique_name": "Exfiltration Over C2 Channel",
+    "tactic": "Exfiltration",
+    "count": 3,
+    "avg_confidence": 0.88
+  },
+  "T1048.003": {
+    "technique_id": "T1048.003",
+    "technique_name": "Exfiltration Over Unencrypted Non-C2 Protocol",
+    "tactic": "Exfiltration",
+    "count": 20,
+    "avg_confidence": 0.82
+  },
+  "T1190": {
+    "technique_id": "T1190",
+    "technique_name": "Exploit Public-Facing Application",
+    "tactic": "Initial Access",
+    "count": 30,
+    "avg_confidence": 0.8
+  }
+}
