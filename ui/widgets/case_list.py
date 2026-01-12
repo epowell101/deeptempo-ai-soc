@@ -14,7 +14,10 @@ from services.report_service import ReportService
 from services.sketch_manager import SketchManager
 from services.timeline_service import TimelineService
 from services.timesketch_service import TimesketchService
+from services.splunk_enrichment_service import SplunkEnrichmentService
+from services.claude_service import ClaudeService
 from ui.timesketch_config import TimesketchConfigDialog
+from ui.splunk_config import SplunkConfigDialog
 
 
 class CreateCaseDialog(QDialog):
@@ -42,7 +45,7 @@ class CreateCaseDialog(QDialog):
         
         self.description_edit = QTextEdit()
         self.description_edit.setPlaceholderText("Enter case description...")
-        self.description_edit.setMaximumHeight(100)
+        # Remove fixed height - let it size naturally
         form_layout.addRow("Description:", self.description_edit)
         
         self.priority_combo = QComboBox()
@@ -184,6 +187,16 @@ class CaseListWidget(QWidget):
         collaboration_btn.clicked.connect(self._show_collaboration)
         toolbar.addWidget(collaboration_btn)
         
+        # Add separator using QFrame
+        separator3 = QFrame()
+        separator3.setFrameShape(QFrame.Shape.VLine)
+        separator3.setFrameShadow(QFrame.Shadow.Sunken)
+        toolbar.addWidget(separator3)
+        
+        enrich_splunk_btn = QPushButton("Enrich with Splunk")
+        enrich_splunk_btn.clicked.connect(self._enrich_with_splunk)
+        toolbar.addWidget(enrich_splunk_btn)
+        
         toolbar.addStretch()
         
         refresh_btn = QPushButton("Refresh")
@@ -202,7 +215,8 @@ class CaseListWidget(QWidget):
         self.table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.table.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
         
-        layout.addWidget(self.table)
+        # Make table expand to fill available space (relative sizing)
+        layout.addWidget(self.table, 1)  # Stretch factor of 1
         
         self.setLayout(layout)
     
@@ -545,4 +559,145 @@ class CaseListWidget(QWidget):
         from ui.widgets.collaboration_widget import CollaborationWidget
         collaboration_widget = CollaborationWidget(case['case_id'], self)
         collaboration_widget.show()
+    
+    def _enrich_with_splunk(self):
+        """Enrich selected case with Splunk data."""
+        case = self._get_selected_case()
+        if not case:
+            QMessageBox.information(self, "No Selection", "Please select a case first.")
+            return
+        
+        # Check if Splunk is configured
+        splunk_service = SplunkConfigDialog.load_service()
+        if not splunk_service:
+            reply = QMessageBox.question(
+                self,
+                "Splunk Not Configured",
+                "Splunk is not configured. Would you like to configure it now?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
+            if reply == QMessageBox.StandardButton.Yes:
+                config_dialog = SplunkConfigDialog(self)
+                if config_dialog.exec() == QDialog.DialogCode.Accepted:
+                    splunk_service = SplunkConfigDialog.load_service()
+                else:
+                    return
+            else:
+                return
+        
+        if not splunk_service:
+            QMessageBox.warning(
+                self,
+                "Configuration Error",
+                "Splunk service not available. Please configure Splunk first."
+            )
+            return
+        
+        # Create enrichment dialog
+        from PyQt6.QtWidgets import QProgressDialog
+        from PyQt6.QtCore import QThread, pyqtSignal
+        
+        class EnrichmentWorker(QThread):
+            """Worker thread for Splunk enrichment."""
+            finished = pyqtSignal(dict)
+            error = pyqtSignal(str)
+            
+            def __init__(self, enrichment_service, case_id, lookback_hours):
+                super().__init__()
+                self.enrichment_service = enrichment_service
+                self.case_id = case_id
+                self.lookback_hours = lookback_hours
+            
+            def run(self):
+                try:
+                    result = self.enrichment_service.enrich_case(
+                        self.case_id,
+                        lookback_hours=self.lookback_hours
+                    )
+                    self.finished.emit(result)
+                except Exception as e:
+                    self.error.emit(str(e))
+        
+        # Show progress dialog
+        progress = QProgressDialog(
+            f"Enriching case {case['case_id']} with Splunk data...\n"
+            "This may take a minute or two.",
+            None,
+            0,
+            0,
+            self
+        )
+        progress.setWindowTitle("Enriching Case")
+        progress.setWindowModality(Qt.WindowModality.WindowModal)
+        progress.setMinimumDuration(0)
+        progress.show()
+        
+        # Create enrichment service and worker
+        claude_service = ClaudeService(use_mcp_tools=False)
+        enrichment_service = SplunkEnrichmentService(splunk_service, claude_service)
+        lookback_hours = SplunkConfigDialog.get_lookback_hours()
+        
+        worker = EnrichmentWorker(enrichment_service, case['case_id'], lookback_hours)
+        
+        def on_finished(result):
+            progress.close()
+            
+            if result.get('success'):
+                summary = result.get('splunk_data', {}).get('summary', {})
+                total_events = summary.get('total_events', 0)
+                
+                # Show results dialog
+                results_dialog = QDialog(self)
+                results_dialog.setWindowTitle("Enrichment Complete")
+                results_dialog.setMinimumSize(700, 500)
+                
+                layout = QVBoxLayout()
+                
+                summary_label = QLabel(
+                    f"<h3>Case {case['case_id']} Enriched Successfully</h3>\n\n"
+                    f"<b>Splunk Events Retrieved:</b> {total_events}<br>"
+                    f"<b>Lookback Period:</b> {lookback_hours} hours ({lookback_hours/24:.1f} days)<br>"
+                )
+                summary_label.setTextFormat(Qt.TextFormat.RichText)
+                layout.addWidget(summary_label)
+                
+                # Show Claude analysis
+                analysis_group = QGroupBox("AI Analysis")
+                analysis_layout = QVBoxLayout()
+                
+                analysis_text = QTextEdit()
+                analysis_text.setReadOnly(True)
+                analysis_text.setPlainText(result.get('claude_analysis', 'No analysis available'))
+                analysis_layout.addWidget(analysis_text)
+                
+                analysis_group.setLayout(analysis_layout)
+                layout.addWidget(analysis_group)
+                
+                # Close button
+                close_btn = QPushButton("Close")
+                close_btn.clicked.connect(results_dialog.accept)
+                layout.addWidget(close_btn)
+                
+                results_dialog.setLayout(layout)
+                results_dialog.exec()
+                
+                self.refresh()
+            else:
+                QMessageBox.critical(
+                    self,
+                    "Enrichment Failed",
+                    f"Failed to enrich case:\n\n{result.get('error', 'Unknown error')}"
+                )
+        
+        def on_error(error_msg):
+            progress.close()
+            QMessageBox.critical(
+                self,
+                "Error",
+                f"Error during enrichment:\n\n{error_msg}"
+            )
+        
+        worker.finished.connect(on_finished)
+        worker.error.connect(on_error)
+        worker.start()
 

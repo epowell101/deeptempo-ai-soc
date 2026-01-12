@@ -1,9 +1,11 @@
 """Main application window for DeepTempo AI SOC."""
 
 import sys
+import logging
 from pathlib import Path
 from PyQt6.QtWidgets import (
-    QMainWindow, QMenuBar, QStatusBar, QToolBar, QMessageBox, QApplication
+    QMainWindow, QMenuBar, QStatusBar, QToolBar, QMessageBox, QApplication,
+    QDockWidget
 )
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QAction, QIcon
@@ -12,9 +14,10 @@ from PyQt6.QtWidgets import QFileDialog, QMessageBox
 from pathlib import Path
 from datetime import datetime
 
+logger = logging.getLogger(__name__)
+
 from ui.dashboard import Dashboard
 from ui.claude_chat import ClaudeChat
-from ui.mcp_manager import MCPManager
 from ui.setup_wizard import SetupWizard
 from ui.config_manager import ConfigManager
 from ui.timesketch_config import TimesketchConfigDialog
@@ -29,13 +32,22 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("DeepTempo AI SOC")
-        self.setGeometry(100, 100, 1400, 900)
+        
+        # Get screen size and set window to full available screen size
+        screen = QApplication.primaryScreen()
+        if screen:
+            screen_geometry = screen.availableGeometry()
+            # Use full available screen (excludes taskbar/dock)
+            self.setGeometry(screen_geometry)
+        else:
+            # Fallback to default size if screen not available
+            self.setGeometry(100, 100, 1200, 900)
         
         # Initialize components
         self.dashboard = None
         self.claude_chat = None
-        self.mcp_manager = None
-        self.timesketch_manager = None
+        self.claude_dock = None
+        self.claude_toggle_action = None
         self.search_widget = None
         
         self._setup_ui()
@@ -45,11 +57,20 @@ class MainWindow(QMainWindow):
         
         # Check if setup is needed
         self._check_setup()
+        
+        # Check and start Timesketch Docker if configured (after a short delay to not block startup)
+        QTimer.singleShot(2000, self._check_and_start_timesketch_docker)
+        
+        # Check Timesketch availability (after Docker has time to start)
+        QTimer.singleShot(5000, self._check_timesketch_availability)
     
     def _setup_ui(self):
         """Set up the main UI components."""
         # Default to dashboard view
         self._show_dashboard()
+        
+        # Set up Claude Chat as a side drawer
+        self._setup_claude_drawer()
     
     def _setup_menu(self):
         """Set up the menu bar."""
@@ -98,20 +119,10 @@ class MainWindow(QMainWindow):
         dashboard_action.triggered.connect(self._show_dashboard)
         view_menu.addAction(dashboard_action)
         
-        claude_action = QAction("&Claude Chat", self)
+        claude_action = QAction("&Toggle Claude Chat", self)
         claude_action.setShortcut("Ctrl+C")
-        claude_action.triggered.connect(self._show_claude_chat)
+        claude_action.triggered.connect(self._toggle_claude_drawer)
         view_menu.addAction(claude_action)
-        
-        mcp_action = QAction("&MCP Manager", self)
-        mcp_action.setShortcut("Ctrl+M")
-        mcp_action.triggered.connect(self._show_mcp_manager)
-        view_menu.addAction(mcp_action)
-        
-        ts_manager_action = QAction("&Timesketch Manager", self)
-        ts_manager_action.setShortcut("Ctrl+T")
-        ts_manager_action.triggered.connect(self._show_timesketch_manager)
-        view_menu.addAction(ts_manager_action)
         
         # Help menu
         help_menu = menubar.addMenu("&Help")
@@ -132,24 +143,12 @@ class MainWindow(QMainWindow):
         
         toolbar.addSeparator()
         
-        # Claude Chat button
+        # Claude Chat toggle button
         claude_action = QAction("Claude Chat", self)
-        claude_action.triggered.connect(self._show_claude_chat)
+        claude_action.setCheckable(True)
+        claude_action.triggered.connect(self._toggle_claude_drawer)
         toolbar.addAction(claude_action)
-        
-        toolbar.addSeparator()
-        
-        # MCP Manager button
-        mcp_action = QAction("MCP Manager", self)
-        mcp_action.triggered.connect(self._show_mcp_manager)
-        toolbar.addAction(mcp_action)
-        
-        toolbar.addSeparator()
-        
-        # Timesketch Manager button
-        ts_action = QAction("Timesketch", self)
-        ts_action.triggered.connect(self._show_timesketch_manager)
-        toolbar.addAction(ts_action)
+        self.claude_toggle_action = claude_action
         
         toolbar.addSeparator()
         
@@ -191,6 +190,113 @@ class MainWindow(QMainWindow):
             if reply == QMessageBox.StandardButton.Yes:
                 self._show_setup_wizard()
     
+    def _check_and_start_timesketch_docker(self):
+        """Check if Timesketch Docker should be auto-started and start it if needed."""
+        from ui.timesketch_config import TimesketchConfigDialog
+        from services.timesketch_docker_service import TimesketchDockerService
+        import json
+        
+        config_file = TimesketchConfigDialog.CONFIG_FILE
+        if not config_file.exists():
+            return
+        
+        try:
+            with open(config_file, 'r') as f:
+                config = json.load(f)
+            
+            # Check if auto-start is enabled
+            if not config.get('auto_start_docker', False):
+                return
+            
+            # Check if server URL is localhost (Docker management only for localhost)
+            server_url = config.get('server_url', '')
+            if not server_url or 'localhost' not in server_url:
+                return
+            
+            # Initialize Docker service
+            docker_service = TimesketchDockerService()
+            
+            if not docker_service.is_docker_available():
+                logger.warning("Docker CLI is not available - cannot auto-start Timesketch")
+                return
+            
+            # Check if Docker daemon is running
+            if not docker_service.is_docker_daemon_running():
+                logger.warning("Docker daemon is not running - cannot auto-start Timesketch container. Please start Docker Desktop.")
+                return
+            
+            # Check if container is already running
+            if docker_service.is_container_running():
+                logger.info("Timesketch Docker container is already running")
+                return
+            
+            # Start the container
+            logger.info("Auto-starting Timesketch Docker container...")
+            port = 5000  # default
+            if ':' in server_url:
+                try:
+                    port_str = server_url.split(':')[-1].split('/')[0]
+                    port = int(port_str)
+                except ValueError:
+                    pass
+            
+            success, message = docker_service.start_container(port=port)
+            if success:
+                logger.info(f"Timesketch Docker container started: {message}")
+            else:
+                logger.warning(f"Failed to auto-start Timesketch Docker: {message}")
+        
+        except Exception as e:
+            logger.error(f"Error checking/starting Timesketch Docker: {e}")
+    
+    def _check_timesketch_availability(self):
+        """Check if Timesketch server is available and show helpful message if not."""
+        from ui.timesketch_config import TimesketchConfigDialog
+        import json
+        
+        config_file = TimesketchConfigDialog.CONFIG_FILE
+        if not config_file.exists():
+            # Timesketch not configured - this is fine, just return
+            return
+        
+        try:
+            with open(config_file, 'r') as f:
+                config = json.load(f)
+            
+            server_url = config.get('server_url', '')
+            if not server_url:
+                return
+            
+            # Try to test connection
+            timesketch_service = TimesketchConfigDialog.load_service()
+            if timesketch_service:
+                success, message = timesketch_service.test_connection()
+                if not success:
+                    # Only show message if auto-start is not enabled (to avoid double messages)
+                    auto_start = config.get('auto_start_docker', False)
+                    if not auto_start:
+                        # Show helpful message
+                        reply = QMessageBox.question(
+                            self,
+                            "Timesketch Server Not Available",
+                            f"Timesketch server is configured but not reachable:\n\n"
+                            f"Server: {server_url}\n"
+                            f"Error: {message}\n\n"
+                            f"Timesketch is an external service that must be running separately.\n\n"
+                            f"To start Timesketch:\n"
+                            f"• Use Settings → Timesketch → Start Docker Server\n"
+                            f"• Or enable 'Auto-start Docker server' in Settings\n"
+                            f"• Or configure a different server URL\n\n"
+                            f"Would you like to configure Timesketch now?",
+                            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                            QMessageBox.StandardButton.No
+                        )
+                        if reply == QMessageBox.StandardButton.Yes:
+                            self._show_settings_console()
+        except Exception as e:
+            # Silently fail - don't interrupt startup for this check
+            pass
+    
     def _show_setup_wizard(self):
         """Show the setup wizard."""
         wizard = SetupWizard(self)
@@ -217,24 +323,85 @@ class MainWindow(QMainWindow):
         self.dashboard = Dashboard(self)
         self.setCentralWidget(self.dashboard)
     
-    def _show_claude_chat(self):
-        """Show the Claude chat interface."""
-        # Always create a new chat widget to avoid deleted widget issues
+    def _setup_claude_drawer(self):
+        """Set up Claude Chat as a side drawer."""
+        # Create dock widget
+        self.claude_dock = QDockWidget("Claude Chat", self)
+        self.claude_dock.setAllowedAreas(Qt.DockWidgetArea.RightDockWidgetArea | Qt.DockWidgetArea.LeftDockWidgetArea)
+        
+        # Configure dock widget features - allow moving, closing, and resizing
+        self.claude_dock.setFeatures(
+            QDockWidget.DockWidgetFeature.DockWidgetMovable |
+            QDockWidget.DockWidgetFeature.DockWidgetClosable
+        )
+        
+        # Create Claude Chat widget
         self.claude_chat = ClaudeChat(self)
-        self.setCentralWidget(self.claude_chat)
+        self.claude_dock.setWidget(self.claude_chat)
+        
+        # Set minimum and maximum width constraints
+        self.claude_dock.setMinimumWidth(250)
+        
+        # Add dock widget to main window (right side by default)
+        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.claude_dock)
+        
+        # Initially hide the drawer
+        self.claude_dock.setVisible(False)
+        
+        # Connect visibility changes to update toggle button
+        self.claude_dock.visibilityChanged.connect(self._on_claude_drawer_visibility_changed)
+        
+        # Store initial window size to prevent expansion
+        self._initial_window_size = None
+    
+    def _toggle_claude_drawer(self):
+        """Toggle Claude Chat drawer visibility."""
+        if self.claude_dock.isVisible():
+            # Hide the drawer - content will expand back
+            self.claude_dock.setVisible(False)
+        else:
+            # Store current window geometry before opening drawer
+            current_geometry = self.geometry()
+            
+            # Temporarily lock window size to prevent expansion
+            min_size = self.minimumSize()
+            max_size = self.maximumSize()
+            self.setFixedSize(self.size())
+            
+            # Show the drawer
+            self.claude_dock.setVisible(True)
+            
+            # Set drawer width to 1/4 of window width
+            window_width = self.width()
+            quarter_width = max(window_width // 4, 250)
+            self.resizeDocks([self.claude_dock], [quarter_width], Qt.Orientation.Horizontal)
+            
+            # Restore window size constraints after a brief moment
+            QTimer.singleShot(100, lambda: (
+                self.setMinimumSize(min_size),
+                self.setMaximumSize(max_size),
+                self.setGeometry(current_geometry)
+            ))
+            
+            # Focus the message input when opening
+            if hasattr(self.claude_chat, 'message_edit'):
+                self.claude_chat.message_edit.setFocus()
+    
+    def _on_claude_drawer_visibility_changed(self, visible: bool):
+        """Update toggle button state when drawer visibility changes."""
+        if hasattr(self, 'claude_toggle_action'):
+            self.claude_toggle_action.setChecked(visible)
     
     def _show_mcp_manager(self):
-        """Show the MCP manager."""
-        # Always create a new manager widget to avoid deleted widget issues
-        self.mcp_manager = MCPManager(self)
-        self.setCentralWidget(self.mcp_manager)
-    
-    def _show_timesketch_manager(self):
-        """Show the Timesketch manager."""
-        from ui.widgets.sketch_manager_widget import SketchManagerWidget
-        # Always create a new manager widget to avoid deleted widget issues
-        self.timesketch_manager = SketchManagerWidget(self)
-        self.setCentralWidget(self.timesketch_manager)
+        """Show the MCP manager in Settings Console."""
+        # Open Settings Console and switch to MCP tab
+        console = SettingsConsole(self)
+        # Find the MCP tab index and set it as current
+        for i in range(console.tabs.count()):
+            if console.tabs.tabText(i) == "MCP Servers":
+                console.tabs.setCurrentIndex(i)
+                break
+        console.exec()
     
     def _show_search(self):
         """Show the enhanced search widget."""

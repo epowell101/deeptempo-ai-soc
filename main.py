@@ -10,9 +10,9 @@ import logging
 from pathlib import Path
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtCore import Qt
-import qdarkstyle
 
 from ui.main_window import MainWindow
+from ui.themes import apply_material_theme
 
 # Configure logging
 log_dir = Path.home() / '.deeptempo'
@@ -30,6 +30,20 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+def _load_theme_preference() -> str:
+    """Load saved theme preference from config file."""
+    try:
+        config_file = Path.home() / '.deeptempo' / 'theme_config.json'
+        if config_file.exists():
+            import json
+            with open(config_file, 'r') as f:
+                config = json.load(f)
+                return config.get('theme', 'dark_blue')
+    except Exception:
+        pass
+    return 'dark_blue'  # Default theme
+
+
 def main():
     """Main application entry point."""
     # Create application
@@ -37,11 +51,30 @@ def main():
     app.setApplicationName("DeepTempo AI SOC")
     app.setOrganizationName("DeepTempo")
     
-    # Set application style (dark theme)
+    # Apply Material Design theme
+    # Try to load saved theme preference, default to dark_blue
+    theme_name = _load_theme_preference()
+    
     try:
-        app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt6())
+        success = apply_material_theme(app, theme_name=theme_name)
+        if success:
+            logger.info(f"Applied Material Design theme: {theme_name}")
+        else:
+            logger.warning("Failed to apply Material theme, falling back to qdarkstyle")
+            # Fallback to qdarkstyle if Material theme fails
+            try:
+                import qdarkstyle
+                app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt6())
+            except ImportError:
+                logger.warning("qdarkstyle not available, using system default")
     except Exception as e:
-        logger.warning(f"Could not load dark theme: {e}")
+        logger.error(f"Error applying Material theme: {e}")
+        # Fallback to qdarkstyle
+        try:
+            import qdarkstyle
+            app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt6())
+        except ImportError:
+            pass
     
     # Note: High DPI scaling is enabled by default in PyQt6
     # The AA_EnableHighDpiScaling and AA_UseHighDpiPixmaps attributes

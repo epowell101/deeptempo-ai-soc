@@ -11,6 +11,7 @@ from services.timesketch_service import TimesketchService
 from services.timeline_service import TimelineService
 from services.data_service import DataService
 from ui.timesketch_config import TimesketchConfigDialog
+from ui.widgets.event_analysis_widget import EventAnalysisWidget
 
 
 class TimesketchTimelineWidget(QDialog):
@@ -79,6 +80,11 @@ class TimesketchTimelineWidget(QDialog):
         self.events_table.horizontalHeader().setStretchLastSection(True)
         self.events_table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.events_table.itemDoubleClicked.connect(self._view_event_details)
+        
+        # Analysis button
+        analyze_btn = QPushButton("Analyze Event with Claude")
+        analyze_btn.clicked.connect(self._analyze_selected_event)
+        events_layout.addWidget(analyze_btn)
         
         events_layout.addWidget(self.events_table)
         events_group.setLayout(events_layout)
@@ -250,6 +256,23 @@ class TimesketchTimelineWidget(QDialog):
             details.append(f"Anomaly Score: {event.get('anomaly_score')}")
         
         self.details_text.setPlainText('\n'.join(details))
+    
+    def _analyze_selected_event(self):
+        """Analyze selected event with Claude."""
+        row = self.events_table.currentRow()
+        if row < 0 or row >= len(self.all_events):
+            QMessageBox.information(
+                self,
+                "No Selection",
+                "Please select an event to analyze."
+            )
+            return
+        
+        event = self.all_events[row]
+        
+        # Open analysis dialog
+        analysis_dialog = EventAnalysisWidget(event, self.all_events, self)
+        analysis_dialog.exec()
     
     def _open_in_timesketch(self):
         """Open sketch in Timesketch web interface."""

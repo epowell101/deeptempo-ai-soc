@@ -126,14 +126,18 @@ class MCPManager(QWidget):
             # Actions
             action_widget = QWidget()
             action_layout = QHBoxLayout()
-            action_layout.setContentsMargins(2, 2, 2, 2)
+            action_layout.setContentsMargins(3, 3, 3, 3)
             
             if status == "running":
                 stop_btn = QPushButton("Stop")
+                stop_btn.setMinimumSize(70, 32)  # Width, Height
+                stop_btn.setMaximumHeight(36)
                 stop_btn.clicked.connect(lambda checked, name=server_name: self._stop_server(name))
                 action_layout.addWidget(stop_btn)
             else:
                 start_btn = QPushButton("Start")
+                start_btn.setMinimumSize(70, 32)  # Width, Height
+                start_btn.setMaximumHeight(36)
                 start_btn.clicked.connect(lambda checked, name=server_name: self._start_server(name))
                 action_layout.addWidget(start_btn)
             
@@ -142,8 +146,13 @@ class MCPManager(QWidget):
             
             # Log button
             log_btn = QPushButton("View Log")
+            log_btn.setMinimumSize(90, 32)  # Width, Height
+            log_btn.setMaximumHeight(36)
             log_btn.clicked.connect(lambda checked, name=server_name: self._view_log(name))
             self.status_table.setCellWidget(row, 3, log_btn)
+            
+            # Set row height to accommodate buttons
+            self.status_table.setRowHeight(row, 42)
         
         self.status_table.resizeColumnsToContents()
         

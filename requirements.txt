@@ -19,6 +19,9 @@ reportlab>=4.0.0
 # Timesketch integration
 requests>=2.31.0
 
+# Splunk integration (uses REST API via requests)
+urllib3>=2.0.0
+
 # AWS S3 integration
 boto3>=1.34.0
 
@@ -28,6 +31,9 @@ boto3>=1.34.0
 
 # Optional: For enhanced vector search
 # faiss-cpu>=1.7.4
+
+# Optional: Material Design theme (for UI reskin)
+# qt-material>=2.14
 
 # Visualization dependencies (from Streamlit UI)
 networkx>=3.0

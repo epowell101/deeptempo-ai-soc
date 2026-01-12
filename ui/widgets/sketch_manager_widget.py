@@ -85,7 +85,8 @@ class SketchManagerWidget(QWidget):
         self.table.horizontalHeader().setStretchLastSection(True)
         self.table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         
-        layout.addWidget(self.table)
+        # Make table expand to fill available space (relative sizing)
+        layout.addWidget(self.table, 1)  # Stretch factor of 1
         
         # Empty state message
         self.empty_label = QLabel("No sketch mappings found. Create a mapping by syncing a case to Timesketch.")

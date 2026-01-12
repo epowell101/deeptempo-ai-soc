@@ -71,7 +71,8 @@ class FindingListWidget(QWidget):
         self.table.itemDoubleClicked.connect(self._on_item_double_clicked)
         self.table.itemSelectionChanged.connect(self._on_selection_changed)
         
-        layout.addWidget(self.table)
+        # Make table expand to fill available space (relative sizing)
+        layout.addWidget(self.table, 1)  # Stretch factor of 1
         
         # Action buttons
         button_layout = QHBoxLayout()

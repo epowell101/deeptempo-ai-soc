@@ -1,12 +1,12 @@
 {
-  "name": "DeepTempo Demo Layer",
+  "name": "DeepTempo AI SOC Layer",
   "versions": {
     "attack": "14",
     "navigator": "4.9.1",
     "layer": "4.5"
   },
   "domain": "enterprise-attack",
-  "description": "Demo ATT&CK layer generated from sample findings",
+  "description": "ATT&CK layer generated from DeepTempo findings",
   "techniques": [
     {
       "techniqueID": "T1071.001",

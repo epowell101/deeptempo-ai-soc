@@ -84,7 +84,8 @@ class WorkflowWidget(QWidget):
         self.findings_table.horizontalHeader().setStretchLastSection(True)
         self.findings_table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         self.findings_table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
-        layout.addWidget(self.findings_table)
+        # Make table expand to fill available space (relative sizing)
+        layout.addWidget(self.findings_table, 2)  # Stretch factor of 2 (takes more space than detail)
         
         # Detail view
         detail_group = QGroupBox("Finding Details & Update")
@@ -92,8 +93,8 @@ class WorkflowWidget(QWidget):
         
         self.detail_text = QTextEdit()
         self.detail_text.setReadOnly(True)
-        self.detail_text.setMaximumHeight(150)
-        detail_layout.addWidget(self.detail_text)
+        # Use relative sizing instead of fixed height
+        detail_layout.addWidget(self.detail_text, 1)  # Stretch factor
         
         # Update controls
         update_layout = QHBoxLayout()

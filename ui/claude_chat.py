@@ -181,6 +181,8 @@ class ClaudeChat(QWidget):
     def _setup_ui(self):
         """Set up the UI."""
         layout = QVBoxLayout()
+        layout.setContentsMargins(5, 5, 5, 5)  # Compact margins for drawer
+        layout.setSpacing(3)  # Reduced spacing for compact layout
         
         # API key section (if not configured)
         if not self.claude_service.has_api_key():
@@ -200,31 +202,37 @@ class ClaudeChat(QWidget):
             layout.addWidget(api_group)
         
         
-        # Chat history
-        history_label = QLabel("Conversation:")
-        layout.addWidget(history_label)
-        
+        # Chat history (no label to save space)
         self.chat_display = ScrollableTextEdit()
         self.chat_display.setReadOnly(True)
         self.chat_display.setLineWrapMode(QTextEdit.LineWrapMode.WidgetWidth)
         # Enable auto-scrolling to bottom
         self.chat_display.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
-        layout.addWidget(self.chat_display)
+        # Make chat display expand to fill available space (relative sizing)
+        layout.addWidget(self.chat_display, 1)  # Stretch factor of 1 makes it take available space
         
         # Attached images section (hidden until images are attached)
-        self.images_group = QGroupBox("Attached Images")
+        self.images_group = QGroupBox("Images")
         images_layout = QVBoxLayout()
+        images_layout.setContentsMargins(5, 5, 5, 5)
+        images_layout.setSpacing(3)
         
         self.images_list = QListWidget()
-        self.images_list.setMaximumHeight(80)
+        self.images_list.setMaximumHeight(60)
         images_layout.addWidget(self.images_list)
         
         images_buttons_layout = QHBoxLayout()
-        remove_image_btn = QPushButton("Remove Selected")
+        remove_image_btn = QPushButton("Remove")
+        remove_image_btn.setMinimumWidth(55)
+        remove_image_btn.setMaximumHeight(20)
+        remove_image_btn.setStyleSheet("font-size: 9px; padding: 2px 4px;")
         remove_image_btn.clicked.connect(self._remove_image)
         images_buttons_layout.addWidget(remove_image_btn)
         
-        clear_images_btn = QPushButton("Clear All")
+        clear_images_btn = QPushButton("Clear")
+        clear_images_btn.setMinimumWidth(45)
+        clear_images_btn.setMaximumHeight(20)
+        clear_images_btn.setStyleSheet("font-size: 9px; padding: 2px 4px;")
         clear_images_btn.clicked.connect(self._clear_images)
         images_buttons_layout.addWidget(clear_images_btn)
         
@@ -239,140 +247,159 @@ class ClaudeChat(QWidget):
         input_layout = QHBoxLayout()
         
         self.message_edit = QLineEdit()
-        self.message_edit.setPlaceholderText("Type your message to Claude...")
+        self.message_edit.setPlaceholderText("Message Claude...")
         self.message_edit.returnPressed.connect(self._send_message)
         self.message_edit.textChanged.connect(self._update_context_indicator)
-        input_layout.addWidget(self.message_edit)
+        input_layout.addWidget(self.message_edit, 1)  # Give it stretch factor to fill space
         
         send_btn = QPushButton("Send")
+        send_btn.setMinimumWidth(50)
+        send_btn.setMaximumHeight(24)
+        send_btn.setStyleSheet("font-size: 11px; padding: 2px 8px; font-weight: bold;")
         send_btn.clicked.connect(self._send_message)
         input_layout.addWidget(send_btn)
         
         layout.addLayout(input_layout)
         
-        # Options
+        # Options - First row
         options_layout = QHBoxLayout()
+        
+        mode_label = QLabel("Mode:")
+        mode_label.setStyleSheet("font-size: 10px;")
+        options_layout.addWidget(mode_label)
         
         self.streaming_checkbox = QComboBox()
         self.streaming_checkbox.addItems(["Streaming", "Non-streaming"])
-        options_layout.addWidget(QLabel("Mode:"))
+        self.streaming_checkbox.setMaximumWidth(110)
+        self.streaming_checkbox.setStyleSheet("font-size: 10px;")
         options_layout.addWidget(self.streaming_checkbox)
         
         # Attach Image button (positioned with other options)
-        attach_image_btn = QPushButton("Attach Image")
+        attach_image_btn = QPushButton("Attach")
         attach_image_btn.setToolTip("Attach Image\nAdd an image file to your message. Supported formats: PNG, JPG, JPEG, GIF, WEBP")
         attach_image_btn.clicked.connect(self._attach_image)
+        attach_image_btn.setMinimumWidth(55)
+        attach_image_btn.setMaximumHeight(24)
+        attach_image_btn.setStyleSheet("font-size: 10px; padding: 2px 6px;")
         options_layout.addWidget(attach_image_btn)
         
         options_layout.addStretch()
         
-        clear_btn = QPushButton("Clear History")
+        clear_btn = QPushButton("Clear")
+        clear_btn.setToolTip("Clear conversation history")
         clear_btn.clicked.connect(self._clear_history)
+        clear_btn.setMinimumWidth(50)
+        clear_btn.setMaximumHeight(24)
+        clear_btn.setStyleSheet("font-size: 10px; padding: 2px 6px;")
         options_layout.addWidget(clear_btn)
         
         layout.addLayout(options_layout)
         
-        # Bottom status bar with context window info (compact)
-        status_layout = QHBoxLayout()
-        status_layout.setContentsMargins(5, 2, 5, 2)
+        # Bottom status bar - Row 1: Context info and progress
+        context_row = QHBoxLayout()
+        context_row.setContentsMargins(0, 2, 0, 2)
         
         # Context window indicator (compact)
-        self.context_label = QLabel("Tokens: 0 / 200,000 (0%) | Remaining: 200,000")
-        self.context_label.setStyleSheet("font-size: 10px; color: #888;")
-        status_layout.addWidget(self.context_label)
+        self.context_label = QLabel("Tokens: 0 / 200k")
+        self.context_label.setStyleSheet("font-size: 9px; color: #888;")
+        context_row.addWidget(self.context_label)
         
         # Compact progress bar
         self.context_progress = QProgressBar()
         self.context_progress.setMinimum(0)
         self.context_progress.setMaximum(200000)
-        self.context_progress.setMaximumHeight(8)
-        self.context_progress.setTextVisible(False)  # Hide text, just show bar
+        self.context_progress.setMaximumHeight(6)
+        self.context_progress.setTextVisible(False)
         self.context_progress.setStyleSheet("""
             QProgressBar {
                 border: 1px solid #555;
-                border-radius: 4px;
+                border-radius: 3px;
                 background: #2a2a2a;
             }
             QProgressBar::chunk {
                 background: #4a9eff;
-                border-radius: 3px;
+                border-radius: 2px;
             }
         """)
-        status_layout.addWidget(self.context_progress, 1)  # Allow it to stretch
+        context_row.addWidget(self.context_progress, 1)
         
-        # Separator
-        separator1 = QLabel("|")
-        separator1.setStyleSheet("font-size: 10px; color: #555; margin: 0 5px;")
-        status_layout.addWidget(separator1)
+        layout.addLayout(context_row)
         
-        # Extended thinking controls (compact)
-        self.thinking_checkbox = QCheckBox("Extended Thinking")
-        self.thinking_checkbox.setChecked(False)
-        self.thinking_checkbox.setStyleSheet("font-size: 10px;")
-        self.thinking_checkbox.setToolTip("Enable Extended Thinking\nAllows Claude to use extended reasoning for complex tasks. Uses additional tokens from the thinking budget.")
-        self.thinking_checkbox.toggled.connect(self._on_thinking_toggled)
-        status_layout.addWidget(self.thinking_checkbox)
-        
-        self.thinking_budget_spin = QSpinBox()
-        self.thinking_budget_spin.setMinimum(1000)
-        self.thinking_budget_spin.setMaximum(100000)
-        self.thinking_budget_spin.setValue(10000)
-        self.thinking_budget_spin.setSingleStep(1000)
-        self.thinking_budget_spin.setSuffix(" tokens")
-        self.thinking_budget_spin.setEnabled(False)
-        self.thinking_budget_spin.setMaximumWidth(120)
-        self.thinking_budget_spin.setStyleSheet("font-size: 10px;")
-        self.thinking_budget_spin.setToolTip("Thinking Budget\nMaximum tokens to allocate for extended thinking. Higher values allow for more complex reasoning but use more tokens.")
-        self.thinking_budget_spin.valueChanged.connect(self._on_thinking_budget_changed)
-        status_layout.addWidget(self.thinking_budget_spin)
-        
-        # Separator
-        separator2 = QLabel("|")
-        separator2.setStyleSheet("font-size: 10px; color: #555; margin: 0 5px;")
-        status_layout.addWidget(separator2)
+        # Bottom status bar - Row 2: MCP and thinking controls
+        controls_row = QHBoxLayout()
+        controls_row.setContentsMargins(0, 2, 0, 2)
         
         # MCP Tools Status (compact)
         self.mcp_status_label = QLabel("MCP: Loading...")
-        self.mcp_status_label.setStyleSheet("font-size: 10px; color: #888;")
+        self.mcp_status_label.setStyleSheet("font-size: 9px; color: #888;")
         self.mcp_status_label.setToolTip("Loading MCP tools...")
-        status_layout.addWidget(self.mcp_status_label)
+        controls_row.addWidget(self.mcp_status_label)
         
         refresh_mcp_btn = QPushButton("↻")
-        refresh_mcp_btn.setMaximumWidth(25)
-        refresh_mcp_btn.setMaximumHeight(20)
-        refresh_mcp_btn.setToolTip("Refresh MCP Tools\nReloads the list of available MCP tools from running servers.")
-        refresh_mcp_btn.setStyleSheet("font-size: 10px; padding: 2px;")
+        refresh_mcp_btn.setMaximumWidth(20)
+        refresh_mcp_btn.setMaximumHeight(18)
+        refresh_mcp_btn.setToolTip("Refresh MCP Tools")
+        refresh_mcp_btn.setStyleSheet("font-size: 9px; padding: 1px;")
         refresh_mcp_btn.clicked.connect(self._refresh_mcp_tools)
-        status_layout.addWidget(refresh_mcp_btn)
+        controls_row.addWidget(refresh_mcp_btn)
         
-        # Separator
-        separator3 = QLabel("|")
-        separator3.setStyleSheet("font-size: 10px; color: #555; margin: 0 5px;")
-        status_layout.addWidget(separator3)
+        controls_row.addStretch()
         
-        # Quick Actions (compact buttons)
+        # Extended thinking controls (compact)
+        self.thinking_checkbox = QCheckBox("Thinking")
+        self.thinking_checkbox.setChecked(False)
+        self.thinking_checkbox.setStyleSheet("font-size: 9px;")
+        self.thinking_checkbox.setToolTip("Enable Extended Thinking")
+        self.thinking_checkbox.toggled.connect(self._on_thinking_toggled)
+        controls_row.addWidget(self.thinking_checkbox)
+        
+        self.thinking_budget_spin = QSpinBox()
+        self.thinking_budget_spin.setMinimum(1)
+        self.thinking_budget_spin.setMaximum(100)
+        self.thinking_budget_spin.setValue(10)
+        self.thinking_budget_spin.setSingleStep(1)
+        self.thinking_budget_spin.setSuffix("k")
+        self.thinking_budget_spin.setEnabled(False)
+        self.thinking_budget_spin.setMaximumWidth(60)
+        self.thinking_budget_spin.setMaximumHeight(18)
+        self.thinking_budget_spin.setStyleSheet("font-size: 9px;")
+        self.thinking_budget_spin.setToolTip("Thinking Budget (in thousands of tokens)")
+        self.thinking_budget_spin.valueChanged.connect(self._on_thinking_budget_changed)
+        controls_row.addWidget(self.thinking_budget_spin)
+        
+        layout.addLayout(controls_row)
+        
+        # Bottom status bar - Row 3: Quick Actions
+        actions_row = QHBoxLayout()
+        actions_row.setContentsMargins(0, 2, 0, 2)
+        
         analyze_btn = QPushButton("Analyze")
+        analyze_btn.setMinimumWidth(52)
         analyze_btn.setMaximumHeight(20)
-        analyze_btn.setStyleSheet("font-size: 10px; padding: 2px 5px;")
-        analyze_btn.setToolTip("Analyze Selected Finding\nOpens a dialog to enter a finding ID for analysis.")
+        analyze_btn.setStyleSheet("font-size: 9px; padding: 2px 6px;")
+        analyze_btn.setToolTip("Analyze Finding")
         analyze_btn.clicked.connect(self._analyze_finding)
-        status_layout.addWidget(analyze_btn)
+        actions_row.addWidget(analyze_btn)
         
         correlate_btn = QPushButton("Correlate")
+        correlate_btn.setMinimumWidth(54)
         correlate_btn.setMaximumHeight(20)
-        correlate_btn.setStyleSheet("font-size: 10px; padding: 2px 5px;")
-        correlate_btn.setToolTip("Correlate Findings\nAnalyzes and correlates multiple security findings to identify patterns.")
+        correlate_btn.setStyleSheet("font-size: 9px; padding: 2px 6px;")
+        correlate_btn.setToolTip("Correlate Findings")
         correlate_btn.clicked.connect(self._correlate_findings)
-        status_layout.addWidget(correlate_btn)
+        actions_row.addWidget(correlate_btn)
         
-        case_summary_btn = QPushButton("Case Summary")
+        case_summary_btn = QPushButton("Summary")
+        case_summary_btn.setMinimumWidth(54)
         case_summary_btn.setMaximumHeight(20)
-        case_summary_btn.setStyleSheet("font-size: 10px; padding: 2px 5px;")
-        case_summary_btn.setToolTip("Generate Case Summary\nOpens a dialog to enter a case ID and generate a summary.")
+        case_summary_btn.setStyleSheet("font-size: 9px; padding: 2px 6px;")
+        case_summary_btn.setToolTip("Generate Case Summary")
         case_summary_btn.clicked.connect(self._generate_case_summary)
-        status_layout.addWidget(case_summary_btn)
+        actions_row.addWidget(case_summary_btn)
         
-        layout.addLayout(status_layout)
+        actions_row.addStretch()
+        
+        layout.addLayout(actions_row)
         
         self.setLayout(layout)
     
@@ -774,7 +801,8 @@ class ClaudeChat(QWidget):
     
     def _on_thinking_budget_changed(self, value: int):
         """Handle thinking budget change."""
-        self.thinking_budget = value
+        # Value is in thousands (e.g., 10 = 10,000 tokens)
+        self.thinking_budget = value * 1000
         self._update_context_indicator()
     
     def _update_context_indicator(self):
@@ -798,12 +826,17 @@ class ClaudeChat(QWidget):
         # Update progress bar
         self.context_progress.setValue(min(total_tokens, 200000))
         
-        # Update label (compact format)
+        # Update label (very compact format for narrow drawers)
         remaining = max(0, 200000 - total_tokens)
         percentage = (total_tokens / 200000) * 100 if total_tokens > 0 else 0
-        self.context_label.setText(
-            f"Tokens: {total_tokens:,} / 200,000 ({percentage:.1f}%) | Remaining: {remaining:,}"
-        )
+        
+        # Format with k suffix for compactness
+        if total_tokens >= 1000:
+            tokens_display = f"{total_tokens/1000:.1f}k"
+        else:
+            tokens_display = str(total_tokens)
+        
+        self.context_label.setText(f"Tokens: {tokens_display} / 200k ({percentage:.0f}%)")
         
         # Color coding for progress bar
         if total_tokens > 180000:

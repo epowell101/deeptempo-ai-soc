@@ -135,16 +135,18 @@ class SearchWidget(QWidget):
         self.results_table.horizontalHeader().setStretchLastSection(True)
         self.results_table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.results_table.itemDoubleClicked.connect(self._view_event_details)
-        results_layout.addWidget(self.results_table)
+        # Make results table expand to fill available space (relative sizing)
+        results_layout.addWidget(self.results_table, 2)  # Stretch factor of 2 (takes more space than details)
         
-        # Event details
+        # Event details - use relative sizing instead of fixed height
         self.event_details = QTextEdit()
         self.event_details.setReadOnly(True)
-        self.event_details.setMaximumHeight(150)
-        results_layout.addWidget(self.event_details)
+        # Use stretch factor to make it take a portion of available space
+        results_layout.addWidget(self.event_details, 1)  # Stretch factor
         
         results_group.setLayout(results_layout)
-        layout.addWidget(results_group)
+        # Make results section expand to fill available space (relative sizing)
+        layout.addWidget(results_group, 1)  # Stretch factor of 1
         
         # Saved queries
         saved_group = QGroupBox("Saved Queries")

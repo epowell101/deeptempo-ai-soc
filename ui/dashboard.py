@@ -14,6 +14,7 @@ from ui.widgets.attack_layer_view import AttackLayerViewWidget
 from ui.widgets.attack_flow_widget import AttackFlowWidget
 from ui.widgets.entity_investigation_widget import EntityInvestigationWidget
 from ui.widgets.workflow_widget import WorkflowWidget
+from ui.widgets.sketch_manager_widget import SketchManagerWidget
 from services.data_service import DataService
 from services.report_service import ReportService
 
@@ -74,6 +75,10 @@ class Dashboard(QWidget):
         self.cases_widget = CaseListWidget(self)
         self.tabs.addTab(self.cases_widget, "Cases")
         
+        # Timelines tab (Timesketch integration)
+        self.timelines_widget = SketchManagerWidget(self)
+        self.tabs.addTab(self.timelines_widget, "Timelines")
+        
         # Evidence tab (placeholder for now)
         evidence_widget = QWidget()
         evidence_layout = QVBoxLayout()
@@ -99,7 +104,8 @@ class Dashboard(QWidget):
         self.workflow_widget = WorkflowWidget(self)
         self.tabs.addTab(self.workflow_widget, "Workflow")
         
-        layout.addWidget(self.tabs)
+        # Make tabs widget expand to fill available space (relative sizing)
+        layout.addWidget(self.tabs, 1)  # Stretch factor of 1 makes it take available space
         
         self.setLayout(layout)
     
@@ -163,6 +169,8 @@ class Dashboard(QWidget):
             self.findings_widget.refresh()
         if hasattr(self, 'cases_widget'):
             self.cases_widget.refresh()
+        if hasattr(self, 'timelines_widget'):
+            self.timelines_widget.refresh()
         if hasattr(self, 'attack_widget'):
             self.attack_widget.refresh()
         if hasattr(self, 'attack_flow_widget'):

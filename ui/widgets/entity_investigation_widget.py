@@ -63,7 +63,8 @@ class EntityInvestigationWidget(QWidget):
         self.entity_table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         self.entity_table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.entity_table.itemSelectionChanged.connect(self._on_entity_selected)
-        layout.addWidget(self.entity_table)
+        # Make table expand to fill available space (relative sizing)
+        layout.addWidget(self.entity_table, 2)  # Stretch factor of 2 (takes more space than detail)
         
         # Entity detail view
         detail_group = QGroupBox("Entity Details")
@@ -75,8 +76,8 @@ class EntityInvestigationWidget(QWidget):
         
         self.detail_text = QTextEdit()
         self.detail_text.setReadOnly(True)
-        self.detail_text.setMaximumHeight(200)
-        detail_layout.addWidget(self.detail_text)
+        # Use relative sizing instead of fixed height
+        detail_layout.addWidget(self.detail_text, 1)  # Stretch factor
         
         detail_group.setLayout(detail_layout)
         layout.addWidget(detail_group)
