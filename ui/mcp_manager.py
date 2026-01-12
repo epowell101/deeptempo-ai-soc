@@ -26,8 +26,11 @@ class MCPManager(QWidget):
         
         # Info label
         info_label = QLabel(
-            "MCP Server Manager\n\n"
-            "Manage and monitor MCP servers for Claude Desktop integration."
+            "<b>MCP Server Manager</b><br><br>"
+            "Manage and monitor MCP servers for Claude Desktop integration.<br><br>"
+            "<b>Server Types:</b><br>"
+            "• <span style='color: green;'>FastMCP</span> - Standalone servers with file logging (can start/stop here)<br>"
+            "• <span style='color: blue;'>Stdio</span> - Claude Desktop integration only (managed by Claude Desktop)"
         )
         info_label.setWordWrap(True)
         layout.addWidget(info_label)
@@ -114,8 +117,14 @@ class MCPManager(QWidget):
             status = statuses.get(server_name, "unknown")
             status_item = QTableWidgetItem(status)
             
+            # Get server object to check type
+            server = self.mcp_service.servers.get(server_name)
+            is_stdio = server and server.server_type == "stdio"
+            
             if status == "running":
                 status_item.setForeground(Qt.GlobalColor.green)
+            elif "stdio" in status.lower() or "claude desktop" in status.lower():
+                status_item.setForeground(Qt.GlobalColor.blue)
             elif status == "stopped":
                 status_item.setForeground(Qt.GlobalColor.gray)
             else:
@@ -128,7 +137,12 @@ class MCPManager(QWidget):
             action_layout = QHBoxLayout()
             action_layout.setContentsMargins(3, 3, 3, 3)
             
-            if status == "running":
+            if is_stdio:
+                # Stdio servers can't be started from here
+                info_label = QLabel("(via Claude)")
+                info_label.setStyleSheet("color: #888; font-size: 10px;")
+                action_layout.addWidget(info_label)
+            elif status == "running":
                 stop_btn = QPushButton("Stop")
                 stop_btn.setMinimumSize(70, 32)  # Width, Height
                 stop_btn.setMaximumHeight(36)
@@ -148,6 +162,9 @@ class MCPManager(QWidget):
             log_btn = QPushButton("View Log")
             log_btn.setMinimumSize(90, 32)  # Width, Height
             log_btn.setMaximumHeight(36)
+            if is_stdio:
+                log_btn.setEnabled(False)
+                log_btn.setToolTip("Stdio servers don't produce standalone logs")
             log_btn.clicked.connect(lambda checked, name=server_name: self._view_log(name))
             self.status_table.setCellWidget(row, 3, log_btn)
             

@@ -29,46 +29,73 @@ async def handle_list_tools() -> list[types.Tool]:
     return [
         types.Tool(
             name="shodan_search_ip",
-            description="Search for IP address information",
+            description="Search for IP address information in Shodan. Returns open ports, services, vulnerabilities, and banners.",
             inputSchema={
                 "type": "object",
                 "properties": {
-                    # TODO: Define tool parameters
+                    "ip": {
+                        "type": "string",
+                        "description": "IP address to search"
+                    }
                 },
-                "required": []
+                "required": ["ip"]
             }
         ),
         types.Tool(
             name="shodan_search_exploits",
-            description="Search for exploits",
+            description="Search for exploits related to a CVE or product in Shodan's exploit database.",
             inputSchema={
                 "type": "object",
                 "properties": {
-                    # TODO: Define tool parameters
+                    "query": {
+                        "type": "string",
+                        "description": "Search query (CVE ID, product name, or keyword)"
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "description": "Maximum number of results (default: 10)",
+                        "default": 10
+                    }
                 },
-                "required": []
+                "required": ["query"]
             }
         ),
         types.Tool(
             name="shodan_get_host_info",
-            description="Get detailed host information",
+            description="Get detailed host information including all historical data, ports, and services for an IP.",
             inputSchema={
                 "type": "object",
                 "properties": {
-                    # TODO: Define tool parameters
+                    "ip": {
+                        "type": "string",
+                        "description": "IP address to get information for"
+                    },
+                    "history": {
+                        "type": "boolean",
+                        "description": "Include historical data (default: false)",
+                        "default": False
+                    }
                 },
-                "required": []
+                "required": ["ip"]
             }
         ),
         types.Tool(
             name="shodan_search_vulnerabilities",
-            description="Search for vulnerabilities",
+            description="Search for hosts vulnerable to a specific CVE.",
             inputSchema={
                 "type": "object",
                 "properties": {
-                    # TODO: Define tool parameters
+                    "cve": {
+                        "type": "string",
+                        "description": "CVE ID (e.g., CVE-2021-44228)"
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "description": "Maximum number of results (default: 10)",
+                        "default": 10
+                    }
                 },
-                "required": []
+                "required": ["cve"]
             }
         )
     ]
@@ -80,65 +107,239 @@ async def handle_call_tool(
     """Handle tool execution requests."""
     
     config = get_shodan_config()
+    api_key = config.get('api_key')
     
-    if not config:
+    if not api_key:
         return [types.TextContent(
             type="text",
             text=json.dumps({
                 "error": "Shodan not configured",
-                "message": "Please configure Shodan in Settings > Integrations"
+                "message": "Please configure Shodan API key in Settings > Integrations"
             }, indent=2)
         )]
     
     try:
-        # TODO: Implement tool handlers
+        import requests
         
         if name == "shodan_search_ip":
-            # TODO: Implement shodan_search_ip
+            ip = arguments.get("ip") if arguments else None
+            
+            if not ip:
+                return [types.TextContent(
+                    type="text",
+                    text=json.dumps({"error": "ip parameter is required"}, indent=2)
+                )]
+            
+            url = f"https://api.shodan.io/shodan/host/{ip}"
+            params = {"key": api_key}
+            
+            response = requests.get(url, params=params, timeout=30)
+            
+            if response.status_code == 404:
+                return [types.TextContent(
+                    type="text",
+                    text=json.dumps({
+                        "ip": ip,
+                        "found": False,
+                        "message": "No information found for this IP"
+                    }, indent=2)
+                )]
+            
+            response.raise_for_status()
+            data = response.json()
+            
+            result = {
+                "ip": ip,
+                "found": True,
+                "hostnames": data.get("hostnames", []),
+                "organization": data.get("org", "Unknown"),
+                "country": data.get("country_name", "Unknown"),
+                "city": data.get("city", "Unknown"),
+                "isp": data.get("isp", "Unknown"),
+                "asn": data.get("asn", "Unknown"),
+                "last_update": data.get("last_update"),
+                "open_ports": data.get("ports", []),
+                "vulnerabilities": data.get("vulns", []),
+                "services": []
+            }
+            
+            # Extract service information
+            for service in data.get("data", [])[:5]:  # First 5 services
+                result["services"].append({
+                    "port": service.get("port"),
+                    "transport": service.get("transport"),
+                    "product": service.get("product"),
+                    "version": service.get("version"),
+                    "banner": service.get("data", "")[:200]  # Truncate banner
+                })
+            
+            return [types.TextContent(
+                type="text",
+                text=json.dumps(result, indent=2)
+            )]
+        
+        elif name == "shodan_search_exploits":
+            query = arguments.get("query") if arguments else None
+            limit = arguments.get("limit", 10) if arguments else 10
+            
+            if not query:
+                return [types.TextContent(
+                    type="text",
+                    text=json.dumps({"error": "query parameter is required"}, indent=2)
+                )]
+            
+            url = "https://exploits.shodan.io/api/search"
+            params = {
+                "key": api_key,
+                "query": query
+            }
+            
+            response = requests.get(url, params=params, timeout=30)
+            response.raise_for_status()
+            data = response.json()
+            
+            exploits = []
+            for exploit in data.get("matches", [])[:limit]:
+                exploits.append({
+                    "id": exploit.get("_id"),
+                    "description": exploit.get("description", "")[:200],
+                    "author": exploit.get("author"),
+                    "platform": exploit.get("platform"),
+                    "type": exploit.get("type"),
+                    "port": exploit.get("port"),
+                    "published": exploit.get("date"),
+                    "source": exploit.get("source"),
+                    "cve": exploit.get("cve", [])
+                })
+            
             return [types.TextContent(
                 type="text",
                 text=json.dumps({
-                    "error": "Not implemented",
-                    "message": "This tool is not yet implemented"
+                    "query": query,
+                    "total": data.get("total", 0),
+                    "exploits": exploits
                 }, indent=2)
             )]
         
-
-        if name == "shodan_search_exploits":
-            # TODO: Implement shodan_search_exploits
+        elif name == "shodan_get_host_info":
+            ip = arguments.get("ip") if arguments else None
+            history = arguments.get("history", False) if arguments else False
+            
+            if not ip:
+                return [types.TextContent(
+                    type="text",
+                    text=json.dumps({"error": "ip parameter is required"}, indent=2)
+                )]
+            
+            url = f"https://api.shodan.io/shodan/host/{ip}"
+            params = {
+                "key": api_key,
+                "history": str(history).lower()
+            }
+            
+            response = requests.get(url, params=params, timeout=30)
+            
+            if response.status_code == 404:
+                return [types.TextContent(
+                    type="text",
+                    text=json.dumps({
+                        "ip": ip,
+                        "found": False
+                    }, indent=2)
+                )]
+            
+            response.raise_for_status()
+            data = response.json()
+            
+            result = {
+                "ip": ip,
+                "found": True,
+                "hostnames": data.get("hostnames", []),
+                "organization": data.get("org"),
+                "country": data.get("country_name"),
+                "city": data.get("city"),
+                "isp": data.get("isp"),
+                "asn": data.get("asn"),
+                "os": data.get("os"),
+                "ports": data.get("ports", []),
+                "vulnerabilities": data.get("vulns", []),
+                "tags": data.get("tags", []),
+                "services": []
+            }
+            
+            # Detailed service information
+            for service in data.get("data", [])[:10]:
+                result["services"].append({
+                    "timestamp": service.get("timestamp"),
+                    "port": service.get("port"),
+                    "transport": service.get("transport"),
+                    "protocol": service.get("_shodan", {}).get("module"),
+                    "product": service.get("product"),
+                    "version": service.get("version"),
+                    "cpe": service.get("cpe", []),
+                    "banner": service.get("data", "")[:300]
+                })
+            
+            return [types.TextContent(
+                type="text",
+                text=json.dumps(result, indent=2)
+            )]
+        
+        elif name == "shodan_search_vulnerabilities":
+            cve = arguments.get("cve") if arguments else None
+            limit = arguments.get("limit", 10) if arguments else 10
+            
+            if not cve:
+                return [types.TextContent(
+                    type="text",
+                    text=json.dumps({"error": "cve parameter is required"}, indent=2)
+                )]
+            
+            url = "https://api.shodan.io/shodan/host/search"
+            params = {
+                "key": api_key,
+                "query": f"vuln:{cve}"
+            }
+            
+            response = requests.get(url, params=params, timeout=30)
+            response.raise_for_status()
+            data = response.json()
+            
+            hosts = []
+            for match in data.get("matches", [])[:limit]:
+                hosts.append({
+                    "ip": match.get("ip_str"),
+                    "port": match.get("port"),
+                    "organization": match.get("org"),
+                    "hostnames": match.get("hostnames", []),
+                    "country": match.get("location", {}).get("country_name"),
+                    "city": match.get("location", {}).get("city"),
+                    "product": match.get("product"),
+                    "version": match.get("version"),
+                    "timestamp": match.get("timestamp")
+                })
+            
             return [types.TextContent(
                 type="text",
                 text=json.dumps({
-                    "error": "Not implemented",
-                    "message": "This tool is not yet implemented"
+                    "cve": cve,
+                    "total": data.get("total", 0),
+                    "vulnerable_hosts": hosts
                 }, indent=2)
             )]
         
-
-        if name == "shodan_get_host_info":
-            # TODO: Implement shodan_get_host_info
-            return [types.TextContent(
-                type="text",
-                text=json.dumps({
-                    "error": "Not implemented",
-                    "message": "This tool is not yet implemented"
-                }, indent=2)
-            )]
-        
-
-        if name == "shodan_search_vulnerabilities":
-            # TODO: Implement shodan_search_vulnerabilities
-            return [types.TextContent(
-                type="text",
-                text=json.dumps({
-                    "error": "Not implemented",
-                    "message": "This tool is not yet implemented"
-                }, indent=2)
-            )]
-        
-        
-        raise ValueError(f"Unknown tool: {name}")
+        else:
+            raise ValueError(f"Unknown tool: {name}")
     
+    except requests.exceptions.HTTPError as e:
+        return [types.TextContent(
+            type="text",
+            text=json.dumps({
+                "error": "API error",
+                "status_code": e.response.status_code if hasattr(e, 'response') else None,
+                "message": str(e)
+            }, indent=2)
+        )]
     except Exception as e:
         logger.error(f"Error in Shodan tool {name}: {e}")
         return [types.TextContent(

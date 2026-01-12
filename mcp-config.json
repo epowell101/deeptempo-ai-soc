@@ -62,6 +62,87 @@
       ],
       "cwd": "${workspaceFolder}",
       "env": {}
+    },
+    "alienvault-otx": {
+      "command": "python",
+      "args": [
+        "-m",
+        "mcp_servers.alienvault_otx_server.server"
+      ],
+      "cwd": "${workspaceFolder}",
+      "env": {}
+    },
+    "shodan": {
+      "command": "python",
+      "args": [
+        "-m",
+        "mcp_servers.shodan_server.server"
+      ],
+      "cwd": "${workspaceFolder}",
+      "env": {}
+    },
+    "ip-geolocation": {
+      "command": "python",
+      "args": [
+        "-m",
+        "mcp_servers.ip_geolocation_server.server"
+      ],
+      "cwd": "${workspaceFolder}",
+      "env": {}
+    },
+    "url-analysis": {
+      "command": "python",
+      "args": [
+        "-m",
+        "mcp_servers.url_analysis_server.server"
+      ],
+      "cwd": "${workspaceFolder}",
+      "env": {}
+    },
+    "hybrid-analysis": {
+      "command": "python",
+      "args": [
+        "-m",
+        "mcp_servers.hybrid_analysis_server.server"
+      ],
+      "cwd": "${workspaceFolder}",
+      "env": {}
+    },
+    "joe-sandbox": {
+      "command": "python",
+      "args": [
+        "-m",
+        "mcp_servers.joe_sandbox_server.server"
+      ],
+      "cwd": "${workspaceFolder}",
+      "env": {}
+    },
+    "anyrun": {
+      "command": "python",
+      "args": [
+        "-m",
+        "mcp_servers.anyrun_server.server"
+      ],
+      "cwd": "${workspaceFolder}",
+      "env": {}
+    },
+    "slack": {
+      "command": "python",
+      "args": [
+        "-m",
+        "mcp_servers.slack_server.server"
+      ],
+      "cwd": "${workspaceFolder}",
+      "env": {}
+    },
+    "jira": {
+      "command": "python",
+      "args": [
+        "-m",
+        "mcp_servers.jira_server.server"
+      ],
+      "cwd": "${workspaceFolder}",
+      "env": {}
     }
   }
 }

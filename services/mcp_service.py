@@ -3,6 +3,7 @@
 import subprocess
 import platform
 import logging
+import json
 from pathlib import Path
 from typing import Optional, Dict, List
 from datetime import datetime
@@ -14,7 +15,7 @@ logger = logging.getLogger(__name__)
 class MCPServer:
     """Represents an MCP server process."""
     
-    def __init__(self, name: str, command: str, args: List[str], cwd: str, env: Dict[str, str]):
+    def __init__(self, name: str, command: str, args: List[str], cwd: str, env: Dict[str, str], server_type: str = "unknown"):
         self.name = name
         self.command = command
         self.args = args
@@ -23,6 +24,7 @@ class MCPServer:
         self.process: Optional[subprocess.Popen] = None
         self.status = "stopped"
         self.start_time: Optional[datetime] = None
+        self.server_type = server_type  # "fastmcp" or "stdio"
     
     def start(self) -> bool:
         """Start the MCP server."""
@@ -139,6 +141,8 @@ class MCPServer:
     
     def get_status(self) -> str:
         """Get server status."""
+        if self.server_type == "stdio":
+            return "stdio (Claude Desktop)"
         if self.is_running():
             return "running"
         return self.status
@@ -175,38 +179,120 @@ class MCPService:
         self.servers: Dict[str, MCPServer] = {}
         self._initialize_servers()
     
+    def _detect_server_type(self, args: List[str]) -> str:
+        """
+        Detect if a server is FastMCP or stdio-based by checking the module path.
+        
+        FastMCP servers: deeptempo_findings_server, evidence_snippets_server, case_store_server
+        Stdio servers: All others (designed for Claude Desktop integration)
+        """
+        # Extract module name from args
+        for arg in args:
+            if "." in arg and arg.startswith("mcp_servers"):
+                # Check if it's one of the known FastMCP servers
+                fastmcp_servers = [
+                    "deeptempo_findings_server",
+                    "evidence_snippets_server",
+                    "case_store_server"
+                ]
+                
+                for fastmcp in fastmcp_servers:
+                    if fastmcp in arg:
+                        return "fastmcp"
+                
+                # All others are stdio-based
+                return "stdio"
+        
+        return "unknown"
+    
     def _initialize_servers(self):
-        """Initialize MCP server configurations."""
+        """
+        Initialize MCP server configurations from mcp-config.json.
+        
+        Loads server configurations dynamically from the mcp-config.json file
+        to ensure consistency with Claude Desktop integration.
+        """
         python_exe_str = str(self.python_exe)
         project_path_str = str(self.project_root)
         
-        server_configs = [
+        # Load servers from mcp-config.json
+        mcp_config_path = self.project_root / "mcp-config.json"
+        server_configs = []
+        
+        if mcp_config_path.exists():
+            try:
+                with open(mcp_config_path, 'r') as f:
+                    mcp_config = json.load(f)
+                    
+                for server_name, server_config in mcp_config.get("mcpServers", {}).items():
+                    # Convert config format from mcp-config.json to our internal format
+                    command = server_config.get("command", "python")
+                    
+                    # Use venv python if command is just "python"
+                    if command == "python":
+                        command = python_exe_str
+                    
+                    # Get cwd, replace ${workspaceFolder} with actual path
+                    cwd = server_config.get("cwd", project_path_str)
+                    if "${workspaceFolder}" in cwd:
+                        cwd = cwd.replace("${workspaceFolder}", project_path_str)
+                    
+                    # Get environment variables
+                    env = server_config.get("env", {}).copy()
+                    env["PYTHONPATH"] = project_path_str
+                    
+                    args = server_config.get("args", [])
+                    
+                    server_configs.append({
+                        "name": server_name,
+                        "command": command,
+                        "args": args,
+                        "cwd": cwd,
+                        "env": env,
+                        "server_type": self._detect_server_type(args)
+                    })
+                    
+                logger.info(f"Loaded {len(server_configs)} servers from mcp-config.json")
+            except Exception as e:
+                logger.error(f"Error loading mcp-config.json: {e}")
+                # Fall back to default servers if config loading fails
+                server_configs = self._get_default_servers(python_exe_str, project_path_str)
+        else:
+            logger.warning("mcp-config.json not found, using default servers")
+            server_configs = self._get_default_servers(python_exe_str, project_path_str)
+        
+        for config in server_configs:
+            server = MCPServer(**config)
+            self.servers[config["name"]] = server
+    
+    def _get_default_servers(self, python_exe_str: str, project_path_str: str) -> List[Dict]:
+        """Get default server configurations if mcp-config.json is not available."""
+        return [
             {
                 "name": "deeptempo-findings",
                 "command": python_exe_str,
                 "args": ["-m", "mcp_servers.deeptempo_findings_server.server"],
                 "cwd": project_path_str,
-                "env": {"PYTHONPATH": project_path_str}
+                "env": {"PYTHONPATH": project_path_str},
+                "server_type": "fastmcp"
             },
             {
                 "name": "evidence-snippets",
                 "command": python_exe_str,
                 "args": ["-m", "mcp_servers.evidence_snippets_server.server"],
                 "cwd": project_path_str,
-                "env": {"PYTHONPATH": project_path_str}
+                "env": {"PYTHONPATH": project_path_str},
+                "server_type": "fastmcp"
             },
             {
                 "name": "case-store",
                 "command": python_exe_str,
                 "args": ["-m", "mcp_servers.case_store_server.server"],
                 "cwd": project_path_str,
-                "env": {"PYTHONPATH": project_path_str}
+                "env": {"PYTHONPATH": project_path_str},
+                "server_type": "fastmcp"
             }
         ]
-        
-        for config in server_configs:
-            server = MCPServer(**config)
-            self.servers[config["name"]] = server
     
     def start_server(self, server_name: str) -> bool:
         """
@@ -222,7 +308,14 @@ class MCPService:
             logger.error(f"Unknown server: {server_name}")
             return False
         
-        return self.servers[server_name].start()
+        server = self.servers[server_name]
+        
+        # Check if it's a stdio-based server
+        if server.server_type == "stdio":
+            logger.warning(f"Server {server_name} is stdio-based and designed for Claude Desktop integration, not standalone monitoring")
+            return False
+        
+        return server.start()
     
     def stop_server(self, server_name: str) -> bool:
         """
@@ -308,11 +401,13 @@ class MCPService:
         log_path = self.servers[server_name].get_log_path()
         
         if not log_path.exists():
-            return f"Log file not found: {log_path}"
+            return f"Log file not yet created. Start the server to generate logs.\n\nExpected log path: {log_path}"
         
         try:
             with open(log_path, 'r') as f:
                 all_lines = f.readlines()
+                if not all_lines:
+                    return f"Log file is empty. Server may not have started yet.\n\nLog path: {log_path}"
                 return ''.join(all_lines[-lines:])
         except Exception as e:
             return f"Error reading log: {e}"

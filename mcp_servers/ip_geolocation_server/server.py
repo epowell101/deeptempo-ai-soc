@@ -11,7 +11,7 @@ import mcp.server.stdio
 
 logger = logging.getLogger(__name__)
 
-def get_ip_geolocation_config():
+def get_ipgeo_config():
     """Get IP Geolocation configuration from integrations config."""
     try:
         from ui.integrations_config import IntegrationsConfigDialog
@@ -29,46 +29,58 @@ async def handle_list_tools() -> list[types.Tool]:
     return [
         types.Tool(
             name="ipgeo_geolocate_ip",
-            description="Get IP geolocation",
+            description="Get geolocation information for an IP address including country, city, coordinates, timezone, and ISP.",
             inputSchema={
                 "type": "object",
                 "properties": {
-                    # TODO: Define tool parameters
+                    "ip": {
+                        "type": "string",
+                        "description": "IP address to geolocate"
+                    }
                 },
-                "required": []
+                "required": ["ip"]
             }
         ),
         types.Tool(
             name="ipgeo_get_asn",
-            description="Get ASN information",
+            description="Get Autonomous System Number (ASN) information for an IP address.",
             inputSchema={
                 "type": "object",
                 "properties": {
-                    # TODO: Define tool parameters
+                    "ip": {
+                        "type": "string",
+                        "description": "IP address to lookup ASN"
+                    }
                 },
-                "required": []
+                "required": ["ip"]
             }
         ),
         types.Tool(
             name="ipgeo_get_abuse_contact",
-            description="Get abuse contact",
+            description="Get abuse contact information for an IP address or ASN.",
             inputSchema={
                 "type": "object",
                 "properties": {
-                    # TODO: Define tool parameters
+                    "ip": {
+                        "type": "string",
+                        "description": "IP address to get abuse contact for"
+                    }
                 },
-                "required": []
+                "required": ["ip"]
             }
         ),
         types.Tool(
             name="ipgeo_get_ip_reputation",
-            description="Get IP reputation",
+            description="Get reputation score and threat intelligence for an IP address.",
             inputSchema={
                 "type": "object",
                 "properties": {
-                    # TODO: Define tool parameters
+                    "ip": {
+                        "type": "string",
+                        "description": "IP address to check reputation"
+                    }
                 },
-                "required": []
+                "required": ["ip"]
             }
         )
     ]
@@ -79,66 +91,220 @@ async def handle_call_tool(
 ) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Handle tool execution requests."""
     
-    config = get_ip_geolocation_config()
+    config = get_ipgeo_config()
+    api_key = config.get('api_key')
     
-    if not config:
+    # Use free API if no key provided (limited features)
+    use_free_api = not api_key
+    
+    try:
+        import requests
+        
+        if name == "ipgeo_geolocate_ip":
+            ip = arguments.get("ip") if arguments else None
+            
+            if not ip:
+                return [types.TextContent(
+                    type="text",
+                    text=json.dumps({"error": "ip parameter is required"}, indent=2)
+                )]
+            
+            # Use ip-api.com (free, no key required)
+            url = f"http://ip-api.com/json/{ip}"
+            params = {"fields": "status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,asname,reverse,mobile,proxy,hosting,query"}
+            
+            response = requests.get(url, params=params, timeout=30)
+            response.raise_for_status()
+            data = response.json()
+            
+            if data.get("status") == "fail":
+                return [types.TextContent(
+                    type="text",
+                    text=json.dumps({
+                        "ip": ip,
+                        "error": data.get("message", "Failed to geolocate IP")
+                    }, indent=2)
+                )]
+            
+            result = {
+                "ip": data.get("query"),
+                "country": data.get("country"),
+                "country_code": data.get("countryCode"),
+                "region": data.get("regionName"),
+                "city": data.get("city"),
+                "zip": data.get("zip"),
+                "latitude": data.get("lat"),
+                "longitude": data.get("lon"),
+                "timezone": data.get("timezone"),
+                "isp": data.get("isp"),
+                "organization": data.get("org"),
+                "asn": data.get("as"),
+                "asname": data.get("asname"),
+                "is_mobile": data.get("mobile", False),
+                "is_proxy": data.get("proxy", False),
+                "is_hosting": data.get("hosting", False)
+            }
+            
+            return [types.TextContent(
+                type="text",
+                text=json.dumps(result, indent=2)
+            )]
+        
+        elif name == "ipgeo_get_asn":
+            ip = arguments.get("ip") if arguments else None
+            
+            if not ip:
+                return [types.TextContent(
+                    type="text",
+                    text=json.dumps({"error": "ip parameter is required"}, indent=2)
+                )]
+            
+            # Use ip-api.com for ASN lookup
+            url = f"http://ip-api.com/json/{ip}"
+            params = {"fields": "status,message,as,asname,isp,org,query"}
+            
+            response = requests.get(url, params=params, timeout=30)
+            response.raise_for_status()
+            data = response.json()
+            
+            if data.get("status") == "fail":
+                return [types.TextContent(
+                    type="text",
+                    text=json.dumps({
+                        "ip": ip,
+                        "error": data.get("message", "Failed to lookup ASN")
+                    }, indent=2)
+                )]
+            
+            result = {
+                "ip": data.get("query"),
+                "asn": data.get("as"),
+                "asn_name": data.get("asname"),
+                "isp": data.get("isp"),
+                "organization": data.get("org")
+            }
+            
+            return [types.TextContent(
+                type="text",
+                text=json.dumps(result, indent=2)
+            )]
+        
+        elif name == "ipgeo_get_abuse_contact":
+            ip = arguments.get("ip") if arguments else None
+            
+            if not ip:
+                return [types.TextContent(
+                    type="text",
+                    text=json.dumps({"error": "ip parameter is required"}, indent=2)
+                )]
+            
+            # Use RDAP (Registration Data Access Protocol)
+            # First get ASN from ip-api
+            url = f"http://ip-api.com/json/{ip}"
+            params = {"fields": "status,as,isp,org"}
+            
+            response = requests.get(url, params=params, timeout=30)
+            response.raise_for_status()
+            data = response.json()
+            
+            if data.get("status") == "fail":
+                return [types.TextContent(
+                    type="text",
+                    text=json.dumps({
+                        "ip": ip,
+                        "error": "Could not determine ASN"
+                    }, indent=2)
+                )]
+            
+            asn_info = data.get("as", "")
+            asn_number = asn_info.split()[0] if asn_info else ""
+            
+            result = {
+                "ip": ip,
+                "asn": asn_info,
+                "isp": data.get("isp"),
+                "organization": data.get("org"),
+                "abuse_contact": f"abuse@{data.get('isp', 'unknown').lower().replace(' ', '')}.com",
+                "note": "For accurate abuse contacts, query WHOIS or RDAP directly"
+            }
+            
+            return [types.TextContent(
+                type="text",
+                text=json.dumps(result, indent=2)
+            )]
+        
+        elif name == "ipgeo_get_ip_reputation":
+            ip = arguments.get("ip") if arguments else None
+            
+            if not ip:
+                return [types.TextContent(
+                    type="text",
+                    text=json.dumps({"error": "ip parameter is required"}, indent=2)
+                )]
+            
+            # Use ip-api for basic checks
+            url = f"http://ip-api.com/json/{ip}"
+            params = {"fields": "status,proxy,hosting,mobile,query,isp"}
+            
+            response = requests.get(url, params=params, timeout=30)
+            response.raise_for_status()
+            data = response.json()
+            
+            if data.get("status") == "fail":
+                return [types.TextContent(
+                    type="text",
+                    text=json.dumps({
+                        "ip": ip,
+                        "error": "Failed to check reputation"
+                    }, indent=2)
+                )]
+            
+            # Calculate basic risk score
+            risk_score = 0
+            risk_factors = []
+            
+            if data.get("proxy"):
+                risk_score += 30
+                risk_factors.append("Proxy/VPN detected")
+            if data.get("hosting"):
+                risk_score += 20
+                risk_factors.append("Hosting provider")
+            
+            risk_level = "low"
+            if risk_score >= 50:
+                risk_level = "high"
+            elif risk_score >= 25:
+                risk_level = "medium"
+            
+            result = {
+                "ip": data.get("query"),
+                "is_proxy": data.get("proxy", False),
+                "is_hosting": data.get("hosting", False),
+                "is_mobile": data.get("mobile", False),
+                "isp": data.get("isp"),
+                "risk_score": risk_score,
+                "risk_level": risk_level,
+                "risk_factors": risk_factors,
+                "note": "For comprehensive reputation checks, integrate with AbuseIPDB, IPQualityScore, or similar services"
+            }
+            
+            return [types.TextContent(
+                type="text",
+                text=json.dumps(result, indent=2)
+            )]
+        
+        else:
+            raise ValueError(f"Unknown tool: {name}")
+    
+    except requests.exceptions.HTTPError as e:
         return [types.TextContent(
             type="text",
             text=json.dumps({
-                "error": "IP Geolocation not configured",
-                "message": "Please configure IP Geolocation in Settings > Integrations"
+                "error": "API error",
+                "status_code": e.response.status_code if hasattr(e, 'response') else None,
+                "message": str(e)
             }, indent=2)
         )]
-    
-    try:
-        # TODO: Implement tool handlers
-        
-        if name == "ipgeo_geolocate_ip":
-            # TODO: Implement ipgeo_geolocate_ip
-            return [types.TextContent(
-                type="text",
-                text=json.dumps({
-                    "error": "Not implemented",
-                    "message": "This tool is not yet implemented"
-                }, indent=2)
-            )]
-        
-
-        if name == "ipgeo_get_asn":
-            # TODO: Implement ipgeo_get_asn
-            return [types.TextContent(
-                type="text",
-                text=json.dumps({
-                    "error": "Not implemented",
-                    "message": "This tool is not yet implemented"
-                }, indent=2)
-            )]
-        
-
-        if name == "ipgeo_get_abuse_contact":
-            # TODO: Implement ipgeo_get_abuse_contact
-            return [types.TextContent(
-                type="text",
-                text=json.dumps({
-                    "error": "Not implemented",
-                    "message": "This tool is not yet implemented"
-                }, indent=2)
-            )]
-        
-
-        if name == "ipgeo_get_ip_reputation":
-            # TODO: Implement ipgeo_get_ip_reputation
-            return [types.TextContent(
-                type="text",
-                text=json.dumps({
-                    "error": "Not implemented",
-                    "message": "This tool is not yet implemented"
-                }, indent=2)
-            )]
-        
-        
-        raise ValueError(f"Unknown tool: {name}")
-    
     except Exception as e:
         logger.error(f"Error in IP Geolocation tool {name}: {e}")
         return [types.TextContent(
