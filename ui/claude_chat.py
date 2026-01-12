@@ -12,7 +12,11 @@ import json
 from pathlib import Path
 
 from services.claude_service import ClaudeService
+from services.claude_factory import create_claude_service
 from services.data_service import DataService
+from services.soc_agents import AgentManager
+from ui.widgets.agent_selector import CompactAgentSelector
+from ui.utils.auto_resize import ButtonSizePolicy
 
 
 class ClaudeChatWorker(QThread):
@@ -24,7 +28,7 @@ class ClaudeChatWorker(QThread):
     
     def __init__(self, service: ClaudeService, message: str, system_prompt: str = None,
                  context: list = None, use_streaming: bool = True, images: list = None,
-                 enable_thinking: bool = False, thinking_budget: int = 10000):
+                 enable_thinking: bool = False, thinking_budget: int = 10000, max_tokens: int = 4096):
         super().__init__()
         self.service = service
         self.message = message
@@ -34,6 +38,7 @@ class ClaudeChatWorker(QThread):
         self.images = images or []
         self.enable_thinking = enable_thinking
         self.thinking_budget = thinking_budget
+        self.max_tokens = max_tokens
     
     def run(self):
         """Run the chat request."""
@@ -51,7 +56,8 @@ class ClaudeChatWorker(QThread):
                         context=self.context,
                         images=self.images if self.images else None,
                         enable_thinking=self.enable_thinking,
-                        thinking_budget=self.thinking_budget
+                        thinking_budget=self.thinking_budget,
+                        max_tokens=self.max_tokens
                     ):
                         self.response_chunk.emit(chunk)
                         full_response += chunk
@@ -67,7 +73,8 @@ class ClaudeChatWorker(QThread):
                     context=self.context,
                     images=self.images if self.images else None,
                     enable_thinking=self.enable_thinking,
-                    thinking_budget=self.thinking_budget
+                    thinking_budget=self.thinking_budget,
+                    max_tokens=self.max_tokens
                 )
                 self.finished.emit(response or "")
         
@@ -164,8 +171,9 @@ class ClaudeChat(QWidget):
     
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.claude_service = ClaudeService(use_mcp_tools=True)  # Enable MCP tools
+        self.claude_service = create_claude_service(use_mcp_tools=True)
         self.data_service = DataService()
+        self.agent_manager = AgentManager()
         self.conversation_history = []
         self.current_worker = None
         self.attached_images = []  # List of image paths/content blocks
@@ -223,15 +231,13 @@ class ClaudeChat(QWidget):
         
         images_buttons_layout = QHBoxLayout()
         remove_image_btn = QPushButton("Remove")
-        remove_image_btn.setMinimumWidth(55)
-        remove_image_btn.setMaximumHeight(20)
+        ButtonSizePolicy.make_compact(remove_image_btn, min_width=55, max_height=20)
         remove_image_btn.setStyleSheet("font-size: 9px; padding: 2px 4px;")
         remove_image_btn.clicked.connect(self._remove_image)
         images_buttons_layout.addWidget(remove_image_btn)
         
         clear_images_btn = QPushButton("Clear")
-        clear_images_btn.setMinimumWidth(45)
-        clear_images_btn.setMaximumHeight(20)
+        ButtonSizePolicy.make_compact(clear_images_btn, min_width=45, max_height=20)
         clear_images_btn.setStyleSheet("font-size: 9px; padding: 2px 4px;")
         clear_images_btn.clicked.connect(self._clear_images)
         images_buttons_layout.addWidget(clear_images_btn)
@@ -253,13 +259,22 @@ class ClaudeChat(QWidget):
         input_layout.addWidget(self.message_edit, 1)  # Give it stretch factor to fill space
         
         send_btn = QPushButton("Send")
-        send_btn.setMinimumWidth(50)
-        send_btn.setMaximumHeight(24)
+        ButtonSizePolicy.make_compact(send_btn, min_width=50, max_height=24)
         send_btn.setStyleSheet("font-size: 11px; padding: 2px 8px; font-weight: bold;")
         send_btn.clicked.connect(self._send_message)
         input_layout.addWidget(send_btn)
         
         layout.addLayout(input_layout)
+        
+        # Agent selector row
+        agent_row = QHBoxLayout()
+        agent_row.setContentsMargins(0, 2, 0, 2)
+        
+        self.agent_selector = CompactAgentSelector()
+        self.agent_selector.agent_changed.connect(self._on_agent_changed)
+        agent_row.addWidget(self.agent_selector)
+        
+        layout.addLayout(agent_row)
         
         # Options - First row
         options_layout = QHBoxLayout()
@@ -277,20 +292,18 @@ class ClaudeChat(QWidget):
         # Attach Image button (positioned with other options)
         attach_image_btn = QPushButton("Attach")
         attach_image_btn.setToolTip("Attach Image\nAdd an image file to your message. Supported formats: PNG, JPG, JPEG, GIF, WEBP")
-        attach_image_btn.clicked.connect(self._attach_image)
-        attach_image_btn.setMinimumWidth(55)
-        attach_image_btn.setMaximumHeight(24)
+        ButtonSizePolicy.make_compact(attach_image_btn, min_width=55, max_height=24)
         attach_image_btn.setStyleSheet("font-size: 10px; padding: 2px 6px;")
+        attach_image_btn.clicked.connect(self._attach_image)
         options_layout.addWidget(attach_image_btn)
         
         options_layout.addStretch()
         
         clear_btn = QPushButton("Clear")
         clear_btn.setToolTip("Clear conversation history")
-        clear_btn.clicked.connect(self._clear_history)
-        clear_btn.setMinimumWidth(50)
-        clear_btn.setMaximumHeight(24)
+        ButtonSizePolicy.make_compact(clear_btn, min_width=50, max_height=24)
         clear_btn.setStyleSheet("font-size: 10px; padding: 2px 6px;")
+        clear_btn.clicked.connect(self._clear_history)
         options_layout.addWidget(clear_btn)
         
         layout.addLayout(options_layout)
@@ -336,8 +349,7 @@ class ClaudeChat(QWidget):
         controls_row.addWidget(self.mcp_status_label)
         
         refresh_mcp_btn = QPushButton("↻")
-        refresh_mcp_btn.setMaximumWidth(20)
-        refresh_mcp_btn.setMaximumHeight(18)
+        ButtonSizePolicy.make_fixed(refresh_mcp_btn, width=20, height=18)
         refresh_mcp_btn.setToolTip("Refresh MCP Tools")
         refresh_mcp_btn.setStyleSheet("font-size: 9px; padding: 1px;")
         refresh_mcp_btn.clicked.connect(self._refresh_mcp_tools)
@@ -374,24 +386,21 @@ class ClaudeChat(QWidget):
         actions_row.setContentsMargins(0, 2, 0, 2)
         
         analyze_btn = QPushButton("Analyze")
-        analyze_btn.setMinimumWidth(52)
-        analyze_btn.setMaximumHeight(20)
+        ButtonSizePolicy.make_compact(analyze_btn, min_width=52, max_height=20)
         analyze_btn.setStyleSheet("font-size: 9px; padding: 2px 6px;")
         analyze_btn.setToolTip("Analyze Finding")
         analyze_btn.clicked.connect(self._analyze_finding)
         actions_row.addWidget(analyze_btn)
         
         correlate_btn = QPushButton("Correlate")
-        correlate_btn.setMinimumWidth(54)
-        correlate_btn.setMaximumHeight(20)
+        ButtonSizePolicy.make_compact(correlate_btn, min_width=54, max_height=20)
         correlate_btn.setStyleSheet("font-size: 9px; padding: 2px 6px;")
         correlate_btn.setToolTip("Correlate Findings")
         correlate_btn.clicked.connect(self._correlate_findings)
         actions_row.addWidget(correlate_btn)
         
         case_summary_btn = QPushButton("Summary")
-        case_summary_btn.setMinimumWidth(54)
-        case_summary_btn.setMaximumHeight(20)
+        ButtonSizePolicy.make_compact(case_summary_btn, min_width=54, max_height=20)
         case_summary_btn.setStyleSheet("font-size: 9px; padding: 2px 6px;")
         case_summary_btn.setToolTip("Generate Case Summary")
         case_summary_btn.clicked.connect(self._generate_case_summary)
@@ -482,6 +491,9 @@ class ClaudeChat(QWidget):
         if not message and not self.attached_images:
             return
         
+        # Get current agent profile
+        current_agent = self.agent_selector.get_current_agent()
+        
         # Build image content blocks if images are attached
         image_blocks = []
         if self.attached_images:
@@ -493,8 +505,8 @@ class ClaudeChat(QWidget):
                     QMessageBox.warning(self, "Image Error", f"Failed to process image {img_path}: {e}")
                     continue
         
-        # Add to chat display (append, don't replace)
-        display_text = f"<b>You:</b> {message if message else '[Image only]'}"
+        # Add to chat display (append, don't replace) with agent indicator
+        display_text = f"<b>You</b> <i>(to {current_agent.icon} {current_agent.name}):</i> {message if message else '[Image only]'}"
         if image_blocks:
             display_text += f" <i>({len(image_blocks)} image(s) attached)</i>"
         self.chat_display.append(f"{display_text}<br>")
@@ -515,21 +527,23 @@ class ClaudeChat(QWidget):
         self.images_group.setVisible(False)  # Hide images group after sending
         self._update_context_indicator()
         
-        # Show thinking indicator
-        self.chat_display.append("<b>Claude:</b> <i>Thinking...</i>")
+        # Show thinking indicator with agent
+        self.chat_display.append(f"<b>{current_agent.icon} {current_agent.name}:</b> <i>Thinking...</i>")
         self._response_started = False  # Reset flag for new response
         self._scroll_to_bottom()
         
-        # Create worker
+        # Create worker with agent's system prompt and settings
         use_streaming = self.streaming_checkbox.currentText() == "Streaming"
         self.current_worker = ClaudeChatWorker(
             self.claude_service,
             user_content if isinstance(user_content, str) else message,
+            system_prompt=current_agent.system_prompt,  # Use agent's system prompt
             context=self.conversation_history[:-1],  # Exclude current message, it's added separately
             use_streaming=use_streaming,
             images=image_blocks if image_blocks else None,
-            enable_thinking=self.enable_thinking,
-            thinking_budget=self.thinking_budget
+            enable_thinking=current_agent.enable_thinking or self.enable_thinking,  # Use agent's thinking setting
+            thinking_budget=self.thinking_budget,
+            max_tokens=current_agent.max_tokens  # Use agent's max_tokens setting
         )
         self.current_worker.response_chunk.connect(self._on_response_chunk)
         self.current_worker.finished.connect(self._on_response_finished)
@@ -538,20 +552,21 @@ class ClaudeChat(QWidget):
     
     def _on_response_chunk(self, chunk: str):
         """Handle streaming response chunk."""
+        current_agent = self.agent_selector.get_current_agent()
+        agent_label = f"{current_agent.icon} {current_agent.name}"
+        
         if not hasattr(self, '_response_started') or not self._response_started:
             # First chunk - replace "Thinking..." with the chunk
             html = self.chat_display.toHtml()
             if "<i>Thinking...</i>" in html:
-                html = html.replace(
-                    "<b>Claude:</b> <i>Thinking...</i>",
-                    f"<b>Claude:</b> {chunk}"
-                )
+                # Replace the thinking indicator (handles both old and new format)
+                html = html.replace("<i>Thinking...</i>", chunk)
                 self.chat_display.setHtml(html)
                 # Ensure scroll after setHtml
                 self._scroll_to_bottom()
             else:
                 # Fallback: append (which auto-scrolls)
-                self.chat_display.append(f"<b>Claude:</b> {chunk}")
+                self.chat_display.append(f"<b>{agent_label}:</b> {chunk}")
             self._response_started = True
         else:
             # Subsequent chunks - append to existing response
@@ -577,6 +592,9 @@ class ClaudeChat(QWidget):
     
     def _on_error(self, error: str):
         """Handle error."""
+        current_agent = self.agent_selector.get_current_agent()
+        agent_label = f"{current_agent.icon} {current_agent.name}"
+        
         # Reset response flag
         self._response_started = False
         
@@ -584,14 +602,30 @@ class ClaudeChat(QWidget):
         html = self.chat_display.toHtml()
         if "<i>Thinking...</i>" in html:
             html = html.replace(
-                "<b>Claude:</b> <i>Thinking...</i>",
-                f"<b>Claude:</b> <font color='red'>Error: {error}</font>"
+                "<i>Thinking...</i>",
+                f"<font color='red'>Error: {error}</font>"
             )
             self.chat_display.setHtml(html)
         else:
-            self.chat_display.append(f"<b>Error:</b> <font color='red'>{error}</font><br>")
+            self.chat_display.append(f"<b>{agent_label} Error:</b> <font color='red'>{error}</font><br>")
         
         self._scroll_to_bottom()
+    
+    def _on_agent_changed(self, agent_id: str, agent_profile):
+        """Handle agent selection change."""
+        # Show notification in chat
+        self.chat_display.append(
+            f"<i style='color: #888;'>→ Switched to {agent_profile.icon} <b>{agent_profile.name}</b> "
+            f"({agent_profile.specialization})</i><br>"
+        )
+        self._scroll_to_bottom()
+        
+        # Update thinking settings based on agent
+        if agent_profile.enable_thinking and not self.thinking_checkbox.isChecked():
+            self.thinking_checkbox.setChecked(True)
+        
+        # Optionally clear history when switching agents (commented out - user can decide)
+        # self.conversation_history = []
     
     def _scroll_to_bottom(self):
         """Scroll chat display to bottom."""
@@ -626,8 +660,62 @@ class ClaudeChat(QWidget):
                     "You can get an API key from: https://console.anthropic.com/"
                 )
     
+    def analyze_finding(self, finding):
+        """
+        Analyze a finding with the Smart Agent.
+        This is called when the Analyze button is clicked on a finding.
+        
+        Args:
+            finding: The finding dict to analyze
+        """
+        # Get finding ID and basic info
+        finding_id = finding.get('finding_id', 'unknown')
+        severity = finding.get('severity', 'unknown')
+        data_source = finding.get('data_source', 'unknown')
+        
+        # Build a comprehensive prompt
+        import json
+        
+        # Remove embedding to keep prompt size reasonable
+        finding_copy = finding.copy()
+        if 'embedding' in finding_copy:
+            finding_copy['embedding'] = f"[{len(finding.get('embedding', []))} dimensional vector]"
+        
+        finding_json = json.dumps(finding_copy, indent=2)
+        
+        prompt = f"""Please analyze this security finding in detail:
+
+**Finding ID:** {finding_id}
+**Severity:** {severity}
+**Data Source:** {data_source}
+
+**Full Finding Data:**
+```json
+{finding_json}
+```
+
+Please provide:
+1. **Summary**: What is this finding about?
+2. **Threat Assessment**: How serious is this threat?
+3. **MITRE ATT&CK Analysis**: What techniques are involved?
+4. **Recommended Actions**: What should we do about this?
+5. **Investigation Steps**: What should we investigate next?
+
+If appropriate, use the approval tools to recommend containment actions with a confidence score."""
+        
+        # Set the prompt in the input field
+        self.message_edit.setText(prompt)
+        
+        # Show a simple notification in the chat
+        self.chat_display.append(
+            f"<p style='color: #2196F3;'><b>🤖 Analyzing finding: {finding_id} (Severity: {severity})</b></p>"
+        )
+        
+        # Automatically send the message
+        self._send_message()
+    
     def _analyze_finding(self):
-        """Analyze a selected finding."""
+        """Analyze a selected finding (legacy method)."""
         # This would need integration with the findings widget
         # For now, prompt user to select a finding ID
         finding_id, ok = QInputDialog.getText(

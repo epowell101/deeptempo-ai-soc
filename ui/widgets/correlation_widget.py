@@ -55,6 +55,11 @@ class CorrelationWidget(QWidget):
         self.temporal_table.setHorizontalHeaderLabels([
             "Start Time", "End Time", "Event Count", "Events"
         ])
+        # Make resizable
+        from PyQt6.QtWidgets import QHeaderView
+        self.temporal_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        self.temporal_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        self.temporal_table.verticalHeader().setVisible(True)
         temporal_layout.addWidget(self.temporal_table)
         temporal_tab.setLayout(temporal_layout)
         self.tabs.addTab(temporal_tab, "Temporal Clusters")
@@ -67,6 +72,10 @@ class CorrelationWidget(QWidget):
         self.ip_table.setHorizontalHeaderLabels([
             "Network", "Event Count", "Details"
         ])
+        # Make resizable
+        self.ip_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        self.ip_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        self.ip_table.verticalHeader().setVisible(True)
         ip_layout.addWidget(self.ip_table)
         ip_tab.setLayout(ip_layout)
         self.tabs.addTab(ip_tab, "IP Networks")
@@ -79,6 +88,10 @@ class CorrelationWidget(QWidget):
         self.attack_table.setHorizontalHeaderLabels([
             "Techniques", "Occurrences", "First Seen", "Last Seen"
         ])
+        # Make resizable
+        self.attack_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        self.attack_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        self.attack_table.verticalHeader().setVisible(True)
         attack_layout.addWidget(self.attack_table)
         attack_tab.setLayout(attack_layout)
         self.tabs.addTab(attack_tab, "Attack Chains")
@@ -91,6 +104,10 @@ class CorrelationWidget(QWidget):
         self.entity_table.setHorizontalHeaderLabels([
             "Relationship", "Event Count", "Details"
         ])
+        # Make resizable
+        self.entity_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        self.entity_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        self.entity_table.verticalHeader().setVisible(True)
         entity_layout.addWidget(self.entity_table)
         entity_tab.setLayout(entity_layout)
         self.tabs.addTab(entity_tab, "Entity Relationships")
@@ -103,6 +120,10 @@ class CorrelationWidget(QWidget):
         self.pattern_table.setHorizontalHeaderLabels([
             "Pattern", "Description", "Confidence", "Event Count"
         ])
+        # Make resizable
+        self.pattern_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        self.pattern_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        self.pattern_table.verticalHeader().setVisible(True)
         pattern_layout.addWidget(self.pattern_table)
         pattern_tab.setLayout(pattern_layout)
         self.tabs.addTab(pattern_tab, "Attack Patterns")
@@ -115,6 +136,10 @@ class CorrelationWidget(QWidget):
         self.mitre_table.setHorizontalHeaderLabels([
             "Technique", "Occurrences", "Events"
         ])
+        # Make resizable
+        self.mitre_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        self.mitre_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        self.mitre_table.verticalHeader().setVisible(True)
         mitre_layout.addWidget(self.mitre_table)
         mitre_tab.setLayout(mitre_layout)
         self.tabs.addTab(mitre_tab, "MITRE Patterns")

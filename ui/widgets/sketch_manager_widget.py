@@ -82,7 +82,15 @@ class SketchManagerWidget(QWidget):
         self.table.setHorizontalHeaderLabels([
             "Case ID", "Case Title", "Sketch ID", "Status", "Last Sync", "Actions"
         ])
-        self.table.horizontalHeader().setStretchLastSection(True)
+        
+        # Make columns and rows resizable by user (like Excel)
+        from PyQt6.QtWidgets import QHeaderView
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        self.table.horizontalHeader().setStretchLastSection(False)
+        self.table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        self.table.verticalHeader().setVisible(True)
+        self.table.verticalHeader().setDefaultSectionSize(30)
+        
         self.table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         
         # Make table expand to fill available space (relative sizing)

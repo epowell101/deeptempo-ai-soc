@@ -6,16 +6,30 @@ from PyQt6.QtWidgets import (
     QDialog, QFormLayout, QTextEdit
 )
 from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtGui import QColor
 import numpy as np
 
 from services.data_service import DataService
 from ui.widgets.finding_detail import FindingDetailWidget
+from ui.utils.auto_resize import TableAutoResize, ButtonSizePolicy
 
 
 class FindingListWidget(QWidget):
     """Widget for displaying and filtering findings."""
     
     finding_selected = pyqtSignal(dict)
+    analyze_with_agent = pyqtSignal(dict)  # Signal to analyze finding (creates new tab in Claude Chat)
+    
+    # Material Design severity colors
+    SEVERITY_COLORS = {
+        'critical': QColor('#D32F2F'),  # Red
+        'high': QColor('#F57C00'),      # Orange
+        'medium': QColor('#FBC02D'),    # Yellow
+        'low': QColor('#388E3C')        # Green
+    }
+    
+    # Default text color for non-severity columns
+    DEFAULT_TEXT_COLOR = QColor('#E0E0E0')  # on_surface color from theme
     
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -60,12 +74,25 @@ class FindingListWidget(QWidget):
         
         # Table
         self.table = QTableWidget()
-        self.table.setColumnCount(7)
+        self.table.setColumnCount(8)  # Added one column for Analyze button
         self.table.setHorizontalHeaderLabels([
             "ID", "Timestamp", "Severity", "Data Source", "Anomaly Score",
-            "Cluster", "MITRE Techniques"
+            "Cluster", "MITRE Techniques", "Actions"
         ])
-        self.table.horizontalHeader().setStretchLastSection(True)
+        
+        # Configure intelligent auto-resizing for columns
+        TableAutoResize.configure(
+            self.table,
+            content_fit_columns=[0, 2, 3, 7],  # ID, Severity, Data Source, Actions (auto-fit)
+            stretch_columns=[6],  # MITRE Techniques (stretches to fill remaining space)
+            interactive_columns=[1, 4, 5]  # Timestamp, Anomaly Score, Cluster (user can resize)
+        )
+        
+        # Make rows resizable by user (like Excel)
+        self.table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        self.table.verticalHeader().setVisible(True)
+        self.table.verticalHeader().setDefaultSectionSize(30)  # Default row height
+        
         self.table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.table.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
         self.table.itemDoubleClicked.connect(self._on_item_double_clicked)
@@ -74,20 +101,23 @@ class FindingListWidget(QWidget):
         # Make table expand to fill available space (relative sizing)
         layout.addWidget(self.table, 1)  # Stretch factor of 1
         
-        # Action buttons
+        # Action buttons with responsive sizing
         button_layout = QHBoxLayout()
         
         view_btn = QPushButton("View Details")
+        ButtonSizePolicy.make_flexible(view_btn, min_width=100)
         view_btn.clicked.connect(self._view_details)
         button_layout.addWidget(view_btn)
         
         neighbors_btn = QPushButton("Find Similar")
+        ButtonSizePolicy.make_flexible(neighbors_btn, min_width=100)
         neighbors_btn.clicked.connect(self._find_similar)
         button_layout.addWidget(neighbors_btn)
         
         button_layout.addStretch()
         
         refresh_btn = QPushButton("Refresh")
+        ButtonSizePolicy.make_compact(refresh_btn, min_width=80)
         refresh_btn.clicked.connect(self.refresh)
         button_layout.addWidget(refresh_btn)
         
@@ -140,43 +170,62 @@ class FindingListWidget(QWidget):
         
         for row, finding in enumerate(self.filtered_findings):
             # ID
-            self.table.setItem(row, 0, QTableWidgetItem(finding.get('finding_id', '')))
+            id_item = QTableWidgetItem(finding.get('finding_id', ''))
+            id_item.setForeground(self.DEFAULT_TEXT_COLOR)
+            self.table.setItem(row, 0, id_item)
             
             # Timestamp
             timestamp = finding.get('timestamp', '')
             if timestamp:
                 timestamp = timestamp.split('T')[0]  # Just date
-            self.table.setItem(row, 1, QTableWidgetItem(timestamp))
+            timestamp_item = QTableWidgetItem(timestamp)
+            timestamp_item.setForeground(self.DEFAULT_TEXT_COLOR)
+            self.table.setItem(row, 1, timestamp_item)
             
             # Severity
-            severity = finding.get('severity', 'unknown')
-            severity_item = QTableWidgetItem(severity)
-            # Color code severity
-            if severity == 'critical':
-                severity_item.setForeground(Qt.GlobalColor.red)
-            elif severity == 'high':
-                severity_item.setForeground(Qt.GlobalColor.darkRed)
-            elif severity == 'medium':
-                severity_item.setForeground(Qt.GlobalColor.yellow)
+            severity = finding.get('severity', 'unknown').lower()
+            severity_item = QTableWidgetItem(severity.capitalize())
+            # Color code severity with Material Design colors
+            if severity in self.SEVERITY_COLORS:
+                # Pass QColor directly, not QBrush (matches working pattern in other widgets)
+                severity_item.setForeground(self.SEVERITY_COLORS[severity])
+            else:
+                severity_item.setForeground(self.DEFAULT_TEXT_COLOR)
             self.table.setItem(row, 2, severity_item)
             
             # Data source
-            self.table.setItem(row, 3, QTableWidgetItem(finding.get('data_source', '')))
+            datasource_item = QTableWidgetItem(finding.get('data_source', ''))
+            datasource_item.setForeground(self.DEFAULT_TEXT_COLOR)
+            self.table.setItem(row, 3, datasource_item)
             
             # Anomaly score
             score = finding.get('anomaly_score', 0)
-            self.table.setItem(row, 4, QTableWidgetItem(f"{score:.3f}"))
+            score_item = QTableWidgetItem(f"{score:.3f}")
+            score_item.setForeground(self.DEFAULT_TEXT_COLOR)
+            self.table.setItem(row, 4, score_item)
             
             # Cluster
             cluster = finding.get('cluster_id', '')
-            self.table.setItem(row, 5, QTableWidgetItem(cluster if cluster else 'None'))
+            cluster_item = QTableWidgetItem(cluster if cluster else 'None')
+            cluster_item.setForeground(self.DEFAULT_TEXT_COLOR)
+            self.table.setItem(row, 5, cluster_item)
             
             # MITRE techniques
             techniques = finding.get('mitre_predictions', {})
             tech_str = ', '.join(list(techniques.keys())[:3])
             if len(techniques) > 3:
                 tech_str += f" (+{len(techniques) - 3} more)"
-            self.table.setItem(row, 6, QTableWidgetItem(tech_str))
+            tech_item = QTableWidgetItem(tech_str)
+            tech_item.setForeground(self.DEFAULT_TEXT_COLOR)
+            self.table.setItem(row, 6, tech_item)
+            
+            # Analyze button - creates new tab in Claude Chat drawer
+            analyze_btn = QPushButton("Analyze")
+            analyze_btn.setToolTip("Analyze this finding in a new chat tab")
+            ButtonSizePolicy.make_compact(analyze_btn, min_width=70, max_height=24)
+            analyze_btn.setStyleSheet("background-color: #2196F3; color: white; padding: 4px;")
+            analyze_btn.clicked.connect(lambda checked, f=finding: self._analyze_finding(f))
+            self.table.setCellWidget(row, 7, analyze_btn)
         
         self.table.resizeColumnsToContents()
     
@@ -194,6 +243,10 @@ class FindingListWidget(QWidget):
         if row >= 0 and row < len(self.filtered_findings):
             return self.filtered_findings[row]
         return None
+    
+    def _analyze_finding(self, finding):
+        """Emit signal to analyze finding (creates new tab in Claude Chat drawer)."""
+        self.analyze_with_agent.emit(finding)
     
     def _view_details(self):
         """View details of selected finding."""
@@ -248,19 +301,48 @@ class FindingListWidget(QWidget):
         table.setHorizontalHeaderLabels([
             "Finding ID", "Similarity", "Severity", "Data Source", "Cluster"
         ])
+        
+        # Configure intelligent auto-resizing
+        TableAutoResize.configure(
+            table,
+            content_fit_columns=[0, 1, 2, 3],  # Finding ID, Similarity, Severity, Data Source
+            stretch_columns=[4]  # Cluster stretches to fill
+        )
+        table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        table.verticalHeader().setVisible(True)
+        
         table.setRowCount(min(10, len(similarities)))
         
         for row, (other, sim) in enumerate(similarities[:10]):
-            table.setItem(row, 0, QTableWidgetItem(other.get('finding_id', '')))
-            table.setItem(row, 1, QTableWidgetItem(f"{sim:.4f}"))
-            table.setItem(row, 2, QTableWidgetItem(other.get('severity', '')))
-            table.setItem(row, 3, QTableWidgetItem(other.get('data_source', '')))
-            table.setItem(row, 4, QTableWidgetItem(other.get('cluster_id', '') or 'None'))
+            id_item = QTableWidgetItem(other.get('finding_id', ''))
+            id_item.setForeground(self.DEFAULT_TEXT_COLOR)
+            table.setItem(row, 0, id_item)
+            
+            sim_item = QTableWidgetItem(f"{sim:.4f}")
+            sim_item.setForeground(self.DEFAULT_TEXT_COLOR)
+            table.setItem(row, 1, sim_item)
+            
+            # Severity with color coding
+            severity = other.get('severity', 'unknown').lower()
+            severity_item = QTableWidgetItem(severity.capitalize())
+            if severity in self.SEVERITY_COLORS:
+                severity_item.setForeground(self.SEVERITY_COLORS[severity])
+            else:
+                severity_item.setForeground(self.DEFAULT_TEXT_COLOR)
+            table.setItem(row, 2, severity_item)
+            
+            ds_item = QTableWidgetItem(other.get('data_source', ''))
+            ds_item.setForeground(self.DEFAULT_TEXT_COLOR)
+            table.setItem(row, 3, ds_item)
+            
+            cluster_item = QTableWidgetItem(other.get('cluster_id', '') or 'None')
+            cluster_item.setForeground(self.DEFAULT_TEXT_COLOR)
+            table.setItem(row, 4, cluster_item)
         
-        table.resizeColumnsToContents()
         layout.addWidget(table)
         
         close_btn = QPushButton("Close")
+        ButtonSizePolicy.make_compact(close_btn, min_width=80)
         close_btn.clicked.connect(dialog.close)
         layout.addWidget(close_btn)
         

@@ -27,6 +27,7 @@ from services.timesketch_docker_service import TimesketchDockerService
 from services.claude_service import ClaudeService
 from ui.timesketch_config import TimesketchConfigDialog
 from ui.splunk_config import SplunkConfigDialog
+from ui.integrations_config import IntegrationsConfigDialog
 from ui.mcp_manager import MCPManager
 from ui.themes.material_config import get_available_themes, get_theme_names
 
@@ -123,6 +124,10 @@ class SettingsConsole(QDialog):
         # Splunk Configuration Tab
         splunk_tab = self._create_splunk_tab()
         self.tabs.addTab(splunk_tab, "Splunk")
+        
+        # Integrations Configuration Tab
+        integrations_tab = self._create_integrations_tab()
+        self.tabs.addTab(integrations_tab, "Integrations")
         
         # General Settings Tab
         general_tab = self._create_general_tab()
@@ -779,6 +784,206 @@ class SettingsConsole(QDialog):
         widget.setLayout(layout)
         scroll.setWidget(widget)
         return scroll
+    
+    def _create_integrations_tab(self) -> QWidget:
+        """Create integrations configuration tab."""
+        # Create scroll area
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        
+        # Create content widget
+        widget = QWidget()
+        layout = QVBoxLayout()
+        
+        # Info
+        info_label = QLabel(
+            "<b>Security Integrations</b><br>"
+            "Configure external security tools and services. "
+            "Integrations are organized by category for easy management."
+        )
+        info_label.setWordWrap(True)
+        layout.addWidget(info_label)
+        
+        # Quick Config Button
+        config_btn = QPushButton("🔧 Configure Integrations")
+        config_btn.clicked.connect(self._open_integrations_dialog)
+        config_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #2196F3;
+                color: white;
+                padding: 10px;
+                font-size: 14px;
+                font-weight: bold;
+                border-radius: 5px;
+            }
+            QPushButton:hover {
+                background-color: #1976D2;
+            }
+        """)
+        layout.addWidget(config_btn)
+        
+        # Status Section
+        status_group = QGroupBox("Integration Status")
+        status_layout = QVBoxLayout()
+        
+        self.integrations_status_label = QLabel("Loading...")
+        self.integrations_status_label.setWordWrap(True)
+        status_layout.addWidget(self.integrations_status_label)
+        
+        refresh_btn = QPushButton("Refresh Status")
+        refresh_btn.clicked.connect(self._refresh_integrations_status)
+        status_layout.addWidget(refresh_btn)
+        
+        status_group.setLayout(status_layout)
+        layout.addWidget(status_group)
+        
+        # Categories Info
+        categories_group = QGroupBox("Available Integration Categories")
+        categories_layout = QVBoxLayout()
+        
+        categories_text = QLabel(
+            "<b>• Threat Intelligence:</b> VirusTotal, MISP, OpenCTI, AlienVault OTX, ThreatConnect, Shodan<br>"
+            "<b>• Incident Management:</b> Jira, PagerDuty, ServiceNow<br>"
+            "<b>• Communications:</b> Slack, Microsoft Teams, Email<br>"
+            "<b>• EDR/XDR:</b> Microsoft Defender, SentinelOne, Carbon Black<br>"
+            "<b>• Cloud Security:</b> AWS Security Hub, Azure Sentinel, GCP Security<br>"
+            "<b>• Network Security:</b> Palo Alto Networks, Cisco Secure<br>"
+            "<b>• Vulnerability Management:</b> Tenable, Qualys<br>"
+            "<b>• Malware Analysis:</b> Hybrid Analysis, Joe Sandbox, ANY.RUN<br>"
+            "<b>• Identity & Access:</b> Okta, Azure AD<br>"
+            "<b>• Email Security:</b> Mimecast, Proofpoint<br>"
+            "<b>• Utilities:</b> GitHub, Elasticsearch, PostgreSQL, IP Geolocation"
+        )
+        categories_text.setWordWrap(True)
+        categories_text.setTextFormat(Qt.TextFormat.RichText)
+        categories_layout.addWidget(categories_text)
+        
+        categories_group.setLayout(categories_layout)
+        layout.addWidget(categories_group)
+        
+        # Usage Instructions
+        usage_group = QGroupBox("How to Use Integrations")
+        usage_layout = QVBoxLayout()
+        
+        usage_text = QLabel(
+            "1. Click <b>'Configure Integrations'</b> above<br>"
+            "2. Navigate to the category tab you want to configure<br>"
+            "3. <b>Enable</b> the integration by checking the checkbox<br>"
+            "4. Fill in the required credentials and settings<br>"
+            "5. Click <b>'Save Configuration'</b><br>"
+            "6. Enabled integrations will be available as MCP tools in Claude<br><br>"
+            "<i>Note: Only enabled integrations consume resources. "
+            "Disable unused integrations to improve performance.</i>"
+        )
+        usage_text.setWordWrap(True)
+        usage_text.setTextFormat(Qt.TextFormat.RichText)
+        usage_layout.addWidget(usage_text)
+        
+        usage_group.setLayout(usage_layout)
+        layout.addWidget(usage_group)
+        
+        layout.addStretch()
+        
+        widget.setLayout(layout)
+        scroll.setWidget(widget)
+        
+        # Initial status load
+        self._refresh_integrations_status()
+        
+        return scroll
+    
+    def _open_integrations_dialog(self):
+        """Open the integrations configuration dialog."""
+        dialog = IntegrationsConfigDialog(self)
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            self._refresh_integrations_status()
+            QMessageBox.information(
+                self,
+                "Integrations Updated",
+                "Integration configuration has been updated. "
+                "Restart MCP servers for changes to take effect."
+            )
+    
+    def _refresh_integrations_status(self):
+        """Refresh the integration status display."""
+        config_file = IntegrationsConfigDialog.CONFIG_FILE
+        
+        if not config_file.exists():
+            self.integrations_status_label.setText(
+                "⚠️ No integrations configured yet.\n\n"
+                "Click 'Configure Integrations' to get started."
+            )
+            self.integrations_status_label.setStyleSheet("color: orange;")
+            return
+        
+        try:
+            with open(config_file, 'r') as f:
+                config = json.load(f)
+            
+            enabled = config.get('enabled_integrations', [])
+            
+            if not enabled:
+                self.integrations_status_label.setText(
+                    "✓ Configuration file exists, but no integrations are enabled.\n\n"
+                    "Enable integrations in the configuration dialog."
+                )
+                self.integrations_status_label.setStyleSheet("color: #FFA500;")
+            else:
+                # Group by category
+                categories = {}
+                category_mapping = IntegrationsConfigDialog.CATEGORIES
+                
+                # Reverse lookup: integration ID to category
+                id_to_category = {}
+                for cat_id, cat_name in category_mapping.items():
+                    id_to_category.update({iid: cat_name for iid in enabled if cat_id in iid or any(word in iid for word in cat_id.split('_'))})
+                
+                # Simple categorization
+                threat_intel = [i for i in enabled if any(x in i for x in ['virus', 'misp', 'opencti', 'otx', 'threat', 'shodan'])]
+                ticketing = [i for i in enabled if any(x in i for x in ['jira', 'pagerduty', 'servicenow'])]
+                comms = [i for i in enabled if any(x in i for x in ['slack', 'teams', 'email'])]
+                edr = [i for i in enabled if any(x in i for x in ['defender', 'sentinel', 'carbon'])]
+                cloud = [i for i in enabled if any(x in i for x in ['aws', 'azure', 'gcp'])]
+                network = [i for i in enabled if any(x in i for x in ['palo', 'cisco'])]
+                vuln = [i for i in enabled if any(x in i for x in ['tenable', 'qualys'])]
+                malware = [i for i in enabled if any(x in i for x in ['hybrid', 'joe', 'anyrun'])]
+                identity = [i for i in enabled if any(x in i for x in ['okta', 'azure_ad'])]
+                email_sec = [i for i in enabled if any(x in i for x in ['mimecast', 'proofpoint'])]
+                utilities = [i for i in enabled if any(x in i for x in ['github', 'elastic', 'postgres', 'ip_geo'])]
+                
+                status_text = f"✓ <b>{len(enabled)} integration(s) enabled:</b><br><br>"
+                
+                if threat_intel:
+                    status_text += f"<b>Threat Intel:</b> {', '.join(threat_intel)}<br>"
+                if ticketing:
+                    status_text += f"<b>Ticketing:</b> {', '.join(ticketing)}<br>"
+                if comms:
+                    status_text += f"<b>Communications:</b> {', '.join(comms)}<br>"
+                if edr:
+                    status_text += f"<b>EDR/XDR:</b> {', '.join(edr)}<br>"
+                if cloud:
+                    status_text += f"<b>Cloud Security:</b> {', '.join(cloud)}<br>"
+                if network:
+                    status_text += f"<b>Network Security:</b> {', '.join(network)}<br>"
+                if vuln:
+                    status_text += f"<b>Vulnerability:</b> {', '.join(vuln)}<br>"
+                if malware:
+                    status_text += f"<b>Malware Analysis:</b> {', '.join(malware)}<br>"
+                if identity:
+                    status_text += f"<b>Identity:</b> {', '.join(identity)}<br>"
+                if email_sec:
+                    status_text += f"<b>Email Security:</b> {', '.join(email_sec)}<br>"
+                if utilities:
+                    status_text += f"<b>Utilities:</b> {', '.join(utilities)}<br>"
+                
+                self.integrations_status_label.setText(status_text)
+                self.integrations_status_label.setStyleSheet("color: green;")
+                self.integrations_status_label.setTextFormat(Qt.TextFormat.RichText)
+        
+        except Exception as e:
+            self.integrations_status_label.setText(f"✗ Error loading configuration: {str(e)}")
+            self.integrations_status_label.setStyleSheet("color: red;")
     
     def _create_general_tab(self) -> QWidget:
         """Create general settings tab."""

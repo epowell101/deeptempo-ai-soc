@@ -5,6 +5,7 @@ from PyQt6.QtWidgets import (
     QTableWidgetItem, QMessageBox, QGroupBox, QTextEdit, QLineEdit
 )
 from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QColor
 import webbrowser
 
 from services.timesketch_service import TimesketchService
@@ -12,10 +13,19 @@ from services.timeline_service import TimelineService
 from services.data_service import DataService
 from ui.timesketch_config import TimesketchConfigDialog
 from ui.widgets.event_analysis_widget import EventAnalysisWidget
+from ui.utils.auto_resize import TableAutoResize, ButtonSizePolicy
 
 
 class TimesketchTimelineWidget(QDialog):
     """Widget for viewing Timesketch timeline."""
+    
+    # Material Design severity colors
+    SEVERITY_COLORS = {
+        'critical': QColor('#D32F2F'),  # Red
+        'high': QColor('#F57C00'),      # Orange
+        'medium': QColor('#FBC02D'),    # Yellow
+        'low': QColor('#388E3C')        # Green
+    }
     
     def __init__(self, case: dict, mapping: dict, parent=None):
         super().__init__(parent)
@@ -47,10 +57,12 @@ class TimesketchTimelineWidget(QDialog):
         header_layout.addStretch()
         
         open_ts_btn = QPushButton("Open in Timesketch")
+        ButtonSizePolicy.make_compact(open_ts_btn, min_width=140)
         open_ts_btn.clicked.connect(self._open_in_timesketch)
         header_layout.addWidget(open_ts_btn)
         
         refresh_btn = QPushButton("Refresh")
+        ButtonSizePolicy.make_compact(refresh_btn, min_width=80)
         refresh_btn.clicked.connect(self._load_timeline)
         header_layout.addWidget(refresh_btn)
         
@@ -77,12 +89,25 @@ class TimesketchTimelineWidget(QDialog):
         self.events_table.setHorizontalHeaderLabels([
             "Timestamp", "Message", "Source", "Severity", "Data Source", "MITRE"
         ])
-        self.events_table.horizontalHeader().setStretchLastSection(True)
+        
+        # Configure intelligent auto-resizing for columns
+        from PyQt6.QtWidgets import QHeaderView
+        TableAutoResize.configure(
+            self.events_table,
+            content_fit_columns=[2, 3, 4],  # Source, Severity, Data Source (auto-fit)
+            stretch_columns=[1, 5],  # Message, MITRE (stretch to fill)
+            interactive_columns=[0]  # Timestamp (user can resize)
+        )
+        self.events_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        self.events_table.verticalHeader().setVisible(True)
+        self.events_table.verticalHeader().setDefaultSectionSize(30)
+        
         self.events_table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.events_table.itemDoubleClicked.connect(self._view_event_details)
         
         # Analysis button
         analyze_btn = QPushButton("Analyze Event with Claude")
+        ButtonSizePolicy.make_flexible(analyze_btn, min_width=180)
         analyze_btn.clicked.connect(self._analyze_selected_event)
         events_layout.addWidget(analyze_btn)
         
@@ -107,6 +132,7 @@ class TimesketchTimelineWidget(QDialog):
         button_layout.addStretch()
         
         close_btn = QPushButton("Close")
+        ButtonSizePolicy.make_compact(close_btn, min_width=80)
         close_btn.clicked.connect(self.close)
         button_layout.addWidget(close_btn)
         
@@ -178,13 +204,11 @@ class TimesketchTimelineWidget(QDialog):
             source = event.get('source_short', event.get('source', 'Unknown'))
             self.events_table.setItem(row, 2, QTableWidgetItem(source))
             
-            # Severity
-            severity = event.get('severity', '')
-            severity_item = QTableWidgetItem(severity)
-            if severity == 'critical':
-                severity_item.setForeground(Qt.GlobalColor.red)
-            elif severity == 'high':
-                severity_item.setForeground(Qt.GlobalColor.darkRed)
+            # Severity with Material Design colors
+            severity = event.get('severity', '').lower()
+            severity_item = QTableWidgetItem(severity.capitalize() if severity else '')
+            if severity in self.SEVERITY_COLORS:
+                severity_item.setForeground(self.SEVERITY_COLORS[severity])
             self.events_table.setItem(row, 3, severity_item)
             
             # Data Source

@@ -6,6 +6,7 @@ from PyQt6.QtWidgets import (
     QGroupBox, QListWidget, QListWidgetItem, QCheckBox
 )
 from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QColor
 from typing import Optional
 import logging
 
@@ -13,12 +14,21 @@ from services.timesketch_service import TimesketchService
 from services.sketch_manager import SketchManager
 from services.data_service import DataService
 from ui.timesketch_config import TimesketchConfigDialog
+from ui.utils.auto_resize import TableAutoResize, ButtonSizePolicy
 
 logger = logging.getLogger(__name__)
 
 
 class SearchWidget(QWidget):
     """Enhanced search widget with Timesketch integration."""
+    
+    # Material Design severity colors
+    SEVERITY_COLORS = {
+        'critical': QColor('#D32F2F'),  # Red
+        'high': QColor('#F57C00'),      # Orange
+        'medium': QColor('#FBC02D'),    # Yellow
+        'low': QColor('#388E3C')        # Green
+    }
     
     # Predefined search queries
     PREDEFINED_QUERIES = [
@@ -69,6 +79,7 @@ class SearchWidget(QWidget):
         query_layout.addWidget(self.query_edit)
         
         search_btn = QPushButton("Search")
+        ButtonSizePolicy.make_compact(search_btn, min_width=80)
         search_btn.clicked.connect(self._execute_search)
         query_layout.addWidget(search_btn)
         
@@ -117,10 +128,12 @@ class SearchWidget(QWidget):
         self.results_count_label = results_toolbar.itemAt(0).widget()
         
         export_btn = QPushButton("Export Results")
+        ButtonSizePolicy.make_compact(export_btn, min_width=110)
         export_btn.clicked.connect(self._export_results)
         results_toolbar.addWidget(export_btn)
         
         save_query_btn = QPushButton("Save Query")
+        ButtonSizePolicy.make_compact(save_query_btn, min_width=90)
         save_query_btn.clicked.connect(self._save_query)
         results_toolbar.addWidget(save_query_btn)
         
@@ -132,7 +145,19 @@ class SearchWidget(QWidget):
         self.results_table.setHorizontalHeaderLabels([
             "Timestamp", "Message", "Source", "Severity", "Sketch", "Details"
         ])
-        self.results_table.horizontalHeader().setStretchLastSection(True)
+        
+        # Configure intelligent auto-resizing for columns
+        from PyQt6.QtWidgets import QHeaderView
+        TableAutoResize.configure(
+            self.results_table,
+            content_fit_columns=[2, 3, 4],  # Source, Severity, Sketch (auto-fit)
+            stretch_columns=[1],  # Message (stretches to fill remaining space)
+            interactive_columns=[0, 5]  # Timestamp, Details (user can resize)
+        )
+        self.results_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        self.results_table.verticalHeader().setVisible(True)
+        self.results_table.verticalHeader().setDefaultSectionSize(30)
+        
         self.results_table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.results_table.itemDoubleClicked.connect(self._view_event_details)
         # Make results table expand to fill available space (relative sizing)
@@ -157,6 +182,7 @@ class SearchWidget(QWidget):
         saved_layout.addWidget(self.saved_queries_list)
         
         delete_query_btn = QPushButton("Delete Selected")
+        ButtonSizePolicy.make_flexible(delete_query_btn, min_width=120)
         delete_query_btn.clicked.connect(self._delete_saved_query)
         saved_layout.addWidget(delete_query_btn)
         
@@ -260,13 +286,11 @@ class SearchWidget(QWidget):
             source = result.get('source_short', result.get('source', 'Unknown'))
             self.results_table.setItem(row, 2, QTableWidgetItem(source))
             
-            # Severity
-            severity = result.get('severity', '')
-            severity_item = QTableWidgetItem(severity)
-            if severity == 'critical':
-                severity_item.setForeground(Qt.GlobalColor.red)
-            elif severity == 'high':
-                severity_item.setForeground(Qt.GlobalColor.darkRed)
+            # Severity with Material Design colors
+            severity = result.get('severity', '').lower()
+            severity_item = QTableWidgetItem(severity.capitalize() if severity else '')
+            if severity in self.SEVERITY_COLORS:
+                severity_item.setForeground(self.SEVERITY_COLORS[severity])
             self.results_table.setItem(row, 3, severity_item)
             
             # Sketch

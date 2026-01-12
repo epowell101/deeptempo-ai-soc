@@ -150,7 +150,14 @@ class AnalyzerWidget(QWidget):
         self.results_table.setHorizontalHeaderLabels([
             "Analyzer", "Status", "Started", "Results"
         ])
-        self.results_table.horizontalHeader().setStretchLastSection(True)
+        
+        # Make columns and rows resizable by user (like Excel)
+        from PyQt6.QtWidgets import QHeaderView
+        self.results_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        self.results_table.horizontalHeader().setStretchLastSection(False)
+        self.results_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        self.results_table.verticalHeader().setVisible(True)
+        self.results_table.verticalHeader().setDefaultSectionSize(30)
         results_layout.addWidget(self.results_table)
         
         # Result details

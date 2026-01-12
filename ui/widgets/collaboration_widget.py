@@ -125,6 +125,11 @@ class CollaborationWidget(QWidget):
         self.collaborators_table.setHorizontalHeaderLabels([
             "Username", "Permission", "Added"
         ])
+        # Make resizable
+        from PyQt6.QtWidgets import QHeaderView
+        self.collaborators_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        self.collaborators_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        self.collaborators_table.verticalHeader().setVisible(True)
         collaborators_layout.addWidget(self.collaborators_table)
         
         collaborators_group.setLayout(collaborators_layout)

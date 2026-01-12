@@ -63,7 +63,15 @@ class AttackLayerViewWidget(QWidget):
         self.table.setHorizontalHeaderLabels([
             "Technique", "Finding Count", "Avg Confidence", "Score"
         ])
-        self.table.horizontalHeader().setStretchLastSection(True)
+        
+        # Make columns and rows resizable by user (like Excel)
+        from PyQt6.QtWidgets import QHeaderView
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        self.table.horizontalHeader().setStretchLastSection(False)
+        self.table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        self.table.verticalHeader().setVisible(True)
+        self.table.verticalHeader().setDefaultSectionSize(30)
+        
         self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         
         layout.addWidget(self.table)

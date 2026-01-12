@@ -59,7 +59,15 @@ class EntityInvestigationWidget(QWidget):
         self.entity_table.setHorizontalHeaderLabels([
             "Entity", "Type", "Risk", "Risk Score", "Findings", "Alerts", "First Seen"
         ])
-        self.entity_table.horizontalHeader().setStretchLastSection(True)
+        
+        # Make columns and rows resizable by user (like Excel)
+        from PyQt6.QtWidgets import QHeaderView
+        self.entity_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        self.entity_table.horizontalHeader().setStretchLastSection(False)
+        self.entity_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        self.entity_table.verticalHeader().setVisible(True)
+        self.entity_table.verticalHeader().setDefaultSectionSize(30)
+        
         self.entity_table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         self.entity_table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.entity_table.itemSelectionChanged.connect(self._on_entity_selected)

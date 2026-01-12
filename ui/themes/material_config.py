@@ -188,8 +188,13 @@ class MaterialTheme:
         /* Widgets */
         QWidget {{
             background-color: {palette['background']};
-            color: {palette['on_background']};
+            /* Don't set color globally - it overrides programmatic setForeground() */
             font-family: "Roboto", "Segoe UI", sans-serif;
+        }}
+        
+        /* Default text color for standard widgets (not table items - they set their own) */
+        QLabel, QCheckBox, QRadioButton, QGroupBox, QListWidget, QTreeWidget {{
+            color: {palette['on_background']};
         }}
         
         /* Buttons */
@@ -304,7 +309,6 @@ class MaterialTheme:
         /* Tables */
         QTableWidget {{
             background-color: {palette['surface']};
-            color: {palette['on_surface']};
             border: 1px solid {palette['surface_variant']};
             gridline-color: {palette['surface_variant']};
             border-radius: 4px;
@@ -312,11 +316,18 @@ class MaterialTheme:
         
         QTableWidget::item {{
             padding: 4px;
+            /* Note: Don't set color here - it overrides setForeground() calls */
+            /* Items need to set their own colors programmatically */
+        }}
+        
+        /* Default text color for headers */
+        QHeaderView {{
+            color: {palette['on_surface']};
         }}
         
         QTableWidget::item:selected {{
             background-color: {palette['primary']};
-            color: {palette['on_primary']};
+            /* Don't override text color on selection - let items keep their custom colors */
         }}
         
         QHeaderView::section {{
@@ -538,9 +549,9 @@ class MaterialTheme:
             background-color: #D32F2F !important;
         }
         
-        /* Selected table items */
+        /* Selected table items - remove color override to preserve item text colors */
         QTableWidget::item:selected {
-            background-color: #F44336 !important;
+            background-color: rgba(244, 67, 54, 0.3) !important;
         }
         
         /* Group box titles */
@@ -562,6 +573,7 @@ class MaterialTheme:
         * {
             selection-background-color: #F44336 !important;
         }
+        
         """
 
 

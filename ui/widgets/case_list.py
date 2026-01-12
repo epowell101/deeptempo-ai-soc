@@ -6,6 +6,7 @@ from PyQt6.QtWidgets import (
     QTextEdit, QMessageBox, QListWidget, QListWidgetItem, QFileDialog, QFrame
 )
 from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QColor
 from pathlib import Path
 from datetime import datetime
 
@@ -128,6 +129,14 @@ class CreateCaseDialog(QDialog):
 class CaseListWidget(QWidget):
     """Widget for displaying and managing cases."""
     
+    # Material Design priority colors (same as severity)
+    PRIORITY_COLORS = {
+        'critical': QColor('#D32F2F'),  # Red
+        'high': QColor('#F57C00'),      # Orange
+        'medium': QColor('#FBC02D'),    # Yellow
+        'low': QColor('#388E3C')        # Green
+    }
+    
     def __init__(self, parent=None):
         super().__init__(parent)
         self.data_service = DataService()
@@ -211,7 +220,15 @@ class CaseListWidget(QWidget):
         self.table.setHorizontalHeaderLabels([
             "Case ID", "Title", "Status", "Priority", "Findings", "Timesketch", "Created"
         ])
-        self.table.horizontalHeader().setStretchLastSection(True)
+        
+        # Make columns and rows resizable by user (like Excel)
+        from PyQt6.QtWidgets import QHeaderView
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        self.table.horizontalHeader().setStretchLastSection(False)
+        self.table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        self.table.verticalHeader().setVisible(True)
+        self.table.verticalHeader().setDefaultSectionSize(30)
+        
         self.table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.table.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
         
@@ -236,7 +253,13 @@ class CaseListWidget(QWidget):
             self.table.setItem(row, 0, QTableWidgetItem(case.get('case_id', '')))
             self.table.setItem(row, 1, QTableWidgetItem(case.get('title', '')))
             self.table.setItem(row, 2, QTableWidgetItem(case.get('status', '')))
-            self.table.setItem(row, 3, QTableWidgetItem(case.get('priority', '')))
+            
+            # Priority with color coding
+            priority = case.get('priority', 'medium').lower()
+            priority_item = QTableWidgetItem(priority.capitalize())
+            if priority in self.PRIORITY_COLORS:
+                priority_item.setForeground(self.PRIORITY_COLORS[priority])
+            self.table.setItem(row, 3, priority_item)
             
             finding_ids = case.get('finding_ids', [])
             self.table.setItem(row, 4, QTableWidgetItem(str(len(finding_ids))))

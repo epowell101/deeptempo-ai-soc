@@ -13,7 +13,6 @@ from ui.widgets.case_list import CaseListWidget
 from ui.widgets.attack_layer_view import AttackLayerViewWidget
 from ui.widgets.attack_flow_widget import AttackFlowWidget
 from ui.widgets.entity_investigation_widget import EntityInvestigationWidget
-from ui.widgets.workflow_widget import WorkflowWidget
 from ui.widgets.sketch_manager_widget import SketchManagerWidget
 from services.data_service import DataService
 from services.report_service import ReportService
@@ -69,6 +68,8 @@ class Dashboard(QWidget):
         
         # Findings tab
         self.findings_widget = FindingListWidget(self)
+        # Connect analyze signal
+        self.findings_widget.analyze_with_agent.connect(self.analyze_finding_with_agent)
         self.tabs.addTab(self.findings_widget, "Findings")
         
         # Cases tab
@@ -100,9 +101,25 @@ class Dashboard(QWidget):
         self.entity_widget = EntityInvestigationWidget(self)
         self.tabs.addTab(self.entity_widget, "Entities")
         
-        # Workflow tab
-        self.workflow_widget = WorkflowWidget(self)
-        self.tabs.addTab(self.workflow_widget, "Workflow")
+        # Approval Queue tab (NEW)
+        try:
+            from ui.widgets.approval_queue import ApprovalQueueWidget
+            self.approval_widget = ApprovalQueueWidget(self)
+            self.tabs.addTab(self.approval_widget, "🚦 Approval Queue")
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).warning(f"Could not load approval queue widget: {e}")
+            self.approval_widget = None
+        
+        # Investigation Workflow tab - formal phase-based investigation tracking
+        try:
+            from ui.widgets.investigation_workflow import InvestigationWorkflowWidget
+            self.investigation_workflow_widget = InvestigationWorkflowWidget(parent=self)
+            self.tabs.addTab(self.investigation_workflow_widget, "🔬 Investigation Phases")
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).warning(f"Could not load investigation workflow widget: {e}")
+            self.investigation_workflow_widget = None
         
         # Make tabs widget expand to fill available space (relative sizing)
         layout.addWidget(self.tabs, 1)  # Stretch factor of 1 makes it take available space
@@ -177,8 +194,6 @@ class Dashboard(QWidget):
             self.attack_flow_widget.refresh()
         if hasattr(self, 'entity_widget'):
             self.entity_widget.refresh()
-        if hasattr(self, 'workflow_widget'):
-            self.workflow_widget.refresh()
     
     def _generate_overall_report(self):
         """Generate overall PDF report."""
@@ -239,4 +254,15 @@ class Dashboard(QWidget):
                 "Error",
                 "Failed to generate report. Please check the logs for details."
             )
+    
+    def analyze_finding_with_agent(self, finding):
+        """
+        Handle analyze finding with agent signal.
+        This is called when the Analyze button is clicked on a finding.
+        Creates a new tab in the Claude Chat drawer.
+        """
+        # Signal parent (MainWindow) to create new chat tab with this finding
+        parent = self.parent()
+        if parent and hasattr(parent, 'create_investigation_tab_for_finding'):
+            parent.create_investigation_tab_for_finding(finding)
 

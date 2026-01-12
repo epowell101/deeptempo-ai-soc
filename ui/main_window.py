@@ -17,7 +17,7 @@ from datetime import datetime
 logger = logging.getLogger(__name__)
 
 from ui.dashboard import Dashboard
-from ui.claude_chat import ClaudeChat
+from ui.claude_chat_tabbed import TabbedClaudeChat
 from ui.setup_wizard import SetupWizard
 from ui.config_manager import ConfigManager
 from ui.timesketch_config import TimesketchConfigDialog
@@ -118,6 +118,8 @@ class MainWindow(QMainWindow):
         dashboard_action.setShortcut("Ctrl+D")
         dashboard_action.triggered.connect(self._show_dashboard)
         view_menu.addAction(dashboard_action)
+        
+        view_menu.addSeparator()
         
         claude_action = QAction("&Toggle Claude Chat", self)
         claude_action.setShortcut("Ctrl+C")
@@ -323,6 +325,25 @@ class MainWindow(QMainWindow):
         self.dashboard = Dashboard(self)
         self.setCentralWidget(self.dashboard)
     
+    def create_investigation_tab_for_finding(self, finding):
+        """
+        Create a new chat tab for a specific finding.
+        This is called from the dashboard when user clicks "Analyze in New Tab".
+        """
+        # Create tab in Claude Chat drawer
+        if self.claude_chat:
+            self.claude_chat.create_tab_for_finding(finding)
+            
+            # Make sure drawer is visible
+            if not self.claude_dock.isVisible():
+                self.claude_dock.show()
+                if self.claude_toggle_action:
+                    self.claude_toggle_action.setChecked(True)
+            
+            # Show status message
+            finding_id = finding.get('finding_id', 'Unknown')
+            self.statusBar().showMessage(f"Created new chat tab for finding: {finding_id}", 5000)
+    
     def _setup_claude_drawer(self):
         """Set up Claude Chat as a side drawer."""
         # Create dock widget
@@ -335,12 +356,13 @@ class MainWindow(QMainWindow):
             QDockWidget.DockWidgetFeature.DockWidgetClosable
         )
         
-        # Create Claude Chat widget
-        self.claude_chat = ClaudeChat(self)
+        # Create Tabbed Claude Chat widget
+        self.claude_chat = TabbedClaudeChat(self)
         self.claude_dock.setWidget(self.claude_chat)
         
         # Set minimum and maximum width constraints
-        self.claude_dock.setMinimumWidth(250)
+        self.claude_dock.setMinimumWidth(350)  # Increased from 250 for better readability
+        self.claude_dock.setMaximumWidth(800)  # Prevent it from taking too much space
         
         # Add dock widget to main window (right side by default)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.claude_dock)
@@ -371,10 +393,10 @@ class MainWindow(QMainWindow):
             # Show the drawer
             self.claude_dock.setVisible(True)
             
-            # Set drawer width to 1/4 of window width
+            # Set drawer width to 1/3 of window width (but not too wide)
             window_width = self.width()
-            quarter_width = max(window_width // 4, 250)
-            self.resizeDocks([self.claude_dock], [quarter_width], Qt.Orientation.Horizontal)
+            drawer_width = min(max(window_width // 3, 350), 600)  # Between 350-600px
+            self.resizeDocks([self.claude_dock], [drawer_width], Qt.Orientation.Horizontal)
             
             # Restore window size constraints after a brief moment
             QTimer.singleShot(100, lambda: (
@@ -489,6 +511,21 @@ class MainWindow(QMainWindow):
                 "Error",
                 "Failed to generate report. Please check the logs for details."
             )
+    
+    def analyze_finding_with_claude(self, finding):
+        """
+        Open Claude chat and start analyzing a finding.
+        
+        Args:
+            finding: The finding dict to analyze
+        """
+        # Show Claude drawer if not visible (use toggle method to prevent window resize)
+        if self.claude_dock and not self.claude_dock.isVisible():
+            self._toggle_claude_drawer()
+        
+        # Send finding to Claude chat for analysis
+        if self.claude_chat:
+            self.claude_chat.analyze_finding(finding)
     
     def _show_about(self):
         """Show about dialog."""

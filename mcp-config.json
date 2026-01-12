@@ -2,19 +2,64 @@
   "mcpServers": {
     "deeptempo-findings": {
       "command": "python",
-      "args": ["-m", "mcp.deeptempo_findings_server.server"],
+      "args": [
+        "-m",
+        "mcp_servers.deeptempo_findings_server.server"
+      ],
       "cwd": "${workspaceFolder}",
       "env": {}
     },
     "evidence-snippets": {
       "command": "python",
-      "args": ["-m", "mcp.evidence_snippets_server.server"],
+      "args": [
+        "-m",
+        "mcp_servers.evidence_snippets_server.server"
+      ],
       "cwd": "${workspaceFolder}",
       "env": {}
     },
     "case-store": {
       "command": "python",
-      "args": ["-m", "mcp.case_store_server.server"],
+      "args": [
+        "-m",
+        "mcp_servers.case_store_server.server"
+      ],
+      "cwd": "${workspaceFolder}",
+      "env": {}
+    },
+    "tempo-flow": {
+      "command": "python",
+      "args": [
+        "-m",
+        "mcp_servers.tempo_flow_server.server"
+      ],
+      "cwd": "${workspaceFolder}",
+      "env": {}
+    },
+    "crowdstrike": {
+      "command": "python",
+      "args": [
+        "-m",
+        "mcp_servers.crowdstrike_server.server"
+      ],
+      "cwd": "${workspaceFolder}",
+      "env": {}
+    },
+    "splunk": {
+      "command": "python",
+      "args": [
+        "-m",
+        "mcp_servers.splunk_server.server"
+      ],
+      "cwd": "${workspaceFolder}",
+      "env": {}
+    },
+    "approval": {
+      "command": "python",
+      "args": [
+        "-m",
+        "mcp_servers.approval_server.server"
+      ],
       "cwd": "${workspaceFolder}",
       "env": {}
     }

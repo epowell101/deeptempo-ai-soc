@@ -6,6 +6,7 @@ from PyQt6.QtWidgets import (
     QWidget, QProgressDialog
 )
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
+from PyQt6.QtGui import QColor
 from typing import Dict, List, Optional
 import json
 import numpy as np
@@ -13,6 +14,7 @@ import numpy as np
 from services.claude_service import ClaudeService
 from services.data_service import DataService
 from services.timeline_service import TimelineService
+from ui.utils.auto_resize import TableAutoResize, ButtonSizePolicy
 
 
 def cosine_similarity(vec1, vec2):
@@ -97,6 +99,14 @@ class AnalysisWorker(QThread):
 class EventAnalysisWidget(QDialog):
     """Widget for analyzing events with Claude integration."""
     
+    # Material Design severity colors
+    SEVERITY_COLORS = {
+        'critical': QColor('#D32F2F'),  # Red
+        'high': QColor('#F57C00'),      # Orange
+        'medium': QColor('#FBC02D'),    # Yellow
+        'low': QColor('#388E3C')        # Green
+    }
+    
     def __init__(self, event: Dict, all_events: List[Dict], parent=None):
         super().__init__(parent)
         self.event = event
@@ -131,6 +141,7 @@ class EventAnalysisWidget(QDialog):
         header_layout.addStretch()
         
         close_btn = QPushButton("Close")
+        ButtonSizePolicy.make_compact(close_btn, min_width=70)
         close_btn.clicked.connect(self.close)
         header_layout.addWidget(close_btn)
         
@@ -149,6 +160,7 @@ class EventAnalysisWidget(QDialog):
         analysis_layout.addWidget(self.analysis_text)
         
         refresh_btn = QPushButton("Refresh Analysis")
+        ButtonSizePolicy.make_flexible(refresh_btn, min_width=130)
         refresh_btn.clicked.connect(self._analyze_event)
         analysis_layout.addWidget(refresh_btn)
         
@@ -164,7 +176,16 @@ class EventAnalysisWidget(QDialog):
         self.similar_table.setHorizontalHeaderLabels([
             "Timestamp", "Message", "Similarity", "Severity", "Source IP", "Destination IP"
         ])
-        self.similar_table.horizontalHeader().setStretchLastSection(True)
+        # Configure intelligent auto-resizing
+        from PyQt6.QtWidgets import QHeaderView
+        TableAutoResize.configure(
+            self.similar_table,
+            content_fit_columns=[2, 3],  # Similarity, Severity (auto-fit)
+            stretch_columns=[1],  # Message (stretches to fill)
+            interactive_columns=[0, 4, 5]  # Timestamp, Source IP, Destination IP (user can resize)
+        )
+        self.similar_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        self.similar_table.verticalHeader().setVisible(True)
         self.similar_table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         similar_layout.addWidget(self.similar_table)
         
@@ -180,7 +201,15 @@ class EventAnalysisWidget(QDialog):
         self.correlated_table.setHorizontalHeaderLabels([
             "Timestamp", "Message", "Correlation Type", "Severity", "Source IP", "Destination IP"
         ])
-        self.correlated_table.horizontalHeader().setStretchLastSection(True)
+        # Configure intelligent auto-resizing
+        TableAutoResize.configure(
+            self.correlated_table,
+            content_fit_columns=[2, 3],  # Correlation Type, Severity (auto-fit)
+            stretch_columns=[1],  # Message (stretches to fill)
+            interactive_columns=[0, 4, 5]  # Timestamp, Source IP, Destination IP (user can resize)
+        )
+        self.correlated_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        self.correlated_table.verticalHeader().setVisible(True)
         self.correlated_table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         correlated_layout.addWidget(self.correlated_table)
         
@@ -200,7 +229,14 @@ class EventAnalysisWidget(QDialog):
         self.ips_table.setHorizontalHeaderLabels([
             "IP Address", "Type", "Event Count", "First Seen"
         ])
-        self.ips_table.horizontalHeader().setStretchLastSection(True)
+        # Configure intelligent auto-resizing
+        TableAutoResize.configure(
+            self.ips_table,
+            content_fit_columns=[1, 2],  # Type, Event Count (auto-fit)
+            stretch_columns=[0, 3]  # IP Address, First Seen (stretch to fill)
+        )
+        self.ips_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        self.ips_table.verticalHeader().setVisible(True)
         ips_layout.addWidget(self.ips_table)
         
         ips_group.setLayout(ips_layout)
@@ -215,7 +251,14 @@ class EventAnalysisWidget(QDialog):
         self.devices_table.setHorizontalHeaderLabels([
             "Hostname", "IP Address", "Event Count", "Severity"
         ])
-        self.devices_table.horizontalHeader().setStretchLastSection(True)
+        # Configure intelligent auto-resizing
+        TableAutoResize.configure(
+            self.devices_table,
+            content_fit_columns=[2, 3],  # Event Count, Severity (auto-fit)
+            stretch_columns=[0, 1]  # Hostname, IP Address (stretch to fill)
+        )
+        self.devices_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        self.devices_table.verticalHeader().setVisible(True)
         devices_layout.addWidget(self.devices_table)
         
         devices_group.setLayout(devices_layout)
@@ -355,7 +398,14 @@ class EventAnalysisWidget(QDialog):
             self.similar_table.setItem(row, 0, QTableWidgetItem(timestamp))
             self.similar_table.setItem(row, 1, QTableWidgetItem(event.get('message', '')[:100]))
             self.similar_table.setItem(row, 2, QTableWidgetItem(f"{similarity:.3f} ({match_type})"))
-            self.similar_table.setItem(row, 3, QTableWidgetItem(event.get('severity', '')))
+            
+            # Severity with Material Design colors
+            severity = event.get('severity', '').lower()
+            severity_item = QTableWidgetItem(severity.capitalize() if severity else '')
+            if severity in self.SEVERITY_COLORS:
+                severity_item.setForeground(self.SEVERITY_COLORS[severity])
+            self.similar_table.setItem(row, 3, severity_item)
+            
             self.similar_table.setItem(row, 4, QTableWidgetItem(event.get('entity_src_ip', '')))
             self.similar_table.setItem(row, 5, QTableWidgetItem(event.get('entity_dst_ip', '')))
         
@@ -433,7 +483,14 @@ class EventAnalysisWidget(QDialog):
             self.correlated_table.setItem(row, 0, QTableWidgetItem(timestamp))
             self.correlated_table.setItem(row, 1, QTableWidgetItem(event.get('message', '')[:100]))
             self.correlated_table.setItem(row, 2, QTableWidgetItem(corr_type))
-            self.correlated_table.setItem(row, 3, QTableWidgetItem(event.get('severity', '')))
+            
+            # Severity with Material Design colors
+            severity = event.get('severity', '').lower()
+            severity_item = QTableWidgetItem(severity.capitalize() if severity else '')
+            if severity in self.SEVERITY_COLORS:
+                severity_item.setForeground(self.SEVERITY_COLORS[severity])
+            self.correlated_table.setItem(row, 3, severity_item)
+            
             self.correlated_table.setItem(row, 4, QTableWidgetItem(event.get('entity_src_ip', '')))
             self.correlated_table.setItem(row, 5, QTableWidgetItem(event.get('entity_dst_ip', '')))
         
@@ -505,11 +562,12 @@ class EventAnalysisWidget(QDialog):
             self.devices_table.setItem(row, 0, QTableWidgetItem(hostname))
             self.devices_table.setItem(row, 1, QTableWidgetItem(data['ip']))
             self.devices_table.setItem(row, 2, QTableWidgetItem(str(data['count'])))
-            severity_item = QTableWidgetItem(data['max_severity'])
-            if data['max_severity'] == 'critical':
-                severity_item.setForeground(Qt.GlobalColor.red)
-            elif data['max_severity'] == 'high':
-                severity_item.setForeground(Qt.GlobalColor.darkRed)
+            
+            # Severity with Material Design colors
+            severity = data['max_severity'].lower()
+            severity_item = QTableWidgetItem(severity.capitalize())
+            if severity in self.SEVERITY_COLORS:
+                severity_item.setForeground(self.SEVERITY_COLORS[severity])
             self.devices_table.setItem(row, 3, severity_item)
         
         self.devices_table.resizeColumnsToContents()

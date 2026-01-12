@@ -5,11 +5,20 @@ from PyQt6.QtWidgets import (
     QGroupBox, QFormLayout, QTableWidget, QTableWidgetItem
 )
 from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QColor, QPalette
 import json
 
 
 class FindingDetailWidget(QDialog):
     """Dialog for viewing finding details."""
+    
+    # Material Design severity colors
+    SEVERITY_COLORS = {
+        'critical': QColor('#D32F2F'),  # Red
+        'high': QColor('#F57C00'),      # Orange
+        'medium': QColor('#FBC02D'),    # Yellow
+        'low': QColor('#388E3C')        # Green
+    }
     
     def __init__(self, finding: dict, parent=None):
         super().__init__(parent)
@@ -29,7 +38,16 @@ class FindingDetailWidget(QDialog):
         
         basic_layout.addRow("Finding ID:", QLabel(self.finding.get('finding_id', 'N/A')))
         basic_layout.addRow("Timestamp:", QLabel(self.finding.get('timestamp', 'N/A')))
-        basic_layout.addRow("Severity:", QLabel(self.finding.get('severity', 'N/A')))
+        
+        # Severity with color coding
+        severity = self.finding.get('severity', 'N/A').lower()
+        severity_label = QLabel(severity.capitalize())
+        if severity in self.SEVERITY_COLORS:
+            # Use inline style for stronger color application
+            color = self.SEVERITY_COLORS[severity]
+            severity_label.setStyleSheet(f"color: rgb({color.red()}, {color.green()}, {color.blue()}); font-weight: bold;")
+        basic_layout.addRow("Severity:", severity_label)
+        
         basic_layout.addRow("Data Source:", QLabel(self.finding.get('data_source', 'N/A')))
         basic_layout.addRow("Status:", QLabel(self.finding.get('status', 'N/A')))
         basic_layout.addRow("Anomaly Score:", QLabel(f"{self.finding.get('anomaly_score', 0):.4f}"))
@@ -56,6 +74,11 @@ class FindingDetailWidget(QDialog):
         mitre_table = QTableWidget()
         mitre_table.setColumnCount(2)
         mitre_table.setHorizontalHeaderLabels(["Technique", "Confidence"])
+        # Make resizable
+        from PyQt6.QtWidgets import QHeaderView
+        mitre_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        mitre_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        mitre_table.verticalHeader().setVisible(True)
         mitre_table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         
         predictions = self.finding.get('mitre_predictions', {})
