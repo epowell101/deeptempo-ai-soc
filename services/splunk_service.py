@@ -303,3 +303,4 @@ class SplunkService:
             logger.error(f"Error getting indexes: {e}")
             return None
 
+

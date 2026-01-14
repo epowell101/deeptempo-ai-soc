@@ -280,3 +280,4 @@ class SplunkConfigDialog(QDialog):
         
         return 168  # Default to 7 days
 
+
