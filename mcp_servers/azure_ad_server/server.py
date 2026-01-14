@@ -12,13 +12,19 @@ import mcp.server.stdio
 logger = logging.getLogger(__name__)
 
 def get_azure_ad_config():
-    """Get Azure Active Directory configuration from integrations config."""
+    """Get Azure Ad configuration from integrations config."""
     try:
-        from ui.integrations_config import IntegrationsConfigDialog
-        config = IntegrationsConfigDialog.get_integration_config('azure_ad')
+        import sys
+        from pathlib import Path
+        # Add parent directory to path to import config_utils
+        parent_dir = str(Path(__file__).parent.parent)
+        if parent_dir not in sys.path:
+            sys.path.insert(0, parent_dir)
+        from config_utils import get_integration_config
+        config = get_integration_config('azure_ad')
         return config
     except Exception as e:
-        logger.error(f"Error loading Azure Active Directory config: {e}")
+        logger.error(f"Error loading Azure Ad config: {e}")
         return {}
 
 server = Server("azure_ad-server")

@@ -30,8 +30,14 @@ class RateLimiter:
 def get_virustotal_config():
     """Get VirusTotal configuration from integrations config."""
     try:
-        from ui.integrations_config import IntegrationsConfigDialog
-        config = IntegrationsConfigDialog.get_integration_config('virustotal')
+        import sys
+        from pathlib import Path
+        # Add parent directory to path to import config_utils
+        parent_dir = str(Path(__file__).parent.parent)
+        if parent_dir not in sys.path:
+            sys.path.insert(0, parent_dir)
+        from config_utils import get_integration_config
+        config = get_integration_config('virustotal')
         return config
     except Exception as e:
         logger.error(f"Error loading VirusTotal config: {e}")

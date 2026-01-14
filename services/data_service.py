@@ -6,7 +6,9 @@ from pathlib import Path
 from typing import Optional, List, Dict, Any
 from datetime import datetime
 import os
-import keyring
+import sys
+sys.path.insert(0, str(Path(__file__).parent.parent / "backend"))
+from secrets_manager import get_secret
 
 logger = logging.getLogger(__name__)
 
@@ -101,9 +103,8 @@ class DataService:
                 with open(config_file, 'r') as f:
                     config = json.load(f)
                 
-                SERVICE_NAME = "deeptempo-ai-soc"
-                access_key = keyring.get_password(SERVICE_NAME, "s3_access_key_id") or ""
-                secret_key = keyring.get_password(SERVICE_NAME, "s3_secret_access_key") or ""
+                access_key = get_secret("AWS_ACCESS_KEY_ID") or ""
+                secret_key = get_secret("AWS_SECRET_ACCESS_KEY") or ""
                 
                 self.set_data_source(
                     "s3",
@@ -415,6 +416,8 @@ class DataService:
                     case['status'] = updates['status']
                 if 'priority' in updates:
                     case['priority'] = updates['priority']
+                if 'assignee' in updates:
+                    case['assignee'] = updates['assignee']
                 if 'notes' in updates:
                     if 'notes' not in case:
                         case['notes'] = []
@@ -426,10 +429,38 @@ class DataService:
                     case['title'] = updates['title']
                 if 'description' in updates:
                     case['description'] = updates['description']
+                if 'activities' in updates:
+                    case['activities'] = updates['activities']
+                if 'resolution_steps' in updates:
+                    case['resolution_steps'] = updates['resolution_steps']
+                if 'finding_ids' in updates:
+                    case['finding_ids'] = updates['finding_ids']
                 
                 case['updated_at'] = datetime.utcnow().isoformat() + "Z"
                 
                 return self.save_cases(cases)
+        
+        return False
+    
+    def delete_case(self, case_id: str) -> bool:
+        """
+        Delete a case.
+        
+        Args:
+            case_id: The case ID to delete.
+        
+        Returns:
+            True if successful, False otherwise.
+        """
+        cases = self.get_cases()
+        initial_length = len(cases)
+        
+        # Filter out the case to delete
+        cases = [c for c in cases if c.get('case_id') != case_id]
+        
+        # Check if a case was removed
+        if len(cases) < initial_length:
+            return self.save_cases(cases)
         
         return False
     

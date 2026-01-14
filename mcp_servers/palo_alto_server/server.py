@@ -12,13 +12,19 @@ import mcp.server.stdio
 logger = logging.getLogger(__name__)
 
 def get_palo_alto_config():
-    """Get Palo Alto Networks configuration from integrations config."""
+    """Get Palo Alto configuration from integrations config."""
     try:
-        from ui.integrations_config import IntegrationsConfigDialog
-        config = IntegrationsConfigDialog.get_integration_config('palo_alto')
+        import sys
+        from pathlib import Path
+        # Add parent directory to path to import config_utils
+        parent_dir = str(Path(__file__).parent.parent)
+        if parent_dir not in sys.path:
+            sys.path.insert(0, parent_dir)
+        from config_utils import get_integration_config
+        config = get_integration_config('palo_alto')
         return config
     except Exception as e:
-        logger.error(f"Error loading Palo Alto Networks config: {e}")
+        logger.error(f"Error loading Palo Alto config: {e}")
         return {}
 
 server = Server("palo_alto-server")

@@ -1,0 +1,91 @@
+# DeepTempo AI SOC Web Application - Requirements
+# Python 3.10+ required
+
+# Core dependencies
+numpy>=1.24.0
+
+# Web Backend (FastAPI)
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+python-multipart>=0.0.6
+websockets>=12.0
+
+# Desktop UI dependencies (for backward compatibility - optional)
+# PyQt6>=6.6.0
+# PyQt6-WebEngine>=6.6.0
+# qdarkstyle>=3.2.0
+
+# Claude API
+anthropic>=0.18.0
+
+# Security and Authentication
+keyring>=24.0.0
+
+# PDF Reports
+reportlab>=4.0.0
+
+# Database (PostgreSQL)
+sqlalchemy>=2.0.0
+psycopg2-binary>=2.9.9
+alembic>=1.13.0
+
+# Timesketch integration
+requests>=2.31.0
+
+# Splunk integration
+urllib3>=2.0.0
+
+# AWS S3 integration
+boto3>=1.34.0
+
+# Visualization dependencies
+networkx>=3.0
+pyvis>=0.3.0
+plotly>=5.17.0
+pandas>=2.0.0
+
+# Integration-specific dependencies (optional - install as needed)
+# NOTE: These are commented out by default to avoid installation issues.
+# Uncomment only the integrations you need, and install separately.
+
+# Threat Intelligence
+# pymisp>=2.4.170  # MISP integration
+# pycti>=5.12.0  # OpenCTI integration
+# shodan>=1.30.1  # Shodan integration
+
+# Incident Management & Ticketing
+# jira>=3.5.0  # Jira integration
+# pdpyras>=5.1.0  # PagerDuty integration
+# pysnow>=0.7.17  # ServiceNow integration
+
+# Communications
+# slack_sdk>=3.23.0  # Slack integration
+# msal>=1.24.1  # Microsoft Teams/Graph API
+
+# EDR/XDR Platforms
+# azure-identity>=1.14.0  # Microsoft Defender authentication
+# azure-mgmt-security>=5.0.0  # Microsoft Defender API
+
+# Cloud Security
+# azure-mgmt-sentinel>=1.0.0  # Azure Sentinel integration - Package not available
+# google-cloud-security-command-center>=1.23.0  # GCP Security integration
+
+# Network Security
+# pan-os-python>=1.11.0  # Palo Alto Networks integration
+
+# Vulnerability Management
+# tenable-io>=1.16.0  # Tenable integration
+
+# Data Storage & Search
+# elasticsearch>=8.10.0  # Elasticsearch integration
+# psycopg2-binary>=2.9.9  # PostgreSQL integration
+
+# Utilities
+# PyGithub>=2.1.1  # GitHub integration
+
+# Development dependencies
+# pytest>=7.0.0
+# pytest-asyncio>=0.21.0
+# black>=23.0.0
+# ruff>=0.0.270
+

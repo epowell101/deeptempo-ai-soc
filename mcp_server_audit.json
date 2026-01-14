@@ -1,0 +1,382 @@
+[
+  {
+    "name": "alienvault_otx_server",
+    "status": "implemented",
+    "status_color": "\u001b[92m",
+    "todos": 0,
+    "loc": 267,
+    "tools": [
+      "otx_get_pulses",
+      "otx_search_indicators",
+      "otx_get_ioc_reputation"
+    ],
+    "tools_count": 3,
+    "notes": ""
+  },
+  {
+    "name": "anyrun_server",
+    "status": "implemented",
+    "status_color": "\u001b[92m",
+    "todos": 0,
+    "loc": 244,
+    "tools": [
+      "anyrun_submit_file",
+      "anyrun_get_report",
+      "anyrun_search_tasks"
+    ],
+    "tools_count": 3,
+    "notes": ""
+  },
+  {
+    "name": "approval_server",
+    "status": "implemented",
+    "status_color": "\u001b[92m",
+    "todos": 0,
+    "loc": 447,
+    "tools": [
+      "create_approval_action",
+      "list_approval_actions",
+      "get_approval_action",
+      "approve_action",
+      "reject_action",
+      "get_approval_stats",
+      "correlate_and_create_action"
+    ],
+    "tools_count": 7,
+    "notes": ""
+  },
+  {
+    "name": "aws_security_hub_server",
+    "status": "stub",
+    "status_color": "\u001b[91m",
+    "todos": 9,
+    "loc": 139,
+    "tools": [
+      "aws_get_findings",
+      "aws_get_insights",
+      "aws_update_findings",
+      "aws_get_compliance_status"
+    ],
+    "tools_count": 4,
+    "notes": ""
+  },
+  {
+    "name": "azure_ad_server",
+    "status": "stub",
+    "status_color": "\u001b[91m",
+    "todos": 11,
+    "loc": 157,
+    "tools": [
+      "azuread_get_user",
+      "azuread_disable_user",
+      "azuread_get_signin_logs",
+      "azuread_get_risky_users",
+      "azuread_reset_password"
+    ],
+    "tools_count": 5,
+    "notes": ""
+  },
+  {
+    "name": "azure_sentinel_server",
+    "status": "stub",
+    "status_color": "\u001b[91m",
+    "todos": 9,
+    "loc": 139,
+    "tools": [
+      "sentinel_query_logs",
+      "sentinel_get_incidents",
+      "sentinel_run_playbook",
+      "sentinel_update_incident"
+    ],
+    "tools_count": 4,
+    "notes": ""
+  },
+  {
+    "name": "carbon_black_server",
+    "status": "stub",
+    "status_color": "\u001b[91m",
+    "todos": 9,
+    "loc": 139,
+    "tools": [
+      "cb_query_processes",
+      "cb_isolate_endpoint",
+      "cb_search_binaries",
+      "cb_live_response"
+    ],
+    "tools_count": 4,
+    "notes": ""
+  },
+  {
+    "name": "crowdstrike_server",
+    "status": "implemented",
+    "status_color": "\u001b[92m",
+    "todos": 0,
+    "loc": 289,
+    "tools": [
+      "get_crowdstrike_alert_by_ip",
+      "crowdstrike_foundry_isolate",
+      "crowdstrike_foundry_unisolate",
+      "get_host_status"
+    ],
+    "tools_count": 4,
+    "notes": ""
+  },
+  {
+    "name": "deeptempo_findings_server",
+    "status": "implemented",
+    "status_color": "\u001b[92m",
+    "todos": 0,
+    "loc": 192,
+    "tools": [],
+    "tools_count": 0,
+    "notes": ""
+  },
+  {
+    "name": "gcp_security_server",
+    "status": "stub",
+    "status_color": "\u001b[91m",
+    "todos": 9,
+    "loc": 139,
+    "tools": [
+      "gcp_list_findings",
+      "gcp_list_assets",
+      "gcp_get_vulnerabilities",
+      "gcp_update_finding"
+    ],
+    "tools_count": 4,
+    "notes": ""
+  },
+  {
+    "name": "hybrid_analysis_server",
+    "status": "implemented",
+    "status_color": "\u001b[92m",
+    "todos": 0,
+    "loc": 289,
+    "tools": [
+      "ha_submit_file",
+      "ha_get_report",
+      "ha_search_hash",
+      "ha_get_similar_samples"
+    ],
+    "tools_count": 4,
+    "notes": ""
+  },
+  {
+    "name": "ip_geolocation_server",
+    "status": "implemented",
+    "status_color": "\u001b[92m",
+    "todos": 0,
+    "loc": 283,
+    "tools": [
+      "ipgeo_geolocate_ip",
+      "ipgeo_get_asn",
+      "ipgeo_get_abuse_contact",
+      "ipgeo_get_ip_reputation"
+    ],
+    "tools_count": 4,
+    "notes": ""
+  },
+  {
+    "name": "jira_server",
+    "status": "implemented",
+    "status_color": "\u001b[92m",
+    "todos": 0,
+    "loc": 376,
+    "tools": [
+      "jira_create_issue",
+      "jira_get_issue",
+      "jira_search_issues",
+      "jira_update_issue",
+      "jira_add_comment"
+    ],
+    "tools_count": 5,
+    "notes": ""
+  },
+  {
+    "name": "joe_sandbox_server",
+    "status": "implemented",
+    "status_color": "\u001b[92m",
+    "todos": 0,
+    "loc": 277,
+    "tools": [
+      "joe_submit_sample",
+      "joe_get_analysis",
+      "joe_search_behavior",
+      "joe_get_iocs"
+    ],
+    "tools_count": 4,
+    "notes": ""
+  },
+  {
+    "name": "microsoft_defender_server",
+    "status": "stub",
+    "status_color": "\u001b[91m",
+    "todos": 11,
+    "loc": 157,
+    "tools": [
+      "defender_get_alerts",
+      "defender_isolate_machine",
+      "defender_run_antivirus_scan",
+      "defender_get_machine_info",
+      "defender_get_vulnerabilities"
+    ],
+    "tools_count": 5,
+    "notes": ""
+  },
+  {
+    "name": "misp_server",
+    "status": "implemented",
+    "status_color": "\u001b[92m",
+    "todos": 0,
+    "loc": 435,
+    "tools": [
+      "misp_search_attributes",
+      "misp_get_event",
+      "misp_add_event",
+      "misp_add_attribute",
+      "misp_search_iocs",
+      "misp_add_sighting"
+    ],
+    "tools_count": 6,
+    "notes": ""
+  },
+  {
+    "name": "okta_server",
+    "status": "stub",
+    "status_color": "\u001b[91m",
+    "todos": 11,
+    "loc": 157,
+    "tools": [
+      "okta_get_user",
+      "okta_suspend_user",
+      "okta_reset_mfa",
+      "okta_get_auth_logs",
+      "okta_get_app_usage"
+    ],
+    "tools_count": 5,
+    "notes": ""
+  },
+  {
+    "name": "palo_alto_server",
+    "status": "stub",
+    "status_color": "\u001b[91m",
+    "todos": 11,
+    "loc": 157,
+    "tools": [
+      "pan_get_threat_logs",
+      "pan_block_ip",
+      "pan_block_url",
+      "pan_get_wildfire_report",
+      "pan_create_security_policy"
+    ],
+    "tools_count": 5,
+    "notes": ""
+  },
+  {
+    "name": "sentinelone_server",
+    "status": "stub",
+    "status_color": "\u001b[91m",
+    "todos": 9,
+    "loc": 139,
+    "tools": [
+      "s1_get_threats",
+      "s1_isolate_endpoint",
+      "s1_remediate_threat",
+      "s1_get_deep_visibility"
+    ],
+    "tools_count": 4,
+    "notes": ""
+  },
+  {
+    "name": "shodan_server",
+    "status": "implemented",
+    "status_color": "\u001b[92m",
+    "todos": 0,
+    "loc": 325,
+    "tools": [
+      "shodan_search_ip",
+      "shodan_search_exploits",
+      "shodan_get_host_info",
+      "shodan_search_vulnerabilities"
+    ],
+    "tools_count": 4,
+    "notes": ""
+  },
+  {
+    "name": "slack_server",
+    "status": "implemented",
+    "status_color": "\u001b[92m",
+    "todos": 0,
+    "loc": 373,
+    "tools": [
+      "slack_send_message",
+      "slack_send_alert",
+      "slack_get_channel_history",
+      "slack_create_channel"
+    ],
+    "tools_count": 4,
+    "notes": ""
+  },
+  {
+    "name": "splunk_server",
+    "status": "implemented",
+    "status_color": "\u001b[92m",
+    "todos": 0,
+    "loc": 485,
+    "tools": [
+      "generate_spl_query",
+      "execute_spl_search",
+      "get_splunk_indexes",
+      "search_by_ip",
+      "search_by_hostname",
+      "search_by_username",
+      "natural_language_search"
+    ],
+    "tools_count": 7,
+    "notes": ""
+  },
+  {
+    "name": "tempo_flow_server",
+    "status": "implemented",
+    "status_color": "\u001b[92m",
+    "todos": 0,
+    "loc": 166,
+    "tools": [
+      "get_tempo_flow_alert",
+      "get_flow_statistics"
+    ],
+    "tools_count": 2,
+    "notes": ""
+  },
+  {
+    "name": "url_analysis_server",
+    "status": "implemented",
+    "status_color": "\u001b[92m",
+    "todos": 0,
+    "loc": 278,
+    "tools": [
+      "url_check_safety",
+      "url_get_whois",
+      "url_get_dns_records",
+      "url_check_ssl_cert"
+    ],
+    "tools_count": 4,
+    "notes": ""
+  },
+  {
+    "name": "virustotal_server",
+    "status": "implemented",
+    "status_color": "\u001b[92m",
+    "todos": 0,
+    "loc": 359,
+    "tools": [
+      "vt_check_hash",
+      "vt_check_ip",
+      "vt_check_domain",
+      "vt_check_url",
+      "vt_get_file_report"
+    ],
+    "tools_count": 5,
+    "notes": ""
+  }
+]

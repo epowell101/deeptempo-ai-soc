@@ -14,8 +14,14 @@ logger = logging.getLogger(__name__)
 def get_slack_config():
     """Get Slack configuration from integrations config."""
     try:
-        from ui.integrations_config import IntegrationsConfigDialog
-        config = IntegrationsConfigDialog.get_integration_config('slack')
+        import sys
+        from pathlib import Path
+        # Add parent directory to path to import config_utils
+        parent_dir = str(Path(__file__).parent.parent)
+        if parent_dir not in sys.path:
+            sys.path.insert(0, parent_dir)
+        from config_utils import get_integration_config
+        config = get_integration_config('slack')
         return config
     except Exception as e:
         logger.error(f"Error loading Slack config: {e}")

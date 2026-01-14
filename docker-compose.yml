@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: deeptempo-postgres
+    environment:
+      POSTGRES_DB: deeptempo_soc
+      POSTGRES_USER: deeptempo
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-deeptempo_secure_password_change_me}
+      POSTGRES_INITDB_ARGS: "-E UTF8"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U deeptempo -d deeptempo_soc"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - deeptempo-network
+
+  # PgAdmin for database management (optional, can be commented out in production)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: deeptempo-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@deeptempo.ai}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    networks:
+      - deeptempo-network
+
+volumes:
+  postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+networks:
+  deeptempo-network:
+    driver: bridge
+

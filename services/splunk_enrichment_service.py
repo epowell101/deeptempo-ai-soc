@@ -7,7 +7,7 @@ from datetime import datetime
 import json
 
 from services.splunk_service import SplunkService
-from services.claude_service import ClaudeService
+from services.claude_factory import create_claude_service
 from services.data_service import DataService
 
 logger = logging.getLogger(__name__)
@@ -16,16 +16,16 @@ logger = logging.getLogger(__name__)
 class SplunkEnrichmentService:
     """Service for enriching cases and findings with Splunk data and Claude analysis."""
     
-    def __init__(self, splunk_service: SplunkService, claude_service: Optional[ClaudeService] = None):
+    def __init__(self, splunk_service: SplunkService, claude_service = None):
         """
         Initialize enrichment service.
         
         Args:
             splunk_service: Configured Splunk service
-            claude_service: Optional Claude service for AI analysis
+            claude_service: Optional Claude service for AI analysis (if None, creates one using factory)
         """
         self.splunk_service = splunk_service
-        self.claude_service = claude_service or ClaudeService(use_mcp_tools=False)
+        self.claude_service = claude_service or create_claude_service(use_mcp_tools=False)
         self.data_service = DataService()
     
     def extract_indicators(self, case: Dict, findings: List[Dict]) -> Dict[str, List[str]]:

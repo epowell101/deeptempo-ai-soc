@@ -27,13 +27,82 @@ Claude: [creates case, generates rollup] "Created case-2026-01-10-abc123.
         Primary techniques: T1071.001 (Web Protocols), T1573.001 (Encrypted Channel)..."
 ```
 
+## 🆕 New Features
+
+### AI-Powered Custom Integration Builder 🤖✨
+
+Build custom security integrations in minutes using AI! Simply provide API documentation and let Claude generate complete MCP server integrations automatically:
+
+- **🧠 AI-Powered Analysis**: Claude analyzes API docs and generates complete integration code
+- **⚡ Lightning Fast**: Go from documentation to working integration in under 5 minutes
+- **🎯 Zero Coding**: No programming knowledge required - just paste API docs
+- **🔧 Production Ready**: Generates complete MCP servers with error handling and validation
+- **📝 Auto Configuration**: Creates UI fields, schemas, and tool definitions automatically
+- **✅ Code Validation**: Built-in validation ensures generated code is correct
+
+**Example Use Case**: Want to add support for a new threat feed? Just paste the API docs and Claude will generate:
+- Integration configuration UI
+- Complete MCP server code  
+- Tool definitions for all API endpoints
+- Authentication handling
+
+**Quick Start**: Settings → Integrations → "Build Custom Integration"  
+**Full Guide**: See `docs/custom-integration-builder.md` for complete documentation  
+**Implementation Details**: See `CUSTOM_INTEGRATION_BUILDER.md` for technical overview
+
+### Cribl Stream Integration 🔄
+
+Optimize your security data pipeline with Cribl Stream integration:
+
+- **📊 Data Normalization**: Standardize logs before AI analysis for better accuracy
+- **💰 Cost Reduction**: Reduce SIEM ingestion costs by 30-50% through intelligent filtering
+- **🔍 Real-time Enrichment**: Add GeoIP, threat intel, and asset context automatically
+- **🚀 Multi-Destination Routing**: Send data to DeepTempo, Splunk, S3, and more simultaneously
+
+**Quick Start**: See `docs/cribl-quick-start.md` for 15-minute setup  
+**Full Guide**: See `docs/cribl-integration.md` for complete documentation
+
+### Comprehensive Case Management System
+
+In addition to conversational AI with Claude, the platform now includes a **full-featured React web UI** with comprehensive case management:
+
+### Key Features
+
+- **📋 Complete Case Management**: Create, track, and resolve security cases from detection to resolution
+- **🔍 Dynamic Finding Association**: Add/remove findings to cases on the fly
+- **📝 Activity Tracking**: Full audit trail with timestamped activities (notes, investigations, actions)
+- **✅ Resolution Workflow**: Document step-by-step resolution process with detailed actions and results
+- **📊 PDF Report Generation**: Generate professional reports including all activities and resolution steps
+- **🎯 Status Tracking**: Open, In Progress, Resolved, Closed with visual indicators
+- **👥 Case Assignment**: Track case ownership and responsibility
+
+### Quick Access
+
+```bash
+# Start the web UI (see QUICK_START_WEB.md for details)
+cd frontend
+npm install
+npm run dev
+# Access at http://localhost:5173
+```
+
+**Documentation:**
+- **Quick Start**: `QUICK_START_CASE_MANAGEMENT.md` - Get started in 5 minutes
+- **Full Guide**: `docs/case-management-system.md` - Complete feature documentation
+- **Demo Case**: Open "Suspicious Lateral Movement Detected" to see all features in action
+
 ## Quick Start
 
 ### Prerequisites
 
-- **Python 3.10+** (required for MCP SDK)
-- **Claude Desktop** ([download here](https://claude.ai/download))
+- **Python 3.10+** (required - 3.12 recommended)
+  - Required for Claude Agent SDK and all integrations
+  - Check version: `python3 --version`
+  - Upgrade if needed: See [PYTHON_COMPATIBILITY_GUIDE.md](PYTHON_COMPATIBILITY_GUIDE.md)
+- **Claude API Key** - Get yours at [console.anthropic.com](https://console.anthropic.com/)
 - **Git**
+
+> **Note for Server Deployments:** This application now supports flexible secrets management suitable for server environments. See [SECRETS_MIGRATION.md](SECRETS_MIGRATION.md) for details.
 
 ### Step 1: Clone and Set Up
 
@@ -42,13 +111,18 @@ Claude: [creates case, generates rollup] "Created case-2026-01-10-abc123.
 git clone https://github.com/epowell101/deeptempo-ai-soc.git
 cd deeptempo-ai-soc
 
-# Create a virtual environment (required)
+# Create a virtual environment (Python 3.10+ required)
 python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-# Install dependencies
+# Install all dependencies (includes Claude Agent SDK and all integrations)
 pip install -r requirements.txt
 pip install "mcp[cli]"
+
+# Configure secrets (for server deployments)
+cp env.example ~/.deeptempo/.env
+nano ~/.deeptempo/.env  # Add your CLAUDE_API_KEY and other secrets
+chmod 600 ~/.deeptempo/.env
 ```
 
 ### Step 2: Generate Sample Data

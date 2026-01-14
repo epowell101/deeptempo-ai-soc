@@ -1,146 +1,161 @@
 {
+  "$schema": "https://github.com/anthropics/anthropic-quickstarts/blob/main/mcp/config-schema.json",
   "mcpServers": {
+    
+    "_comment_infrastructure": "=== INFRASTRUCTURE & DEVELOPMENT (Community Servers) ===",
+    
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      }
+    },
+    
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres"],
+      "env": {
+        "POSTGRES_CONNECTION_STRING": "${POSTGRES_URL}"
+      }
+    },
+    
+    "_comment_custom": "=== CUSTOM BUSINESS LOGIC ===",
+    
     "deeptempo-findings": {
-      "command": "python",
-      "args": [
-        "-m",
-        "mcp_servers.deeptempo_findings_server.server"
-      ],
+      "command": "python3",
+      "args": ["-m", "mcp_servers.deeptempo_findings_server.server"],
       "cwd": "${workspaceFolder}",
       "env": {}
     },
-    "evidence-snippets": {
-      "command": "python",
-      "args": [
-        "-m",
-        "mcp_servers.evidence_snippets_server.server"
-      ],
-      "cwd": "${workspaceFolder}",
-      "env": {}
-    },
-    "case-store": {
-      "command": "python",
-      "args": [
-        "-m",
-        "mcp_servers.case_store_server.server"
-      ],
-      "cwd": "${workspaceFolder}",
-      "env": {}
-    },
+    
     "tempo-flow": {
-      "command": "python",
-      "args": [
-        "-m",
-        "mcp_servers.tempo_flow_server.server"
-      ],
+      "command": "python3",
+      "args": ["-m", "mcp_servers.tempo_flow_server.server"],
       "cwd": "${workspaceFolder}",
       "env": {}
     },
-    "crowdstrike": {
-      "command": "python",
-      "args": [
-        "-m",
-        "mcp_servers.crowdstrike_server.server"
-      ],
-      "cwd": "${workspaceFolder}",
-      "env": {}
-    },
-    "splunk": {
-      "command": "python",
-      "args": [
-        "-m",
-        "mcp_servers.splunk_server.server"
-      ],
-      "cwd": "${workspaceFolder}",
-      "env": {}
-    },
+    
     "approval": {
-      "command": "python",
-      "args": [
-        "-m",
-        "mcp_servers.approval_server.server"
-      ],
+      "command": "python3",
+      "args": ["-m", "mcp_servers.approval_server.server"],
       "cwd": "${workspaceFolder}",
       "env": {}
     },
-    "alienvault-otx": {
-      "command": "python",
-      "args": [
-        "-m",
-        "mcp_servers.alienvault_otx_server.server"
-      ],
+    
+    "_comment_edr": "=== EDR/XDR PLATFORMS ===",
+    
+    "crowdstrike": {
+      "command": "python3",
+      "args": ["-m", "mcp_servers.crowdstrike_server.server"],
       "cwd": "${workspaceFolder}",
       "env": {}
     },
-    "shodan": {
-      "command": "python",
-      "args": [
-        "-m",
-        "mcp_servers.shodan_server.server"
-      ],
+    
+    "_comment_siem": "=== SIEM ===",
+    
+    "splunk": {
+      "command": "python3",
+      "args": ["-m", "mcp_servers.splunk_server.server"],
       "cwd": "${workspaceFolder}",
       "env": {}
     },
-    "ip-geolocation": {
-      "command": "python",
-      "args": [
-        "-m",
-        "mcp_servers.ip_geolocation_server.server"
-      ],
-      "cwd": "${workspaceFolder}",
-      "env": {}
-    },
-    "url-analysis": {
-      "command": "python",
-      "args": [
-        "-m",
-        "mcp_servers.url_analysis_server.server"
-      ],
-      "cwd": "${workspaceFolder}",
-      "env": {}
-    },
-    "hybrid-analysis": {
-      "command": "python",
-      "args": [
-        "-m",
-        "mcp_servers.hybrid_analysis_server.server"
-      ],
-      "cwd": "${workspaceFolder}",
-      "env": {}
-    },
-    "joe-sandbox": {
-      "command": "python",
-      "args": [
-        "-m",
-        "mcp_servers.joe_sandbox_server.server"
-      ],
-      "cwd": "${workspaceFolder}",
-      "env": {}
-    },
-    "anyrun": {
-      "command": "python",
-      "args": [
-        "-m",
-        "mcp_servers.anyrun_server.server"
-      ],
-      "cwd": "${workspaceFolder}",
-      "env": {}
-    },
+    
+    "_comment_communication": "=== COMMUNICATION & COLLABORATION ===",
+    
     "slack": {
-      "command": "python",
-      "args": [
-        "-m",
-        "mcp_servers.slack_server.server"
-      ],
+      "command": "python3",
+      "args": ["-m", "mcp_servers.slack_server.server"],
       "cwd": "${workspaceFolder}",
       "env": {}
     },
+    
+    "pagerduty": {
+      "command": "python3",
+      "args": ["-m", "mcp_servers.pagerduty_server.server"],
+      "cwd": "${workspaceFolder}",
+      "env": {}
+    },
+    
+    "microsoft-teams": {
+      "command": "python3",
+      "args": ["-m", "mcp_servers.microsoft_teams_server.server"],
+      "cwd": "${workspaceFolder}",
+      "env": {}
+    },
+    
+    "_comment_ticketing": "=== TICKETING & INCIDENT MANAGEMENT ===",
+    
     "jira": {
-      "command": "python",
-      "args": [
-        "-m",
-        "mcp_servers.jira_server.server"
-      ],
+      "command": "python3",
+      "args": ["-m", "mcp_servers.jira_server.server"],
+      "cwd": "${workspaceFolder}",
+      "env": {}
+    },
+    
+    "_comment_threat_intel": "=== THREAT INTELLIGENCE ===",
+    
+    "virustotal": {
+      "command": "python3",
+      "args": ["-m", "mcp_servers.virustotal_server.server"],
+      "cwd": "${workspaceFolder}",
+      "env": {}
+    },
+    
+    "alienvault-otx": {
+      "command": "python3",
+      "args": ["-m", "mcp_servers.alienvault_otx_server.server"],
+      "cwd": "${workspaceFolder}",
+      "env": {}
+    },
+    
+    "shodan": {
+      "command": "python3",
+      "args": ["-m", "mcp_servers.shodan_server.server"],
+      "cwd": "${workspaceFolder}",
+      "env": {}
+    },
+    
+    "misp": {
+      "command": "python3",
+      "args": ["-m", "mcp_servers.misp_server.server"],
+      "cwd": "${workspaceFolder}",
+      "env": {}
+    },
+    
+    "url-analysis": {
+      "command": "python3",
+      "args": ["-m", "mcp_servers.url_analysis_server.server"],
+      "cwd": "${workspaceFolder}",
+      "env": {}
+    },
+    
+    "ip-geolocation": {
+      "command": "python3",
+      "args": ["-m", "mcp_servers.ip_geolocation_server.server"],
+      "cwd": "${workspaceFolder}",
+      "env": {}
+    },
+    
+    "_comment_sandbox": "=== SANDBOX ANALYSIS ===",
+    
+    "hybrid-analysis": {
+      "command": "python3",
+      "args": ["-m", "mcp_servers.hybrid_analysis_server.server"],
+      "cwd": "${workspaceFolder}",
+      "env": {}
+    },
+    
+    "joe-sandbox": {
+      "command": "python3",
+      "args": ["-m", "mcp_servers.joe_sandbox_server.server"],
+      "cwd": "${workspaceFolder}",
+      "env": {}
+    },
+    
+    "anyrun": {
+      "command": "python3",
+      "args": ["-m", "mcp_servers.anyrun_server.server"],
       "cwd": "${workspaceFolder}",
       "env": {}
     }

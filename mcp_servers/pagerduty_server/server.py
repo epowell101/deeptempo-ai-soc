@@ -14,8 +14,14 @@ logger = logging.getLogger(__name__)
 def get_pagerduty_config():
     """Get PagerDuty configuration from integrations config."""
     try:
-        from ui.integrations_config import IntegrationsConfigDialog
-        config = IntegrationsConfigDialog.get_integration_config('pagerduty')
+        import sys
+        from pathlib import Path
+        # Add parent directory to path to import config_utils
+        parent_dir = str(Path(__file__).parent.parent)
+        if parent_dir not in sys.path:
+            sys.path.insert(0, parent_dir)
+        from config_utils import get_integration_config
+        config = get_integration_config('pagerduty')
         return config
     except Exception as e:
         logger.error(f"Error loading PagerDuty config: {e}")
@@ -28,49 +34,60 @@ async def handle_list_tools() -> list[types.Tool]:
     """List available PagerDuty tools."""
     return [
         types.Tool(
-            name="pd_create_incident",
-            description="Create a PagerDuty incident",
+            name="pagerduty_create_incident",
+            description="Create a new incident in PagerDuty for critical security events.",
             inputSchema={
                 "type": "object",
                 "properties": {
-                    # TODO: Define tool parameters
+                    "title": {
+                        "type": "string",
+                        "description": "Incident title/summary"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Detailed incident description"
+                    },
+                    "urgency": {
+                        "type": "string",
+                        "description": "Incident urgency (high or low)",
+                        "enum": ["high", "low"]
+                    },
+                    "severity": {
+                        "type": "string",
+                        "description": "Incident severity",
+                        "enum": ["critical", "error", "warning", "info"]
+                    }
                 },
-                "required": []
+                "required": ["title", "description"]
             }
         ),
         types.Tool(
-            name="pd_acknowledge_incident",
-            description="Acknowledge an incident",
+            name="pagerduty_send_alert",
+            description="Send an alert to PagerDuty using Events API v2.",
             inputSchema={
                 "type": "object",
                 "properties": {
-                    # TODO: Define tool parameters
+                    "summary": {
+                        "type": "string",
+                        "description": "Brief summary of the alert"
+                    },
+                    "severity": {
+                        "type": "string",
+                        "description": "Alert severity",
+                        "enum": ["critical", "error", "warning", "info"]
+                    },
+                    "source": {
+                        "type": "string",
+                        "description": "Source of the alert (e.g., 'DeepTempo AI SOC')"
+                    },
+                    "custom_details": {
+                        "type": "object",
+                        "description": "Additional details as key-value pairs"
+                    }
                 },
-                "required": []
+                "required": ["summary", "severity"]
             }
         ),
-        types.Tool(
-            name="pd_get_on_call",
-            description="Get current on-call information",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    # TODO: Define tool parameters
-                },
-                "required": []
-            }
-        ),
-        types.Tool(
-            name="pd_trigger_escalation",
-            description="Trigger escalation policy",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    # TODO: Define tool parameters
-                },
-                "required": []
-            }
-        )
     ]
 
 @server.call_tool()
@@ -79,78 +96,42 @@ async def handle_call_tool(
 ) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Handle tool execution requests."""
     
-    config = get_pagerduty_config()
+    if not arguments:
+        arguments = {}
     
+    config = get_pagerduty_config()
     if not config:
         return [types.TextContent(
             type="text",
-            text=json.dumps({
-                "error": "PagerDuty not configured",
-                "message": "Please configure PagerDuty in Settings > Integrations"
-            }, indent=2)
+            text="PagerDuty integration not configured. Please configure in Settings → Integrations."
         )]
     
-    try:
-        # TODO: Implement tool handlers
-        
-        if name == "pd_create_incident":
-            # TODO: Implement pd_create_incident
-            return [types.TextContent(
-                type="text",
-                text=json.dumps({
-                    "error": "Not implemented",
-                    "message": "This tool is not yet implemented"
-                }, indent=2)
-            )]
-        
-
-        if name == "pd_acknowledge_incident":
-            # TODO: Implement pd_acknowledge_incident
-            return [types.TextContent(
-                type="text",
-                text=json.dumps({
-                    "error": "Not implemented",
-                    "message": "This tool is not yet implemented"
-                }, indent=2)
-            )]
-        
-
-        if name == "pd_get_on_call":
-            # TODO: Implement pd_get_on_call
-            return [types.TextContent(
-                type="text",
-                text=json.dumps({
-                    "error": "Not implemented",
-                    "message": "This tool is not yet implemented"
-                }, indent=2)
-            )]
-        
-
-        if name == "pd_trigger_escalation":
-            # TODO: Implement pd_trigger_escalation
-            return [types.TextContent(
-                type="text",
-                text=json.dumps({
-                    "error": "Not implemented",
-                    "message": "This tool is not yet implemented"
-                }, indent=2)
-            )]
-        
-        
+    if name == "pagerduty_create_incident":
+        # Mock implementation - replace with actual PagerDuty API call
+        result = {
+            "status": "success",
+            "message": f"Incident created: {arguments.get('title')}",
+            "incident_id": "mock-incident-001",
+            "urgency": arguments.get('urgency', config.get('default_urgency', 'high')),
+            "note": "This is a mock response. Implement actual PagerDuty API integration."
+        }
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "pagerduty_send_alert":
+        # Mock implementation - replace with actual Events API v2 call
+        result = {
+            "status": "success",
+            "message": f"Alert sent: {arguments.get('summary')}",
+            "dedup_key": "mock-dedup-key-001",
+            "note": "This is a mock response. Implement actual PagerDuty Events API v2 integration."
+        }
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    else:
         raise ValueError(f"Unknown tool: {name}")
-    
-    except Exception as e:
-        logger.error(f"Error in PagerDuty tool {name}: {e}")
-        return [types.TextContent(
-            type="text",
-            text=json.dumps({
-                "error": str(e),
-                "tool": name
-            }, indent=2)
-        )]
 
 async def main():
-    """Run the PagerDuty MCP server."""
+    """Run the MCP server."""
     async with mcp.server.stdio.stdio_server() as (read_stream, write_stream):
         await server.run(
             read_stream,
@@ -167,3 +148,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+

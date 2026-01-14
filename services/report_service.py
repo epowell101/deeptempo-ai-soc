@@ -341,6 +341,66 @@ class ReportService:
                     story.append(Spacer(1, 0.1*inch))
                 story.append(Spacer(1, 0.2*inch))
             
+            # Activities
+            activities = case.get('activities', [])
+            if activities:
+                story.append(Paragraph("Case Activities", self.styles['CustomHeading']))
+                activities_data = [["Timestamp", "Type", "Description"]]
+                for activity in activities:
+                    timestamp = activity.get('timestamp', 'N/A')
+                    if 'T' in timestamp:
+                        timestamp = timestamp.split('T')[0] + ' ' + timestamp.split('T')[1].split('.')[0]
+                    activity_type = activity.get('activity_type', 'N/A').replace('_', ' ').title()
+                    description = activity.get('description', 'N/A')[:100]
+                    activities_data.append([timestamp, activity_type, description])
+                
+                activities_table = Table(activities_data, colWidths=[2*inch, 1.5*inch, 2.5*inch])
+                activities_table.setStyle(TableStyle([
+                    ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#9b59b6')),
+                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                    ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                    ('FONTSIZE', (0, 0), (-1, 0), 10),
+                    ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+                    ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+                    ('FONTSIZE', (0, 1), (-1, -1), 9),
+                ]))
+                story.append(activities_table)
+                story.append(Spacer(1, 0.2*inch))
+            
+            # Resolution Steps
+            resolution_steps = case.get('resolution_steps', [])
+            if resolution_steps:
+                story.append(Paragraph("Resolution Steps", self.styles['CustomHeading']))
+                for i, step in enumerate(resolution_steps, 1):
+                    story.append(Paragraph(f"Step {i}: {step.get('description', 'N/A')}", 
+                                          self.styles['CustomSubheading']))
+                    
+                    step_info = [
+                        ["Field", "Value"],
+                        ["Timestamp", step.get('timestamp', 'N/A')],
+                        ["Action Taken", step.get('action_taken', 'N/A')],
+                    ]
+                    
+                    result = step.get('result', '')
+                    if result:
+                        step_info.append(["Result", result])
+                    
+                    step_table = Table(step_info, colWidths=[2*inch, 4*inch])
+                    step_table.setStyle(TableStyle([
+                        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#27ae60')),
+                        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                        ('FONTSIZE', (0, 0), (-1, 0), 10),
+                        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+                        ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+                        ('FONTSIZE', (0, 1), (-1, -1), 9),
+                    ]))
+                    story.append(step_table)
+                    story.append(Spacer(1, 0.15*inch))
+                story.append(Spacer(1, 0.2*inch))
+            
             # Findings
             story.append(Paragraph(f"Related Findings ({len(findings)})", self.styles['CustomHeading']))
             

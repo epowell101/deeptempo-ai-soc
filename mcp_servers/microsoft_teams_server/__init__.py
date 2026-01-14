@@ -1,1 +1,2 @@
-"""Microsoft Teams MCP Server for Enterprise collaboration platform."""
+"""Microsoft Teams MCP Server."""
+

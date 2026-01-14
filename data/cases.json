@@ -104,6 +104,117 @@
       ],
       "created_at": "2026-01-12T13:39:04.460739Z",
       "updated_at": "2026-01-12T13:39:04.460739Z"
+    },
+    {
+      "case_id": "case-2026-01-14-demo001",
+      "title": "Suspicious Lateral Movement Detected",
+      "description": "Multiple authentication attempts detected across network segments, indicating possible lateral movement by compromised account. Initial detection shows abnormal SMB traffic patterns and multiple failed login attempts.",
+      "finding_ids": [
+        "f-20260109-9bfe5ba7",
+        "f-20260109-a975f660",
+        "f-20260109-445da0ed"
+      ],
+      "status": "resolved",
+      "priority": "critical",
+      "assignee": "security.analyst@company.com",
+      "tags": [
+        "lateral-movement",
+        "compromised-account",
+        "demo"
+      ],
+      "notes": [],
+      "timeline": [
+        {
+          "timestamp": "2026-01-14T09:00:00.000000Z",
+          "event": "Case created"
+        },
+        {
+          "timestamp": "2026-01-14T09:15:00.000000Z",
+          "event": "Status changed to in-progress"
+        },
+        {
+          "timestamp": "2026-01-14T14:30:00.000000Z",
+          "event": "Status changed to resolved"
+        }
+      ],
+      "activities": [
+        {
+          "timestamp": "2026-01-14T09:05:00.000000Z",
+          "activity_type": "note",
+          "description": "Initial triage completed. Identified source account: jsmith@corp.local. Account shows activity from multiple IPs.",
+          "details": {}
+        },
+        {
+          "timestamp": "2026-01-14T09:30:00.000000Z",
+          "activity_type": "investigation",
+          "description": "Reviewed authentication logs. Found 47 failed login attempts followed by 3 successful authentications to servers in different VLANs.",
+          "details": {}
+        },
+        {
+          "timestamp": "2026-01-14T10:00:00.000000Z",
+          "activity_type": "action_taken",
+          "description": "Disabled compromised account jsmith@corp.local in Active Directory. Contacted user to verify recent activity.",
+          "details": {}
+        },
+        {
+          "timestamp": "2026-01-14T11:15:00.000000Z",
+          "activity_type": "investigation",
+          "description": "User confirmed they did not perform these actions. Account credentials likely compromised. Reviewing EDR logs on accessed systems.",
+          "details": {}
+        },
+        {
+          "timestamp": "2026-01-14T12:00:00.000000Z",
+          "activity_type": "finding_added",
+          "description": "Added related findings showing suspicious process execution on target servers.",
+          "details": {}
+        },
+        {
+          "timestamp": "2026-01-14T14:00:00.000000Z",
+          "activity_type": "note",
+          "description": "All affected systems cleaned and returned to service. Enhanced monitoring deployed. User password reset with MFA enabled.",
+          "details": {}
+        }
+      ],
+      "resolution_steps": [
+        {
+          "timestamp": "2026-01-14T10:05:00.000000Z",
+          "description": "Account Containment",
+          "action_taken": "Immediately disabled the compromised account jsmith@corp.local in Active Directory. Terminated all active sessions associated with the account across the network. Notified user via phone to verify legitimate activity.",
+          "result": "Account successfully disabled within 5 minutes of detection. All active sessions terminated. User confirmed suspicious activity. No legitimate business impact."
+        },
+        {
+          "timestamp": "2026-01-14T11:00:00.000000Z",
+          "description": "Evidence Collection",
+          "action_taken": "Collected authentication logs from domain controllers spanning past 7 days. Captured EDR logs from 5 accessed servers. Exported firewall logs showing network connections. Created forensic snapshots of 2 most-impacted servers (SRV-2024-042, SRV-2024-089).",
+          "result": "Successfully collected 12GB of log data. Identified attack timeline from initial compromise to detection. Found evidence of credential dumping tool execution on workstation WS-2024-156."
+        },
+        {
+          "timestamp": "2026-01-14T12:30:00.000000Z",
+          "description": "Lateral Movement Analysis",
+          "action_taken": "Analyzed network traffic patterns using SIEM correlation rules. Identified 5 compromised systems accessed via SMB and RDP. Reviewed process execution logs on each system. Identified malicious binary 'svchost32.exe' (mimicking legitimate process) running on 3 systems.",
+          "result": "Confirmed attacker accessed 5 systems total. Stole credentials from LSASS memory on 2 systems. Attempted to access file shares containing sensitive data. No evidence of successful data exfiltration detected."
+        },
+        {
+          "timestamp": "2026-01-14T13:15:00.000000Z",
+          "description": "System Remediation",
+          "action_taken": "Isolated affected systems from network. Killed malicious processes. Removed persistence mechanisms (scheduled tasks, registry keys). Cleared cached credentials. Applied security patches. Reimaged 2 most-compromised systems. Reset passwords for 15 accounts that authenticated to compromised systems.",
+          "result": "All malicious artifacts removed. No persistence mechanisms remaining. All affected systems cleaned and validated. 15 user accounts secured with password resets. Systems returned to production after 48-hour monitoring period with no suspicious activity."
+        },
+        {
+          "timestamp": "2026-01-14T14:00:00.000000Z",
+          "description": "Prevention & Monitoring",
+          "action_taken": "Deployed enhanced EDR detection rules for credential dumping tools. Enabled MFA for all accounts in affected department. Created network monitoring rules for unusual SMB/RDP patterns. Added IOCs to threat intelligence feeds (file hashes, C2 domains). Scheduled follow-up security awareness training.",
+          "result": "Enhanced detection rules deployed and validated. MFA enabled for 87 users. Monitoring rules detecting similar patterns in real-time. IOCs distributed to all security tools. Training scheduled for next week."
+        },
+        {
+          "timestamp": "2026-01-14T14:30:00.000000Z",
+          "description": "Documentation & Reporting",
+          "action_taken": "Generated comprehensive incident report including timeline, affected systems, IOCs, and remediation steps. Created MITRE ATT&CK mapping (T1078 - Valid Accounts, T1021 - Remote Services, T1003 - Credential Dumping). Updated incident response playbook with lessons learned. Notified management and compliance team.",
+          "result": "Complete incident documentation created and archived. MITRE mapping completed for threat intelligence. Playbook updated with 3 process improvements identified. Management and compliance teams briefed on incident and resolution."
+        }
+      ],
+      "created_at": "2026-01-14T09:00:00.000000Z",
+      "updated_at": "2026-01-14T15:26:44.762260Z"
     }
   ]
 }

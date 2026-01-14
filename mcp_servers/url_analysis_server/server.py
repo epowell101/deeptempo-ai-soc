@@ -12,13 +12,19 @@ import mcp.server.stdio
 logger = logging.getLogger(__name__)
 
 def get_url_analysis_config():
-    """Get URL Analysis configuration from integrations config."""
+    """Get Url Analysis configuration from integrations config."""
     try:
-        from ui.integrations_config import IntegrationsConfigDialog
-        config = IntegrationsConfigDialog.get_integration_config('url_analysis')
+        import sys
+        from pathlib import Path
+        # Add parent directory to path to import config_utils
+        parent_dir = str(Path(__file__).parent.parent)
+        if parent_dir not in sys.path:
+            sys.path.insert(0, parent_dir)
+        from config_utils import get_integration_config
+        config = get_integration_config('url_analysis')
         return config
     except Exception as e:
-        logger.error(f"Error loading URL Analysis config: {e}")
+        logger.error(f"Error loading Url Analysis config: {e}")
         return {}
 
 server = Server("url_analysis-server")

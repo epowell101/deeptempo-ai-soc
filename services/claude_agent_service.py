@@ -54,22 +54,78 @@ class ClaudeAgentService:
     
     def _get_default_system_prompt(self) -> str:
         """Get default system prompt."""
-        return """You are Claude, an AI assistant for security operations and analysis.
+        return """You are Claude, an AI assistant for security operations and analysis in the DeepTempo AI SOC platform.
 
-When working with security findings and cases:
-- Provide clear, actionable analysis
-- Use available tools to gather information
-- Correlate findings when patterns emerge
-- Be thorough but efficient in your analysis"""
+<default_to_action>
+By default, implement changes rather than only suggesting them. If the user's intent is unclear, infer the most useful likely action and proceed, using tools to discover any missing details instead of guessing. Try to infer the user's intent about whether a tool call is intended or not, and act accordingly.
+</default_to_action>
+
+<use_parallel_tool_calls>
+If you intend to call multiple tools and there are no dependencies between the tool calls, make all of the independent tool calls in parallel. Prioritize calling tools simultaneously whenever the actions can be done in parallel rather than sequentially. Maximize use of parallel tool calls where possible to increase speed and efficiency.
+</use_parallel_tool_calls>
+
+<investigate_before_answering>
+Never speculate about data you have not retrieved. If the user references a specific finding, case, or other security entity, you MUST use the appropriate MCP tool to fetch it before answering. Make sure to investigate and retrieve relevant data BEFORE answering questions. Never make any claims about security data before investigating - give grounded and hallucination-free answers.
+</investigate_before_answering>
+
+<available_mcp_tools>
+You have access to MCP (Model Context Protocol) tools that connect to various security platforms and data sources. The tools are prefixed with the server name (e.g., "deeptempo-findings_get_finding"). Use these tools to:
+
+1. **Findings & Cases**: Retrieve and analyze security findings from DeepTempo LogLM
+   - Finding IDs start with "f-" (e.g., "f-20260109-40d9379b")
+   - Case IDs start with "case-" (e.g., "case-12345")
+   - Use tools like: list_findings, get_finding, list_cases, get_case
+
+2. **Security Integrations**: Query data from various security platforms
+   - The available integrations are dynamically loaded based on what's configured
+   - Tools are named with the pattern: {integration-name}_{tool-name}
+   - Check your available tools to see which integrations are active
+
+3. **Threat Intelligence**: Analyze indicators, URLs, files, etc.
+   - Use tools for VirusTotal, Shodan, AnyRun, Hybrid Analysis, etc. (if available)
+   - These help enrich findings with external context
+
+4. **Investigation Workflows**: Execute predefined investigation workflows
+   - Automate common SOC investigation patterns
+   - Use tempo_flow_server tools for workflows
+
+When a user mentions an ID or entity (finding, case, IP, hash, domain), ALWAYS use the appropriate MCP tool to retrieve it first. Never try to access these as files - they are stored in databases and accessed via MCP tools.
+</available_mcp_tools>
+
+<recognizing_security_entities>
+Common patterns you should recognize and how to handle them:
+
+- Finding IDs: "f-YYYYMMDD-XXXXXXXX" → Use deeptempo-findings_get_finding tool
+- Case IDs: "case-" prefix → Use case-store_get_case tool  
+- IP addresses: X.X.X.X → Consider using IP geolocation or threat intel tools
+- Domain names: example.com → Consider using URL analysis or threat intel tools
+- File hashes: MD5/SHA1/SHA256 → Consider using malware analysis tools
+- URLs: http(s)://... → Consider using URL analysis tools
+
+IMPORTANT: When a user says "analyze [ID]", "check [ID]", "investigate [ID]", etc., your FIRST action should ALWAYS be to use the appropriate MCP tool to fetch that entity's data.
+</recognizing_security_entities>
+
+<security_analysis_workflow>
+When analyzing security findings and cases:
+1. **Retrieve**: Use MCP tools to fetch the finding/case data first
+2. **Understand**: Parse the severity, data source, MITRE techniques, and context
+3. **Correlate**: Look for related findings or patterns using similarity/correlation tools
+4. **Enrich**: Use threat intelligence tools to add external context
+5. **Analyze**: Provide clear assessment of the threat, impact, and recommended actions
+6. **Act**: Be thorough but efficient - prioritize actionable insights
+</security_analysis_workflow>
+
+Your goal is to help SOC analysts work more efficiently by leveraging all available tools and integrations to provide comprehensive, accurate, and actionable security analysis."""
     
     def _load_api_key(self) -> bool:
         """Load API key from secure storage."""
         try:
-            # Try keyring first
+            # Use secrets manager with fallback to legacy names
             try:
-                self.api_key = keyring.get_password(self.SERVICE_NAME, self.API_KEY_NAME)
-                if not self.api_key:
-                    self.api_key = keyring.get_password(self.SERVICE_NAME, "anthropic_api_key")
+                self.api_key = (get_secret("CLAUDE_API_KEY") or 
+                               get_secret("ANTHROPIC_API_KEY") or
+                               get_secret("claude_api_key") or
+                               get_secret("anthropic_api_key"))
             except Exception:
                 pass
             
@@ -101,45 +157,60 @@ When working with security findings and cases:
             
             mcp_client = get_mcp_client()
             if mcp_client:
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
+                # Try to use existing event loop or create a new one
                 try:
-                    tools_dict = loop.run_until_complete(mcp_client.list_tools())
-                    seen_tool_names = set()
+                    # Check if there's already a running loop
+                    loop = asyncio.get_running_loop()
+                    # If we're in an async context, use cached tools
+                    logger.info("Running in async context - using cached MCP tools")
+                    tools_dict = mcp_client.tools_cache
+                    if not tools_dict:
+                        logger.warning("No cached MCP tools available yet. Tools will be loaded on first use.")
+                        return
+                except RuntimeError:
+                    # No running loop, safe to create one
+                    loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(loop)
                     
-                    for server_name, server_tools in tools_dict.items():
-                        for tool in server_tools:
-                            tool_name = f"{server_name}_{tool['name']}"
-                            
-                            if tool_name in seen_tool_names:
-                                continue
-                            seen_tool_names.add(tool_name)
-                            
-                            input_schema = tool.get("inputSchema", {})
-                            if hasattr(input_schema, 'model_dump'):
-                                input_schema = input_schema.model_dump()
-                            elif not isinstance(input_schema, dict):
-                                input_schema = dict(input_schema) if input_schema else {}
-                            
-                            if not input_schema or "type" not in input_schema:
-                                input_schema = {
-                                    "type": "object",
-                                    "properties": {},
-                                    "required": []
-                                }
-                            
-                            # Store tool metadata for Agent SDK tool conversion
-                            self.mcp_tools.append({
-                                "name": tool_name,
-                                "server_name": server_name,
-                                "actual_name": tool['name'],
-                                "description": f"[{server_name}] {tool.get('description', '')}",
-                                "input_schema": input_schema
-                            })
-                    
-                    logger.info(f"Loaded {len(self.mcp_tools)} MCP tools from {len(tools_dict)} servers")
-                finally:
-                    loop.close()
+                    try:
+                        tools_dict = loop.run_until_complete(mcp_client.list_tools())
+                    finally:
+                        loop.close()
+                
+                seen_tool_names = set()
+                
+                for server_name, server_tools in tools_dict.items():
+                    for tool in server_tools:
+                        tool_name = f"{server_name}_{tool['name']}"
+                        
+                        if tool_name in seen_tool_names:
+                            continue
+                        seen_tool_names.add(tool_name)
+                        
+                        input_schema = tool.get("inputSchema", {})
+                        if hasattr(input_schema, 'model_dump'):
+                            input_schema = input_schema.model_dump()
+                        elif not isinstance(input_schema, dict):
+                            input_schema = dict(input_schema) if input_schema else {}
+                        
+                        if not input_schema or "type" not in input_schema:
+                            input_schema = {
+                                "type": "object",
+                                "properties": {},
+                                "required": []
+                            }
+                        
+                        # Store tool metadata for Agent SDK tool conversion
+                        self.mcp_tools.append({
+                            "name": tool_name,
+                            "server_name": server_name,
+                            "actual_name": tool['name'],
+                            "description": f"[{server_name}] {tool.get('description', '')}",
+                            "input_schema": input_schema
+                        })
+                
+                if self.mcp_tools:
+                    logger.info(f"✓ Loaded {len(self.mcp_tools)} MCP tools from {len(tools_dict)} servers")
         except Exception as e:
             logger.warning(f"Could not load MCP tools: {e}")
             self.mcp_tools = []
@@ -183,7 +254,7 @@ When working with security findings and cases:
         
         if save:
             try:
-                keyring.set_password(self.SERVICE_NAME, self.API_KEY_NAME, self.api_key)
+                set_secret("CLAUDE_API_KEY", self.api_key)
             except Exception:
                 config_file = Path.home() / ".deeptempo" / "config.json"
                 config_file.parent.mkdir(parents=True, exist_ok=True)
@@ -266,14 +337,16 @@ When working with security findings and cases:
         try:
             async for message_chunk in query(prompt=full_prompt, options=options):
                 if message_chunk.type == "assistant":
-                    # Extract text content from assistant message
+                    # Extract text content from assistant message (skip thinking blocks)
                     content = message_chunk.data.message.get('content', [])
                     if isinstance(content, list):
                         for block in content:
                             if isinstance(block, dict) and block.get('type') == 'text':
                                 yield block.get('text', '')
-                            elif hasattr(block, 'text'):
-                                yield block.text
+                            elif hasattr(block, 'type') and hasattr(block, 'text'):
+                                # Only yield if it's a text block, not a thinking block
+                                if block.type == 'text':
+                                    yield block.text
                     elif isinstance(content, str):
                         yield content
                 elif message_chunk.type == "tool_use":

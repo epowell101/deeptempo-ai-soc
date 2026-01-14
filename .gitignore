@@ -1,5 +1,89 @@
-claude-api.txt
-
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 venv/
-TestOutputs/
-timesketch/
+ENV/
+env/
+
+# PyQt6
+*.pyc
+*.pyo
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Data (keep structure, not actual data)
+# data/*.json
+# Uncomment above to ignore data files
+
+# Secrets
+*.pem
+*.key
+.env
+.env.local
+config.json
+*_config.json
+!mcp-config.json
+
+# Node.js / React
+frontend/node_modules/
+frontend/build/
+frontend/dist/
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+# Build artifacts
+*.pyc
+*.pyd
+*.exe
+*.dll
+
+# Test outputs
+TestOutputs/*.pdf
+!TestOutputs/.gitkeep
+
+# Timesketch
+timesketch/data/
+timesketch/logs/
+timesketch/upload/
+timesketch/etc/
+
+# Temporary files
+tmp/
+temp/
+*.tmp

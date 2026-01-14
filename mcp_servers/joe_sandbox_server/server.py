@@ -14,8 +14,14 @@ logger = logging.getLogger(__name__)
 def get_joe_sandbox_config():
     """Get Joe Sandbox configuration from integrations config."""
     try:
-        from ui.integrations_config import IntegrationsConfigDialog
-        config = IntegrationsConfigDialog.get_integration_config('joe_sandbox')
+        import sys
+        from pathlib import Path
+        # Add parent directory to path to import config_utils
+        parent_dir = str(Path(__file__).parent.parent)
+        if parent_dir not in sys.path:
+            sys.path.insert(0, parent_dir)
+        from config_utils import get_integration_config
+        config = get_integration_config('joe_sandbox')
         return config
     except Exception as e:
         logger.error(f"Error loading Joe Sandbox config: {e}")

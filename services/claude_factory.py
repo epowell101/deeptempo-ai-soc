@@ -26,7 +26,7 @@ class ClaudeServiceFactory:
         except Exception:
             pass
         
-        return "direct"  # Default to direct implementation
+        return "agent_sdk"  # Default to Claude Agent SDK (Python 3.10+ required)
     
     @classmethod
     def set_default_implementation(cls, implementation: ClaudeImplementation):
@@ -75,9 +75,15 @@ class ClaudeServiceFactory:
                 from services.claude_agent_service import ClaudeAgentService
                 return ClaudeAgentService(**kwargs)
             except ImportError as e:
-                raise ImportError(
-                    "Claude Agent SDK not installed. Install with: pip install claude-agent-sdk"
-                ) from e
+                # Fall back to direct implementation if agent SDK not available
+                import sys
+                logger = __import__('logging').getLogger(__name__)
+                logger.warning(
+                    f"Claude Agent SDK not available (requires Python 3.10+, you have {sys.version_info.major}.{sys.version_info.minor}). "
+                    f"Falling back to direct implementation."
+                )
+                from services.claude_service import ClaudeService
+                return ClaudeService(**kwargs)
         
         else:
             raise ValueError(

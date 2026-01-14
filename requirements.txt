@@ -1,24 +1,33 @@
 # DeepTempo AI SOC - Requirements
-# Python 3.10+ required
+# Python 3.10+ required (Python 3.13 supported)
+#
+# INSTALLATION:
+# pip install -r requirements.txt
+#
+# PYTHON 3.13 COMPATIBILITY:
+# - Most integrations: ✅ Compatible
+# - Commented out (incompatible):
+#   • pysnow (ServiceNow) - conflicts with pandas 2.2.0
+#   • google-cloud-security-command-center - max Python 3.12
+#   • tenable-io - not yet compatible
+#   • azure-mgmt-sentinel - package not available on PyPI
+#
+# See INTEGRATION_COMPATIBILITY_SYSTEM.md for dynamic compatibility checking
 
 # Core dependencies
-numpy>=1.24.0
+numpy>=1.26.0  # Required for Python 3.12 compatibility
 
 # MCP SDK (for running MCP servers and client)
 # Note: Install with: pip install mcp
 # mcp>=0.1.0
 
-# Desktop UI dependencies
-PyQt6>=6.6.0
-PyQt6-WebEngine>=6.6.0
+# Core API dependencies
 anthropic>=0.18.0
-qdarkstyle>=3.2.0
 keyring>=24.0.0
 reportlab>=4.0.0
 
-# Optional: Claude Agent SDK (alternative to direct anthropic SDK)
-# Uncomment to use Agent SDK implementation:
-# claude-agent-sdk>=0.1.0
+# Claude Agent SDK (enhanced agent features)
+claude-agent-sdk>=0.1.0
 
 # Timesketch integration
 requests>=2.31.0
@@ -36,16 +45,18 @@ boto3>=1.34.0
 # Optional: For enhanced vector search
 # faiss-cpu>=1.7.4
 
-# Optional: Material Design theme (for UI reskin)
-# qt-material>=2.14
 
 # Visualization dependencies (from Streamlit UI)
 networkx>=3.0
 pyvis>=0.3.0
 plotly>=5.17.0
-pandas>=2.0.0
+pandas>=2.2.0  # Required for Python 3.13 support
 
-# Integration-specific dependencies (optional - install as needed for enabled integrations)
+# ============================================================================
+# Integration dependencies (Python 3.10+ required)
+# All integrations are enabled by default
+# ============================================================================
+
 # Threat Intelligence
 pymisp>=2.4.170  # MISP integration
 pycti>=5.12.0  # OpenCTI integration
@@ -54,7 +65,7 @@ shodan>=1.30.1  # Shodan integration
 # Incident Management & Ticketing
 jira>=3.5.0  # Jira integration
 pdpyras>=5.1.0  # PagerDuty integration
-pysnow>=0.7.17  # ServiceNow integration
+# pysnow>=0.7.17  # ServiceNow integration (conflicts with pandas 2.2.0 - requires old pytz version)
 
 # Communications
 slack_sdk>=3.23.0  # Slack integration
@@ -66,18 +77,20 @@ azure-mgmt-security>=5.0.0  # Microsoft Defender API
 
 # Cloud Security
 # boto3>=1.34.0  # Already included above for S3
-azure-mgmt-sentinel>=1.0.0  # Azure Sentinel integration
-google-cloud-security-command-center>=1.23.0  # GCP Security integration
+# azure-mgmt-sentinel  # Azure Sentinel integration (package may not be available - use Azure SDK for Python instead)
+# google-cloud-security-command-center>=1.23.0  # GCP Security integration (not compatible with Python 3.13 yet)
 
 # Network Security
 pan-os-python>=1.11.0  # Palo Alto Networks integration
 
 # Vulnerability Management
-tenable-io>=1.16.0  # Tenable integration
+# tenable-io>=1.16.0  # Tenable integration (not compatible with Python 3.13 yet)
 
 # Data Storage & Search
 elasticsearch>=8.10.0  # Elasticsearch integration
 psycopg2-binary>=2.9.9  # PostgreSQL integration
+sqlalchemy>=2.0.0  # SQLAlchemy ORM for database operations
+alembic>=1.13.0  # Database migrations
 
 # Utilities
 PyGithub>=2.1.1  # GitHub integration

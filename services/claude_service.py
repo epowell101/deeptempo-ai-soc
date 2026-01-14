@@ -5,9 +5,11 @@ import json
 import base64
 from typing import Optional, List, Dict, AsyncIterator, Union
 from pathlib import Path
-import keyring
 import platform
 import asyncio
+import sys
+sys.path.insert(0, str(Path(__file__).parent.parent / "backend"))
+from secrets_manager import get_secret, set_secret
 
 try:
     from anthropic import Anthropic, AsyncAnthropic
@@ -53,7 +55,7 @@ class ClaudeService:
     
     def _get_default_system_prompt(self) -> str:
         """Get default system prompt with Claude 4.5 best practices."""
-        return """You are Claude, an AI assistant created by Anthropic. You are helping with security operations and analysis.
+        return """You are Claude, an AI assistant for security operations and analysis in the DeepTempo AI SOC platform.
 
 <default_to_action>
 By default, implement changes rather than only suggesting them. If the user's intent is unclear, infer the most useful likely action and proceed, using tools to discover any missing details instead of guessing. Try to infer the user's intent about whether a tool call (e.g., file edit or read) is intended or not, and act accordingly.
@@ -64,40 +66,66 @@ If you intend to call multiple tools and there are no dependencies between the t
 </use_parallel_tool_calls>
 
 <investigate_before_answering>
-Never speculate about code or data you have not opened. If the user references a specific file or finding, you MUST read it before answering. Make sure to investigate and read relevant files BEFORE answering questions. Never make any claims about code or data before investigating unless you are certain of the correct answer - give grounded and hallucination-free answers.
+Never speculate about data you have not retrieved. If the user references a specific finding, case, or other security entity, you MUST use the appropriate MCP tool to fetch it before answering. Make sure to investigate and retrieve relevant data BEFORE answering questions. Never make any claims about security data before investigating - give grounded and hallucination-free answers.
 </investigate_before_answering>
 
-When working with security findings and cases:
-- Provide clear, actionable analysis
-- Use available tools to gather information
-- Correlate findings when patterns emerge
-- Be thorough but efficient in your analysis"""
+<available_mcp_tools>
+You have access to MCP (Model Context Protocol) tools that connect to various security platforms and data sources. The tools are prefixed with the server name (e.g., "deeptempo-findings_get_finding"). Use these tools to:
+
+1. **Findings & Cases**: Retrieve and analyze security findings from DeepTempo LogLM
+   - Finding IDs start with "f-" (e.g., "f-20260109-40d9379b")
+   - Case IDs start with "case-" (e.g., "case-12345")
+   - Use tools like: list_findings, get_finding, list_cases, get_case
+
+2. **Security Integrations**: Query data from various security platforms
+   - The available integrations are dynamically loaded based on what's configured
+   - Tools are named with the pattern: {integration-name}_{tool-name}
+   - Check your available tools to see which integrations are active
+
+3. **Threat Intelligence**: Analyze indicators, URLs, files, etc.
+   - Use tools for VirusTotal, Shodan, AnyRun, Hybrid Analysis, etc. (if available)
+   - These help enrich findings with external context
+
+4. **Investigation Workflows**: Execute predefined investigation workflows
+   - Automate common SOC investigation patterns
+   - Use tempo_flow_server tools for workflows
+
+When a user mentions an ID or entity (finding, case, IP, hash, domain), ALWAYS use the appropriate MCP tool to retrieve it first. Never try to access these as files - they are stored in databases and accessed via MCP tools.
+</available_mcp_tools>
+
+<recognizing_security_entities>
+Common patterns you should recognize and how to handle them:
+
+- Finding IDs: "f-YYYYMMDD-XXXXXXXX" → Use deeptempo-findings_get_finding tool
+- Case IDs: "case-" prefix → Use case-store_get_case tool  
+- IP addresses: X.X.X.X → Consider using IP geolocation or threat intel tools
+- Domain names: example.com → Consider using URL analysis or threat intel tools
+- File hashes: MD5/SHA1/SHA256 → Consider using malware analysis tools
+- URLs: http(s)://... → Consider using URL analysis tools
+
+IMPORTANT: When a user says "analyze [ID]", "check [ID]", "investigate [ID]", etc., your FIRST action should ALWAYS be to use the appropriate MCP tool to fetch that entity's data.
+</recognizing_security_entities>
+
+<security_analysis_workflow>
+When analyzing security findings and cases:
+1. **Retrieve**: Use MCP tools to fetch the finding/case data first
+2. **Understand**: Parse the severity, data source, MITRE techniques, and context
+3. **Correlate**: Look for related findings or patterns using similarity/correlation tools
+4. **Enrich**: Use threat intelligence tools to add external context
+5. **Analyze**: Provide clear assessment of the threat, impact, and recommended actions
+6. **Act**: Be thorough but efficient - prioritize actionable insights
+</security_analysis_workflow>
+
+Your goal is to help SOC analysts work more efficiently by leveraging all available tools and integrations to provide comprehensive, accurate, and actionable security analysis."""
     
     def _load_api_key(self) -> bool:
         """Load API key from secure storage."""
         try:
-            # Try keyring first (more secure)
-            try:
-                # Try new key name first (claude_api_key)
-                self.api_key = keyring.get_password(self.SERVICE_NAME, self.API_KEY_NAME)
-                # Fallback to old key name for backward compatibility
-                if not self.api_key:
-                    self.api_key = keyring.get_password(self.SERVICE_NAME, "anthropic_api_key")
-            except Exception:
-                pass
-            
-            # Fallback to config file
-            if not self.api_key:
-                config_file = Path.home() / ".deeptempo" / "config.json"
-                if config_file.exists():
-                    with open(config_file, 'r') as f:
-                        config = json.load(f)
-                        self.api_key = config.get('anthropic_api_key') or config.get('claude_api_key')
-            
-            # Also check environment variable
-            if not self.api_key:
-                import os
-                self.api_key = os.environ.get('ANTHROPIC_API_KEY')
+            # Use secrets manager with fallback to legacy names
+            self.api_key = (get_secret("CLAUDE_API_KEY") or 
+                           get_secret("ANTHROPIC_API_KEY") or
+                           get_secret("claude_api_key") or
+                           get_secret("anthropic_api_key"))
             
             if self.api_key and ANTHROPIC_AVAILABLE:
                 self.client = Anthropic(api_key=self.api_key)
@@ -121,51 +149,84 @@ When working with security findings and cases:
             
             mcp_client = get_mcp_client()
             if mcp_client:
-                # Run async function to get tools
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
+                # Try to use existing event loop or create a new one
                 try:
-                    tools_dict = loop.run_until_complete(mcp_client.list_tools())
-                    # Track tool names to prevent duplicates
-                    seen_tool_names = set()
+                    # Check if there's already a running loop
+                    loop = asyncio.get_running_loop()
+                    # If we're in an async context, we can't use run_until_complete
+                    # Instead, just use cached tools or skip loading
+                    logger.info("Running in async context - using cached MCP tools")
+                    tools_dict = mcp_client.tools_cache
+                    if not tools_dict:
+                        logger.warning("No cached MCP tools available yet. Tools will be loaded on first use.")
+                        return
+                except RuntimeError:
+                    # No running loop, safe to create one
+                    loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(loop)
                     
-                    # Flatten tools from all servers with server prefix
-                    for server_name, server_tools in tools_dict.items():
-                        for tool in server_tools:
-                            # Format for Claude API with server prefix
-                            tool_name = f"{server_name}_{tool['name']}"
+                    try:
+                        # First, try to get cached tools
+                        tools_dict = loop.run_until_complete(mcp_client.list_tools())
+                        
+                        # If no tools are cached, try to connect to servers
+                        if not tools_dict or all(len(tools) == 0 for tools in tools_dict.values()):
+                            logger.info("No cached MCP tools found, attempting to connect to servers...")
+                            servers = mcp_client.mcp_service.list_servers()
+                            for server_name in servers:
+                                try:
+                                    loop.run_until_complete(mcp_client.connect_to_server(server_name))
+                                except Exception as e:
+                                    logger.warning(f"Could not connect to {server_name}: {e}")
                             
-                            # Skip if we've already seen this tool name
-                            if tool_name in seen_tool_names:
-                                logger.warning(f"Skipping duplicate tool: {tool_name}")
-                                continue
-                            seen_tool_names.add(tool_name)
-                            
-                            # Get input schema - handle both dict and object formats
-                            input_schema = tool.get("inputSchema", {})
-                            if hasattr(input_schema, 'model_dump'):
-                                input_schema = input_schema.model_dump()
-                            elif not isinstance(input_schema, dict):
-                                input_schema = dict(input_schema) if input_schema else {}
-                            
-                            # Ensure input_schema has required structure
-                            if not input_schema or "type" not in input_schema:
-                                input_schema = {
-                                    "type": "object",
-                                    "properties": {},
-                                    "required": []
-                                }
-                            
-                            claude_tool = {
-                                "name": tool_name,
-                                "description": f"[{server_name}] {tool.get('description', '')}",
-                                "input_schema": input_schema
+                            # Try to get tools again after connecting
+                            tools_dict = loop.run_until_complete(mcp_client.list_tools())
+                    finally:
+                        loop.close()
+                
+                # Track tool names to prevent duplicates
+                seen_tool_names = set()
+                
+                # Flatten tools from all servers with server prefix
+                for server_name, server_tools in tools_dict.items():
+                    for tool in server_tools:
+                        # Format for Claude API with server prefix
+                        tool_name = f"{server_name}_{tool['name']}"
+                        
+                        # Skip if we've already seen this tool name
+                        if tool_name in seen_tool_names:
+                            logger.warning(f"Skipping duplicate tool: {tool_name}")
+                            continue
+                        seen_tool_names.add(tool_name)
+                        
+                        # Get input schema - handle both dict and object formats
+                        input_schema = tool.get("inputSchema", {})
+                        if hasattr(input_schema, 'model_dump'):
+                            input_schema = input_schema.model_dump()
+                        elif not isinstance(input_schema, dict):
+                            input_schema = dict(input_schema) if input_schema else {}
+                        
+                        # Ensure input_schema has required structure
+                        if not input_schema or "type" not in input_schema:
+                            input_schema = {
+                                "type": "object",
+                                "properties": {},
+                                "required": []
                             }
-                            self.mcp_tools.append(claude_tool)
-                    
-                    logger.info(f"Loaded {len(self.mcp_tools)} MCP tools from {len(tools_dict)} servers")
-                finally:
-                    loop.close()
+                        
+                        claude_tool = {
+                            "name": tool_name,
+                            "description": f"[{server_name}] {tool.get('description', '')}",
+                            "input_schema": input_schema
+                        }
+                        self.mcp_tools.append(claude_tool)
+                
+                if self.mcp_tools:
+                    tool_names = [t['name'] for t in self.mcp_tools]
+                    logger.info(f"✓ Loaded {len(self.mcp_tools)} MCP tools from {len(tools_dict)} servers")
+                    logger.debug(f"Available tools: {', '.join(tool_names)}")
+                else:
+                    logger.warning("No MCP tools were loaded. Check that MCP servers are configured and running.")
             else:
                 logger.warning("MCP client not available")
         except Exception as e:
@@ -197,23 +258,8 @@ When working with security findings and cases:
             self.async_client = AsyncAnthropic(api_key=self.api_key)
             
             if save:
-                # Try to save to keyring
-                try:
-                    keyring.set_password(self.SERVICE_NAME, self.API_KEY_NAME, self.api_key)
-                except Exception:
-                    # Fallback to config file
-                    config_file = Path.home() / ".deeptempo" / "config.json"
-                    config_file.parent.mkdir(parents=True, exist_ok=True)
-                    
-                    config = {}
-                    if config_file.exists():
-                        with open(config_file, 'r') as f:
-                            config = json.load(f)
-                    
-                    config['anthropic_api_key'] = self.api_key
-                    
-                    with open(config_file, 'w') as f:
-                        json.dump(config, f, indent=2)
+                # Save using secrets manager
+                set_secret("CLAUDE_API_KEY", self.api_key)
             
             return True
         
@@ -411,19 +457,23 @@ When working with security findings and cases:
                         logger.warning("Claude refused to respond to the request")
                         return "I apologize, but I cannot assist with that request."
                     
-                    # Extract text from response
+                    # Extract text from response (skip thinking blocks)
                     if final_response.content:
                         for content_block in final_response.content:
-                            if hasattr(content_block, 'text'):
-                                return content_block.text
-                            elif hasattr(content_block, 'type') and content_block.type == 'text':
-                                return content_block.text
+                            # Only return text from text blocks, skip thinking blocks
+                            if hasattr(content_block, 'type') and content_block.type == 'text':
+                                if hasattr(content_block, 'text'):
+                                    return content_block.text
                 finally:
                     loop.close()
             
-            # Extract text from response
+            # Extract text from response (skip thinking blocks)
             if response.content:
-                return response.content[0].text
+                for content_block in response.content:
+                    # Only return text from text blocks, skip thinking blocks
+                    if hasattr(content_block, 'type') and content_block.type == 'text':
+                        if hasattr(content_block, 'text'):
+                            return content_block.text
             
             return None
         
@@ -602,6 +652,7 @@ When working with security findings and cases:
             if response.stop_reason == "tool_use" and response.content:
                 # Yield initial text if any
                 for content_block in response.content:
+                    # Only process text blocks, skip thinking blocks and other types
                     if hasattr(content_block, 'type') and content_block.type == "text":
                         if hasattr(content_block, 'text'):
                             yield content_block.text
@@ -640,11 +691,15 @@ When working with security findings and cases:
                     iteration += 1
                     continue_response = await self.async_client.messages.create(**continue_kwargs)
                     
-                    # Stream text content
+                    # Stream text content - skip thinking blocks
                     for content_block in continue_response.content:
-                        if hasattr(content_block, 'type') and content_block.type == "text":
-                            if hasattr(content_block, 'text'):
+                        # Only yield text blocks, explicitly skip thinking blocks
+                        if hasattr(content_block, 'type'):
+                            if content_block.type == "text" and hasattr(content_block, 'text'):
                                 yield content_block.text
+                            # Skip thinking blocks silently
+                            elif content_block.type == "thinking":
+                                continue
                     
                     # Check if more tool use is needed
                     if continue_response.stop_reason == "tool_use" and continue_response.content:
@@ -663,11 +718,15 @@ When working with security findings and cases:
                         # Done - no more tool use
                         break
             else:
-                # No tool use - just stream the text response
+                # No tool use - just stream the text response (skip thinking blocks)
                 for content_block in response.content:
-                    if hasattr(content_block, 'type') and content_block.type == "text":
-                        if hasattr(content_block, 'text'):
+                    # Only yield text blocks, explicitly skip thinking blocks
+                    if hasattr(content_block, 'type'):
+                        if content_block.type == "text" and hasattr(content_block, 'text'):
                             yield content_block.text
+                        # Skip thinking blocks silently
+                        elif content_block.type == "thinking":
+                            continue
         
         except Exception as e:
             logger.error(f"Error in Claude chat stream: {e}")
