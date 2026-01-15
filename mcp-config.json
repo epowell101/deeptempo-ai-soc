@@ -14,10 +14,11 @@
     
     "postgres": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-postgres"],
-      "env": {
-        "POSTGRES_CONNECTION_STRING": "${POSTGRES_URL}"
-      }
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "${POSTGRESQL_CONNECTION_STRING}"
+      ]
     },
     
     "_comment_custom": "=== CUSTOM BUSINESS LOGIC ===",
@@ -39,6 +40,20 @@
     "approval": {
       "command": "python3",
       "args": ["-m", "mcp_servers.approval_server.server"],
+      "cwd": "${workspaceFolder}",
+      "env": {}
+    },
+    
+    "timesketch": {
+      "command": "python3",
+      "args": ["-m", "mcp_servers.timesketch_server.server"],
+      "cwd": "${workspaceFolder}",
+      "env": {}
+    },
+    
+    "attack-layer": {
+      "command": "python3",
+      "args": ["-m", "mcp_servers.attack_layer_server.server"],
       "cwd": "${workspaceFolder}",
       "env": {}
     },

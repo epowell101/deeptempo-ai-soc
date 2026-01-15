@@ -64,6 +64,7 @@ interface ChatTab {
   id: string
   title: string
   messages: Message[]
+  investigationKey?: string  // Unique key for finding+agent investigations to prevent duplicates
 }
 
 interface ClaudeDrawerProps {
@@ -94,12 +95,95 @@ interface AttachedFile {
 }
 
 export default function ClaudeDrawer({ open, onClose, initialMessages, initialAgentId, initialTitle }: ClaudeDrawerProps) {
+  // Helper function to strip thinking blocks from messages
+  const stripThinkingBlocks = (messages: Message[]): Message[] => {
+    return messages.map(msg => {
+      if (msg.role === 'assistant' && Array.isArray(msg.content)) {
+        // Filter out thinking blocks from content array
+        const filteredContent = msg.content.filter((block: ContentBlock) => block.type !== 'thinking')
+        // If only thinking blocks existed, convert to empty text
+        if (filteredContent.length === 0) {
+          return { ...msg, content: '' }
+        }
+        return { ...msg, content: filteredContent }
+      }
+      return msg
+    }).filter(msg => {
+      // Remove messages that have no content after filtering
+      if (msg.role === 'assistant' && msg.content === '') {
+        return false
+      }
+      return true
+    })
+  }
+
+  // Load persisted chat data from localStorage
+  const loadPersistedChatData = () => {
+    try {
+      const savedTabs = localStorage.getItem('claudeDrawerTabs')
+      const savedCurrentTab = localStorage.getItem('claudeDrawerCurrentTab')
+      
+      if (savedTabs) {
+        const parsedTabs = JSON.parse(savedTabs)
+        
+        // Clean up any thinking blocks from persisted messages
+        // This ensures compatibility when loading old sessions
+        const cleanedTabs = parsedTabs.map((tab: ChatTab) => ({
+          ...tab,
+          messages: tab.messages.map(msg => {
+            if (msg.role === 'assistant' && Array.isArray(msg.content)) {
+              // Filter out thinking blocks
+              const filteredContent = msg.content.filter((block: any) => block.type !== 'thinking')
+              return { ...msg, content: filteredContent.length > 0 ? filteredContent : msg.content }
+            }
+            return msg
+          })
+        }))
+        
+        return {
+          tabs: cleanedTabs,
+          currentTab: savedCurrentTab ? parseInt(savedCurrentTab, 10) : 0
+        }
+      }
+    } catch (error) {
+      console.error('Error loading persisted chat data:', error)
+    }
+    
+    return {
+      tabs: [{ id: '1', title: 'Chat 1', messages: [] }],
+      currentTab: 0
+    }
+  }
+
+  // Load persisted chat settings from localStorage
+  const loadPersistedSettings = () => {
+    try {
+      const savedSettings = localStorage.getItem('claudeDrawerSettings')
+      if (savedSettings) {
+        return JSON.parse(savedSettings)
+      }
+    } catch (error) {
+      console.error('Error loading persisted settings:', error)
+    }
+    
+    return {
+      model: 'claude-sonnet-4-20250514',
+      maxTokens: 4096,
+      enableThinking: false,
+      thinkingBudget: 10,
+      streaming: false,
+      systemPrompt: '',
+      selectedAgent: ''
+    }
+  }
+
+  const persistedData = loadPersistedChatData()
+  const persistedSettings = loadPersistedSettings()
+  
   // Tab management
-  const [tabs, setTabs] = useState<ChatTab[]>([
-    { id: '1', title: 'Chat 1', messages: [] },
-  ])
-  const [currentTab, setCurrentTab] = useState(0)
-  const [hasInitialized, setHasInitialized] = useState(false)
+  const [tabs, setTabs] = useState<ChatTab[]>(persistedData.tabs)
+  const [currentTab, setCurrentTab] = useState(persistedData.currentTab)
+  const [lastInvestigationId, setLastInvestigationId] = useState<string | null>(null)
   
   // Message input
   const [input, setInput] = useState('')
@@ -107,16 +191,16 @@ export default function ClaudeDrawer({ open, onClose, initialMessages, initialAg
   
   // Chat settings
   const [showSettings, setShowSettings] = useState(false)
-  const [model, setModel] = useState('claude-sonnet-4-20250514')
-  const [maxTokens, setMaxTokens] = useState(4096)
-  const [enableThinking, setEnableThinking] = useState(false)
-  const [thinkingBudget, setThinkingBudget] = useState(10)
-  const [streaming, setStreaming] = useState(false)
-  const [systemPrompt, setSystemPrompt] = useState('')
+  const [model, setModel] = useState(persistedSettings.model)
+  const [maxTokens, setMaxTokens] = useState(persistedSettings.maxTokens)
+  const [enableThinking, setEnableThinking] = useState(persistedSettings.enableThinking)
+  const [thinkingBudget, setThinkingBudget] = useState(persistedSettings.thinkingBudget)
+  const [streaming, setStreaming] = useState(persistedSettings.streaming)
+  const [systemPrompt, setSystemPrompt] = useState(persistedSettings.systemPrompt)
   
   // Agent selection
   const [agents, setAgents] = useState<Agent[]>([])
-  const [selectedAgent, setSelectedAgent] = useState<string>('')
+  const [selectedAgent, setSelectedAgent] = useState<string>(persistedSettings.selectedAgent)
   
   // Models list
   const [models, setModels] = useState<Model[]>([])
@@ -142,6 +226,42 @@ export default function ClaudeDrawer({ open, onClose, initialMessages, initialAg
     scrollToBottom()
   }, [tabs, currentTab])
 
+  // Persist tabs to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem('claudeDrawerTabs', JSON.stringify(tabs))
+    } catch (error) {
+      console.error('Error persisting tabs:', error)
+    }
+  }, [tabs])
+
+  // Persist current tab to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('claudeDrawerCurrentTab', currentTab.toString())
+    } catch (error) {
+      console.error('Error persisting current tab:', error)
+    }
+  }, [currentTab])
+
+  // Persist chat settings to localStorage whenever they change
+  useEffect(() => {
+    try {
+      const settings = {
+        model,
+        maxTokens,
+        enableThinking,
+        thinkingBudget,
+        streaming,
+        systemPrompt,
+        selectedAgent
+      }
+      localStorage.setItem('claudeDrawerSettings', JSON.stringify(settings))
+    } catch (error) {
+      console.error('Error persisting settings:', error)
+    }
+  }, [model, maxTokens, enableThinking, thinkingBudget, streaming, systemPrompt, selectedAgent])
+
   useEffect(() => {
     if (open) {
       loadAgents()
@@ -152,39 +272,82 @@ export default function ClaudeDrawer({ open, onClose, initialMessages, initialAg
 
   // Handle initial investigation data
   useEffect(() => {
+    // Create a unique ID for this investigation request
+    const investigationId = initialMessages && initialAgentId 
+      ? `${initialAgentId}-${JSON.stringify(initialMessages)}`
+      : null
+    
     console.log('Investigation useEffect triggered', { 
       open, 
       hasMessages: !!initialMessages && initialMessages.length > 0, 
       hasAgentId: !!initialAgentId,
-      hasInitialized 
+      investigationId,
+      lastInvestigationId
     })
     
-    if (open && initialMessages && initialMessages.length > 0 && initialAgentId && !hasInitialized) {
+    // Only proceed if:
+    // 1. Drawer is open
+    // 2. We have investigation data
+    // 3. This is a NEW investigation (different from the last one)
+    if (open && initialMessages && initialMessages.length > 0 && initialAgentId && investigationId !== lastInvestigationId) {
       console.log('Starting automatic investigation with agent:', initialAgentId)
-      setHasInitialized(true)
+      setLastInvestigationId(investigationId)
+      
+      // Extract finding ID from the first message (format: "analyze f-20260109-40d9379b...")
+      let findingId = ''
+      const firstMessageContent = typeof initialMessages[0]?.content === 'string' 
+        ? initialMessages[0].content 
+        : ''
+      const findingMatch = firstMessageContent.match(/f-\d{8}-[a-f0-9]{8}/i)
+      if (findingMatch) {
+        findingId = findingMatch[0]
+      }
+      
+      // Create investigation key to check for duplicates
+      const investigationKey = findingId ? `${findingId}-${initialAgentId}` : null
+      
+      // Check if we already have a tab for this investigation
+      const existingTabIndex = investigationKey 
+        ? tabs.findIndex(tab => tab.investigationKey === investigationKey)
+        : -1
+      
+      if (existingTabIndex !== -1) {
+        // Tab already exists - just switch to it
+        console.log('Found existing investigation tab, switching to it')
+        setCurrentTab(existingTabIndex)
+        setSelectedAgent(initialAgentId)
+        return // Don't create a new tab or start a new investigation
+      }
       
       // Create a new tab with the investigation
       const newTab: ChatTab = {
         id: `investigation-${Date.now()}`,
         title: initialTitle || 'Investigation',
-        messages: initialMessages
+        messages: initialMessages,
+        investigationKey: investigationKey || undefined
       }
       
-      setTabs([newTab])
-      setCurrentTab(0)
+      // Add new tab to existing tabs instead of replacing them
+      setTabs(prevTabs => [...prevTabs, newTab])
+      const newTabIndex = tabs.length // Index of the newly added tab
+      setCurrentTab(newTabIndex)
       setSelectedAgent(initialAgentId)
       setLoading(true)
       
       // Trigger the investigation by sending the message to the API
       const startInvestigation = async () => {
         try {
-          console.log('Sending investigation request to API...')
+          console.log('Sending investigation request to API with agent:', initialAgentId)
+          console.log('Initial messages:', initialMessages)
+          
+          // Explicitly enable thinking for investigations
+          // Investigation agents (investigator, threat_hunter, etc.) need extended thinking
           const response = await claudeApi.chat({
             messages: initialMessages,
             model: model || 'claude-sonnet-4-20250514',
-            max_tokens: maxTokens || 4096,
-            enable_thinking: enableThinking || false,
-            thinking_budget: (thinkingBudget || 10) * 1000,
+            max_tokens: 32768,  // Large token limit for investigations
+            enable_thinking: true,  // Always enable thinking for investigations
+            thinking_budget: 20000,  // 20k token budget (must be less than max_tokens)
             agent_id: initialAgentId,
             streaming: streaming || false,
           })
@@ -196,7 +359,14 @@ export default function ClaudeDrawer({ open, onClose, initialMessages, initialAg
             content: response.data.response || 'No response',
           }
           
-          setTabs([{ ...newTab, messages: [...initialMessages, assistantMessage] }])
+          // Update the specific tab that was created for this investigation
+          setTabs(prevTabs => 
+            prevTabs.map(tab => 
+              tab.id === newTab.id 
+                ? { ...tab, messages: [...initialMessages, assistantMessage] }
+                : tab
+            )
+          )
           
           // Send desktop notification for investigation completion
           notificationService.notifyInvestigationComplete({
@@ -210,7 +380,14 @@ export default function ClaudeDrawer({ open, onClose, initialMessages, initialAg
             role: 'assistant',
             content: `Error: ${error?.response?.data?.detail || 'Failed to get response'}`,
           }
-          setTabs([{ ...newTab, messages: [...initialMessages, errorMessage] }])
+          // Update the specific tab with the error message
+          setTabs(prevTabs => 
+            prevTabs.map(tab => 
+              tab.id === newTab.id 
+                ? { ...tab, messages: [...initialMessages, errorMessage] }
+                : tab
+            )
+          )
         } finally {
           setLoading(false)
         }
@@ -220,12 +397,12 @@ export default function ClaudeDrawer({ open, onClose, initialMessages, initialAg
       setTimeout(startInvestigation, 300)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, initialMessages, initialAgentId, initialTitle, hasInitialized])
+  }, [open, initialMessages, initialAgentId, initialTitle, lastInvestigationId])
 
-  // Reset initialization when drawer closes
+  // Reset investigation tracking when drawer closes
   useEffect(() => {
     if (!open) {
-      setHasInitialized(false)
+      setLastInvestigationId(null)
     }
   }, [open])
 
@@ -379,8 +556,13 @@ export default function ClaudeDrawer({ open, onClose, initialMessages, initialAg
     setLoading(true)
 
     try {
+      // Strip thinking blocks from messages if thinking is disabled
+      const messagesToSend = enableThinking 
+        ? newTabs[currentTab].messages 
+        : stripThinkingBlocks(newTabs[currentTab].messages)
+      
       const response = await claudeApi.chat({
-        messages: newTabs[currentTab].messages,
+        messages: messagesToSend,
         model,
         max_tokens: maxTokens,
         enable_thinking: enableThinking,
@@ -542,13 +724,20 @@ export default function ClaudeDrawer({ open, onClose, initialMessages, initialAg
 
         {/* Settings Panel */}
         <Collapse in={showSettings}>
-          <Box sx={{ p: 2, bgcolor: 'background.default', borderBottom: 1, borderColor: 'divider' }}>
+          <Box sx={{ 
+            p: 2, 
+            bgcolor: 'background.default', 
+            borderBottom: 1, 
+            borderColor: 'divider',
+            position: 'relative',
+            zIndex: 1
+          }}>
             <Accordion defaultExpanded>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography variant="subtitle2">Chat Settings</Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%' }}>
                   {/* Model Selection */}
                   <FormControl fullWidth size="small">
                     <InputLabel>Model</InputLabel>
@@ -599,7 +788,7 @@ export default function ClaudeDrawer({ open, onClose, initialMessages, initialAg
                   </FormControl>
 
                   {/* Extended Thinking */}
-                  <Box>
+                  <Box sx={{ width: '100%' }}>
                     <FormControlLabel
                       control={
                         <Checkbox
@@ -610,26 +799,30 @@ export default function ClaudeDrawer({ open, onClose, initialMessages, initialAg
                       label="Enable Extended Thinking"
                     />
                     {enableThinking && (
-                      <TextField
-                        fullWidth
-                        size="small"
-                        type="number"
-                        label="Thinking Budget (k tokens)"
-                        value={thinkingBudget}
-                        onChange={(e) => setThinkingBudget(parseInt(e.target.value) || 10)}
-                        inputProps={{ min: 1, max: 100, step: 1 }}
-                        helperText="Budget for extended thinking in thousands of tokens"
-                      />
+                      <Box sx={{ mt: 1, width: '100%' }}>
+                        <TextField
+                          fullWidth
+                          size="small"
+                          type="number"
+                          label="Thinking Budget (k tokens)"
+                          value={thinkingBudget}
+                          onChange={(e) => setThinkingBudget(parseInt(e.target.value) || 10)}
+                          inputProps={{ min: 1, max: 100, step: 1 }}
+                          helperText="Budget for extended thinking in thousands of tokens"
+                        />
+                      </Box>
                     )}
                   </Box>
 
                   {/* Streaming Toggle */}
-                  <FormControlLabel
-                    control={
-                      <Checkbox checked={streaming} onChange={(e) => setStreaming(e.target.checked)} />
-                    }
-                    label="Enable Streaming"
-                  />
+                  <Box sx={{ width: '100%' }}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox checked={streaming} onChange={(e) => setStreaming(e.target.checked)} />
+                      }
+                      label="Enable Streaming"
+                    />
+                  </Box>
 
                   {/* System Prompt */}
                   <TextField
@@ -695,7 +888,7 @@ export default function ClaudeDrawer({ open, onClose, initialMessages, initialAg
         </Box>
 
         {/* Tabs */}
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', position: 'relative', zIndex: 0 }}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Tabs
               value={currentTab}
@@ -727,7 +920,12 @@ export default function ClaudeDrawer({ open, onClose, initialMessages, initialAg
                 />
               ))}
             </Tabs>
-            <Button startIcon={<AddIcon />} onClick={handleNewTab} size="small" sx={{ m: 1 }}>
+            <Button 
+              startIcon={<AddIcon />} 
+              onClick={handleNewTab} 
+              size="small" 
+              sx={{ m: 1, minWidth: 'auto', whiteSpace: 'nowrap' }}
+            >
               New
             </Button>
           </Box>

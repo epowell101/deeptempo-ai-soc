@@ -71,10 +71,10 @@ Never speculate about data you have not retrieved. If the user references a spec
 <available_mcp_tools>
 You have access to MCP (Model Context Protocol) tools that connect to various security platforms and data sources. The tools are prefixed with the server name (e.g., "deeptempo-findings_get_finding"). Use these tools to:
 
-1. **Findings & Cases**: Retrieve and analyze security findings from DeepTempo LogLM
+1. **Findings & Cases**: Retrieve and analyze security findings and cases from DeepTempo
    - Finding IDs start with "f-" (e.g., "f-20260109-40d9379b")
-   - Case IDs start with "case-" (e.g., "case-12345")
-   - Use tools like: list_findings, get_finding, list_cases, get_case
+   - Case IDs start with "case-" (e.g., "case-20260114-a1b2c3d4")
+   - Use deeptempo-findings server tools: list_findings, get_finding, list_cases, get_case, create_case, update_case
 
 2. **Security Integrations**: Query data from various security platforms
    - The available integrations are dynamically loaded based on what's configured
@@ -89,6 +89,14 @@ You have access to MCP (Model Context Protocol) tools that connect to various se
    - Automate common SOC investigation patterns
    - Use tempo_flow_server tools for workflows
 
+5. **Log Analysis**: Search logs and create investigation timelines
+   - Use timesketch server tools: list_sketches, search_timesketch, create_sketch, export_to_timesketch
+   - Query logs for forensic analysis during investigations
+
+6. **MITRE ATT&CK Analysis**: Analyze and visualize attack techniques
+   - Use attack-layer server tools: get_technique_rollup, get_findings_by_technique, create_attack_layer
+   - Generate ATT&CK Navigator layers for visualization
+
 When a user mentions an ID or entity (finding, case, IP, hash, domain), ALWAYS use the appropriate MCP tool to retrieve it first. Never try to access these as files - they are stored in databases and accessed via MCP tools.
 </available_mcp_tools>
 
@@ -96,7 +104,7 @@ When a user mentions an ID or entity (finding, case, IP, hash, domain), ALWAYS u
 Common patterns you should recognize and how to handle them:
 
 - Finding IDs: "f-YYYYMMDD-XXXXXXXX" → Use deeptempo-findings_get_finding tool
-- Case IDs: "case-" prefix → Use case-store_get_case tool  
+- Case IDs: "case-YYYYMMDD-XXXXXXXX" → Use deeptempo-findings_get_case tool  
 - IP addresses: X.X.X.X → Consider using IP geolocation or threat intel tools
 - Domain names: example.com → Consider using URL analysis or threat intel tools
 - File hashes: MD5/SHA1/SHA256 → Consider using malware analysis tools
@@ -275,6 +283,52 @@ Your goal is to help SOC analysts work more efficiently by leveraging all availa
         """Check if API key is configured."""
         return self.api_key is not None
     
+    def _strip_thinking_blocks(self, messages: List[Dict]) -> List[Dict]:
+        """
+        Strip thinking blocks from assistant messages when thinking is disabled.
+        
+        This prevents errors when conversation history contains thinking blocks
+        but thinking mode is disabled for the current request.
+        """
+        cleaned_messages = []
+        for msg in messages:
+            if msg.get('role') == 'assistant':
+                content = msg.get('content')
+                if isinstance(content, list):
+                    # Filter out thinking blocks
+                    cleaned_content = []
+                    for block in content:
+                        if isinstance(block, dict):
+                            if block.get('type') != 'thinking':
+                                cleaned_content.append(block)
+                        elif hasattr(block, 'type'):
+                            if block.type != 'thinking':
+                                # Convert to dict format
+                                if block.type == 'text' and hasattr(block, 'text'):
+                                    cleaned_content.append({'type': 'text', 'text': block.text})
+                                elif block.type == 'tool_use':
+                                    cleaned_content.append({
+                                        'type': 'tool_use',
+                                        'id': getattr(block, 'id', ''),
+                                        'name': getattr(block, 'name', ''),
+                                        'input': getattr(block, 'input', {})
+                                    })
+                    
+                    # Only include message if it has non-thinking content
+                    if cleaned_content:
+                        cleaned_messages.append({
+                            'role': 'assistant',
+                            'content': cleaned_content
+                        })
+                elif isinstance(content, str):
+                    # String content doesn't contain thinking blocks
+                    cleaned_messages.append(msg)
+            else:
+                # Non-assistant messages pass through unchanged
+                cleaned_messages.append(msg)
+        
+        return cleaned_messages
+    
     async def chat_stream(self, message: str, system_prompt: Optional[str] = None,
                          context: Optional[List[Dict]] = None, model: str = "claude-sonnet-4-5-20250929",
                          images: Optional[List[Dict]] = None, max_tokens: int = 4096,
@@ -303,9 +357,16 @@ Your goal is to help SOC analysts work more efficiently by leveraging all availa
         import os
         os.environ['ANTHROPIC_API_KEY'] = self.api_key
         
+        # Determine thinking settings
+        use_thinking = enable_thinking if enable_thinking is not None else self.enable_thinking
+        
         # Build prompt with context
         full_prompt = message
         if context:
+            # If thinking is disabled, strip thinking blocks from context
+            if not use_thinking:
+                context = self._strip_thinking_blocks(context)
+            
             # Format context as conversation
             context_text = "\n\n".join([
                 f"{'User' if msg['role'] == 'user' else 'Assistant'}: {msg['content']}"

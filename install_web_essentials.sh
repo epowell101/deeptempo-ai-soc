@@ -20,47 +20,47 @@ echo ""
 echo "Installing core dependencies..."
 # Core dependencies
 pip install -q --upgrade pip
-pip install -q numpy>=1.24.0
+pip install -q "numpy>=1.24.0"
 
 echo "Installing web backend..."
 # Web Backend (FastAPI)
-pip install -q fastapi>=0.109.0
+pip install -q "fastapi>=0.109.0"
 pip install -q "uvicorn[standard]>=0.27.0"
-pip install -q python-multipart>=0.0.6
-pip install -q websockets>=12.0
+pip install -q "python-multipart>=0.0.6"
+pip install -q "websockets>=12.0"
 
 echo "Installing AI and security packages..."
 # Claude API
-pip install -q anthropic>=0.18.0
+pip install -q "anthropic>=0.18.0"
 
 # Security and Authentication
-pip install -q keyring>=24.0.0
+pip install -q "keyring>=24.0.0"
 
 echo "Installing database packages..."
 # Database (PostgreSQL)
-pip install -q sqlalchemy>=2.0.0
-pip install -q psycopg2-binary>=2.9.9
-pip install -q alembic>=1.13.0
+pip install -q "sqlalchemy>=2.0.0"
+pip install -q "psycopg2-binary>=2.9.9"
+pip install -q "alembic>=1.13.0"
 
 echo "Installing reporting and visualization..."
 # PDF Reports
-pip install -q reportlab>=4.0.0
+pip install -q "reportlab>=4.0.0"
 
 # Visualization dependencies
-pip install -q networkx>=3.0
-pip install -q pyvis>=0.3.0
-pip install -q plotly>=5.17.0
-pip install -q pandas>=2.0.0
+pip install -q "networkx>=3.0"
+pip install -q "pyvis>=0.3.0"
+pip install -q "plotly>=5.17.0"
+pip install -q "pandas>=2.0.0"
 
 echo "Installing integration packages..."
 # Timesketch integration
-pip install -q requests>=2.31.0
+pip install -q "requests>=2.31.0"
 
 # Splunk integration
-pip install -q urllib3>=2.0.0
+pip install -q "urllib3>=2.0.0"
 
 # AWS S3 integration
-pip install -q boto3>=1.34.0
+pip install -q "boto3>=1.34.0"
 
 echo ""
 echo "=========================================="

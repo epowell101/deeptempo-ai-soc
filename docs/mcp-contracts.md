@@ -364,11 +364,93 @@ Export raw logs for a time range.
 
 **Note:** This endpoint is disabled by default. Enable with `ENABLE_RAW_LOG_EXPORT=true`.
 
-## Case Store Server
+## DeepTempo Findings Server - Case Management
 
-### Tools
+Case management tools are now integrated into the DeepTempo Findings server (previously in separate case_store_server).
 
-#### `create_case`
+### Case Tools
+
+#### `deeptempo-findings_list_cases`
+
+List investigation cases with optional filters.
+
+**Parameters:**
+```json
+{
+    "status": {
+        "type": "string",
+        "enum": ["new", "in_progress", "resolved", "closed"],
+        "description": "Filter by case status"
+    },
+    "priority": {
+        "type": "string",
+        "enum": ["low", "medium", "high", "critical"],
+        "description": "Filter by priority"
+    },
+    "assignee": {
+        "type": "string",
+        "description": "Filter by assignee"
+    },
+    "limit": {
+        "type": "integer",
+        "default": 50
+    }
+}
+```
+
+**Returns:**
+```json
+{
+    "total": 10,
+    "cases": [
+        {
+            "case_id": "case-20260114-a1b2c3d4",
+            "title": "Suspicious lateral movement investigation",
+            "status": "in_progress",
+            "priority": "high",
+            "finding_count": 5,
+            "created_at": "2026-01-14T15:00:00Z"
+        }
+    ]
+}
+```
+
+#### `deeptempo-findings_get_case`
+
+Get detailed information about a specific case.
+
+**Parameters:**
+```json
+{
+    "case_id": {
+        "type": "string",
+        "required": true
+    },
+    "include_findings": {
+        "type": "boolean",
+        "default": true
+    }
+}
+```
+
+**Returns:**
+```json
+{
+    "case_id": "case-20260114-a1b2c3d4",
+    "title": "...",
+    "description": "...",
+    "status": "in_progress",
+    "priority": "high",
+    "assignee": "analyst@company.com",
+    "tags": ["malware", "lateral-movement"],
+    "findings": [...],
+    "notes": [...],
+    "timeline": [...],
+    "created_at": "2026-01-14T15:00:00Z"
+}
+```
+
+#### `deeptempo-findings_create_case`
 
 Create a new investigation case.
 
@@ -379,18 +461,24 @@ Create a new investigation case.
         "type": "string",
         "required": true
     },
-    "description": {
-        "type": "string"
-    },
     "finding_ids": {
         "type": "array",
         "items": {"type": "string"},
         "required": true
     },
+    "description": {
+        "type": "string",
+        "default": ""
+    },
     "priority": {
         "type": "string",
         "enum": ["low", "medium", "high", "critical"],
         "default": "medium"
+    },
+    "status": {
+        "type": "string",
+        "enum": ["new", "in_progress", "resolved", "closed"],
+        "default": "new"
     },
     "assignee": {
         "type": "string"
@@ -405,16 +493,16 @@ Create a new investigation case.
 **Returns:**
 ```json
 {
-    "case": {
-        "case_id": "case-2024-01-15-001",
-        "title": "...",
-        "status": "new",
-        "created_at": "2024-01-15T15:00:00Z"
-    }
+    "success": true,
+    "case_id": "case-20260114-a1b2c3d4",
+    "title": "...",
+    "status": "new",
+    "finding_count": 3,
+    "created_at": "2026-01-14T15:00:00Z"
 }
 ```
 
-#### `update_case`
+#### `deeptempo-findings_update_case`
 
 Update an existing case.
 

@@ -179,6 +179,29 @@ class MCPService:
         self.servers: Dict[str, MCPServer] = {}
         self._initialize_servers()
     
+    def _substitute_env_vars(self, value: str) -> str:
+        """
+        Substitute environment variables in a string.
+        Supports ${VAR_NAME} format.
+        
+        Args:
+            value: String that may contain environment variable references
+            
+        Returns:
+            String with environment variables substituted
+        """
+        import re
+        
+        # Pattern to match ${VAR_NAME}
+        pattern = r'\$\{([^}]+)\}'
+        
+        def replace_var(match):
+            var_name = match.group(1)
+            # Try to get from environment, return empty string if not found
+            return os.environ.get(var_name, '')
+        
+        return re.sub(pattern, replace_var, value)
+    
     def _detect_server_type(self, args: List[str]) -> str:
         """
         Detect if a server is FastMCP or stdio-based by checking the module path.
@@ -246,7 +269,10 @@ class MCPService:
                     env = server_config.get("env", {}).copy()
                     env["PYTHONPATH"] = project_path_str
                     
+                    # Get args and perform environment variable substitution
                     args = server_config.get("args", [])
+                    # Substitute environment variables in args (e.g., ${VAR_NAME})
+                    args = [self._substitute_env_vars(arg) for arg in args]
                     
                     server_configs.append({
                         "name": server_name,

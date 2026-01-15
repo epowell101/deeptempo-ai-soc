@@ -10,7 +10,7 @@ from datetime import datetime
 from sqlalchemy import select, func, or_, and_
 from sqlalchemy.orm import Session
 
-from database.models import Case, Finding, SketchMapping, AttackLayer, case_findings
+from database.models import Case, Finding, SketchMapping, AttackLayer, AIDecisionLog, case_findings
 from database.connection import get_db_manager
 
 logger = logging.getLogger(__name__)
@@ -529,4 +529,292 @@ class DatabaseService:
         except Exception as e:
             logger.error(f"Error getting finding statistics: {e}")
             return {'total': 0, 'by_severity': {}, 'by_data_source': {}}
+    
+    # ========== AI Decision Log Operations ==========
+    
+    def create_ai_decision(
+        self,
+        decision_id: str,
+        agent_id: str,
+        decision_type: str,
+        confidence_score: float,
+        reasoning: str,
+        recommended_action: str,
+        finding_id: Optional[str] = None,
+        case_id: Optional[str] = None,
+        workflow_id: Optional[str] = None,
+        decision_metadata: Optional[dict] = None
+    ) -> Optional[AIDecisionLog]:
+        """
+        Log an AI decision for tracking and feedback.
+        
+        Args:
+            decision_id: Unique decision identifier
+            agent_id: ID of the agent making the decision
+            decision_type: Type of decision (e.g., 'triage', 'escalate', 'isolate')
+            confidence_score: AI's confidence in the decision (0-1)
+            reasoning: AI's reasoning for the decision
+            recommended_action: Recommended action text
+            finding_id: Optional associated finding ID
+            case_id: Optional associated case ID
+            workflow_id: Optional workflow ID
+            decision_metadata: Optional additional metadata
+        
+        Returns:
+            Created AIDecisionLog or None if failed
+        """
+        try:
+            with self.db_manager.session_scope() as session:
+                decision = AIDecisionLog(
+                    decision_id=decision_id,
+                    agent_id=agent_id,
+                    decision_type=decision_type,
+                    confidence_score=confidence_score,
+                    reasoning=reasoning,
+                    recommended_action=recommended_action,
+                    finding_id=finding_id,
+                    case_id=case_id,
+                    workflow_id=workflow_id,
+                    decision_metadata=decision_metadata,
+                    timestamp=datetime.utcnow()
+                )
+                
+                session.add(decision)
+                session.flush()
+                
+                logger.info(f"Created AI decision log: {decision_id} by {agent_id}")
+                return decision
+        except Exception as e:
+            logger.error(f"Error creating AI decision log: {e}")
+            return None
+    
+    def submit_ai_decision_feedback(
+        self,
+        decision_id: str,
+        human_reviewer: str,
+        human_decision: str,
+        feedback_comment: Optional[str] = None,
+        accuracy_grade: Optional[float] = None,
+        reasoning_grade: Optional[float] = None,
+        action_appropriateness: Optional[float] = None,
+        actual_outcome: Optional[str] = None,
+        time_saved_minutes: Optional[int] = None
+    ) -> Optional[AIDecisionLog]:
+        """
+        Submit human feedback on an AI decision.
+        
+        Args:
+            decision_id: Decision to provide feedback on
+            human_reviewer: Name/ID of reviewer
+            human_decision: Human's decision ('agree', 'disagree', 'partial')
+            feedback_comment: Optional comment
+            accuracy_grade: Grade for accuracy (0-1)
+            reasoning_grade: Grade for reasoning quality (0-1)
+            action_appropriateness: Grade for action appropriateness (0-1)
+            actual_outcome: Actual outcome ('true_positive', 'false_positive', etc.)
+            time_saved_minutes: Estimated time saved by AI
+        
+        Returns:
+            Updated AIDecisionLog or None if failed
+        """
+        try:
+            with self.db_manager.session_scope() as session:
+                decision = session.query(AIDecisionLog).filter(
+                    AIDecisionLog.decision_id == decision_id
+                ).first()
+                
+                if not decision:
+                    logger.error(f"AI decision not found: {decision_id}")
+                    return None
+                
+                # Update feedback fields
+                decision.human_reviewer = human_reviewer
+                decision.human_decision = human_decision
+                decision.feedback_comment = feedback_comment
+                decision.accuracy_grade = accuracy_grade
+                decision.reasoning_grade = reasoning_grade
+                decision.action_appropriateness = action_appropriateness
+                decision.actual_outcome = actual_outcome
+                decision.time_saved_minutes = time_saved_minutes
+                decision.feedback_timestamp = datetime.utcnow()
+                
+                session.flush()
+                
+                logger.info(f"Updated AI decision feedback: {decision_id} by {human_reviewer}")
+                return decision
+        except Exception as e:
+            logger.error(f"Error submitting AI decision feedback: {e}")
+            return None
+    
+    def get_ai_decision(self, decision_id: str) -> Optional[AIDecisionLog]:
+        """
+        Get an AI decision by ID.
+        
+        Args:
+            decision_id: Decision ID
+        
+        Returns:
+            AIDecisionLog or None if not found
+        """
+        try:
+            with self.db_manager.session_scope() as session:
+                return session.query(AIDecisionLog).filter(
+                    AIDecisionLog.decision_id == decision_id
+                ).first()
+        except Exception as e:
+            logger.error(f"Error getting AI decision: {e}")
+            return None
+    
+    def list_ai_decisions(
+        self,
+        agent_id: Optional[str] = None,
+        finding_id: Optional[str] = None,
+        case_id: Optional[str] = None,
+        has_feedback: Optional[bool] = None,
+        limit: int = 100,
+        offset: int = 0
+    ) -> List[AIDecisionLog]:
+        """
+        List AI decisions with optional filters.
+        
+        Args:
+            agent_id: Filter by agent ID
+            finding_id: Filter by finding ID
+            case_id: Filter by case ID
+            has_feedback: Filter by whether feedback exists
+            limit: Maximum number of results
+            offset: Offset for pagination
+        
+        Returns:
+            List of AIDecisionLog objects
+        """
+        try:
+            with self.db_manager.session_scope() as session:
+                query = session.query(AIDecisionLog)
+                
+                if agent_id:
+                    query = query.filter(AIDecisionLog.agent_id == agent_id)
+                
+                if finding_id:
+                    query = query.filter(AIDecisionLog.finding_id == finding_id)
+                
+                if case_id:
+                    query = query.filter(AIDecisionLog.case_id == case_id)
+                
+                if has_feedback is not None:
+                    if has_feedback:
+                        query = query.filter(AIDecisionLog.human_decision.isnot(None))
+                    else:
+                        query = query.filter(AIDecisionLog.human_decision.is_(None))
+                
+                decisions = query.order_by(
+                    AIDecisionLog.timestamp.desc()
+                ).limit(limit).offset(offset).all()
+                
+                return decisions
+        except Exception as e:
+            logger.error(f"Error listing AI decisions: {e}")
+            return []
+    
+    def get_ai_decision_stats(
+        self,
+        agent_id: Optional[str] = None,
+        days: int = 30
+    ) -> dict:
+        """
+        Get statistics on AI decisions and feedback.
+        
+        Args:
+            agent_id: Optional filter by agent ID
+            days: Number of days to look back
+        
+        Returns:
+            Dictionary with statistics
+        """
+        try:
+            from datetime import timedelta
+            
+            with self.db_manager.session_scope() as session:
+                since = datetime.utcnow() - timedelta(days=days)
+                
+                query = session.query(AIDecisionLog).filter(
+                    AIDecisionLog.timestamp >= since
+                )
+                
+                if agent_id:
+                    query = query.filter(AIDecisionLog.agent_id == agent_id)
+                
+                # Total decisions
+                total_decisions = query.count()
+                
+                # Decisions with feedback
+                feedback_query = query.filter(AIDecisionLog.human_decision.isnot(None))
+                total_with_feedback = feedback_query.count()
+                
+                # Agreement rate
+                agree_count = feedback_query.filter(
+                    AIDecisionLog.human_decision == 'agree'
+                ).count()
+                
+                # Average grades
+                avg_accuracy = session.query(
+                    func.avg(AIDecisionLog.accuracy_grade)
+                ).filter(
+                    AIDecisionLog.timestamp >= since,
+                    AIDecisionLog.accuracy_grade.isnot(None)
+                )
+                
+                if agent_id:
+                    avg_accuracy = avg_accuracy.filter(AIDecisionLog.agent_id == agent_id)
+                
+                avg_accuracy = avg_accuracy.scalar() or 0
+                
+                # Outcome counts
+                outcomes = {}
+                for outcome, count in session.query(
+                    AIDecisionLog.actual_outcome,
+                    func.count(AIDecisionLog.id)
+                ).filter(
+                    AIDecisionLog.timestamp >= since,
+                    AIDecisionLog.actual_outcome.isnot(None)
+                ).group_by(AIDecisionLog.actual_outcome).all():
+                    outcomes[outcome] = count
+                
+                # Time saved
+                total_time_saved = session.query(
+                    func.sum(AIDecisionLog.time_saved_minutes)
+                ).filter(
+                    AIDecisionLog.timestamp >= since,
+                    AIDecisionLog.time_saved_minutes.isnot(None)
+                )
+                
+                if agent_id:
+                    total_time_saved = total_time_saved.filter(AIDecisionLog.agent_id == agent_id)
+                
+                total_time_saved = total_time_saved.scalar() or 0
+                
+                return {
+                    'total_decisions': total_decisions,
+                    'total_with_feedback': total_with_feedback,
+                    'feedback_rate': round(total_with_feedback / total_decisions, 3) if total_decisions > 0 else 0,
+                    'agreement_rate': round(agree_count / total_with_feedback, 3) if total_with_feedback > 0 else 0,
+                    'avg_accuracy_grade': round(avg_accuracy, 3),
+                    'outcomes': outcomes,
+                    'total_time_saved_minutes': int(total_time_saved),
+                    'total_time_saved_hours': round(total_time_saved / 60, 1),
+                    'period_days': days
+                }
+        except Exception as e:
+            logger.error(f"Error getting AI decision statistics: {e}")
+            return {
+                'total_decisions': 0,
+                'total_with_feedback': 0,
+                'feedback_rate': 0,
+                'agreement_rate': 0,
+                'avg_accuracy_grade': 0,
+                'outcomes': {},
+                'total_time_saved_minutes': 0,
+                'total_time_saved_hours': 0,
+                'period_days': days
+            }
 

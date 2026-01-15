@@ -21,7 +21,8 @@ from api import (
     attack_router,
     agents_router,
     custom_integrations_router,
-    storage_status_router
+    storage_status_router,
+    ai_decisions_router
 )
 from api.integrations_compatibility import router as compatibility_router
 from api.ingestion import router as ingestion_router
@@ -74,6 +75,7 @@ app.include_router(compatibility_router, prefix="/api/integrations", tags=["inte
 app.include_router(custom_integrations_router, prefix="/api/custom-integrations", tags=["custom-integrations"])
 app.include_router(ingestion_router, prefix="/api/ingest", tags=["ingestion"])
 app.include_router(storage_status_router, prefix="/api/storage", tags=["storage"])
+app.include_router(ai_decisions_router, prefix="/api/ai", tags=["ai-decisions"])
 
 @app.on_event("startup")
 async def startup_event():
@@ -81,6 +83,31 @@ async def startup_event():
     logger.info("=" * 60)
     logger.info("Starting DeepTempo AI SOC Backend")
     logger.info("=" * 60)
+    
+    # Load secrets into environment for MCP servers
+    try:
+        from backend.secrets_manager import get_secret
+        import os
+        
+        # Load PostgreSQL connection string for MCP postgres server
+        postgres_conn = get_secret("POSTGRESQL_CONNECTION_STRING")
+        if postgres_conn:
+            os.environ["POSTGRESQL_CONNECTION_STRING"] = postgres_conn
+            logger.debug("Loaded PostgreSQL connection string from secrets")
+        else:
+            # Set default connection string if not configured
+            default_conn = "postgresql://deeptempo:deeptempo_secure_password_change_me@localhost:5432/deeptempo_soc"
+            os.environ["POSTGRESQL_CONNECTION_STRING"] = default_conn
+            logger.debug("Using default PostgreSQL connection string")
+            
+        # Load GitHub token for MCP github server
+        github_token = get_secret("GITHUB_TOKEN")
+        if github_token:
+            os.environ["GITHUB_TOKEN"] = github_token
+            logger.debug("Loaded GitHub token from secrets")
+            
+    except Exception as e:
+        logger.warning(f"Error loading secrets for MCP servers: {e}")
     
     # Initialize data storage backend
     logger.info("Initializing data storage...")

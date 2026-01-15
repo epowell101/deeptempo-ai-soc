@@ -7,6 +7,52 @@ const api = axios.create({
   },
 })
 
+// AI Decisions API
+export const aiDecisionsApi = {
+  create: (data: {
+    decision_id: string
+    agent_id: string
+    decision_type: string
+    confidence_score: number
+    reasoning: string
+    recommended_action: string
+    finding_id?: string
+    case_id?: string
+    workflow_id?: string
+    decision_metadata?: any
+  }) => api.post('/ai/decisions', data),
+  
+  getById: (decisionId: string) => api.get(`/ai/decisions/${decisionId}`),
+  
+  list: (params?: {
+    agent_id?: string
+    finding_id?: string
+    case_id?: string
+    has_feedback?: boolean
+    limit?: number
+    offset?: number
+  }) => api.get('/ai/decisions', { params }),
+  
+  submitFeedback: (decisionId: string, data: {
+    human_reviewer: string
+    human_decision: string
+    feedback_comment?: string
+    accuracy_grade?: number
+    reasoning_grade?: number
+    action_appropriateness?: number
+    actual_outcome?: string
+    time_saved_minutes?: number
+  }) => api.post(`/ai/decisions/${decisionId}/feedback`, data),
+  
+  getStats: (params?: {
+    agent_id?: string
+    days?: number
+  }) => api.get('/ai/decisions/stats', { params }),
+  
+  getPendingFeedback: (limit?: number) => 
+    api.get('/ai/decisions/pending-feedback', { params: { limit } }),
+}
+
 // Findings API
 export const findingsApi = {
   getAll: (params?: {
@@ -24,6 +70,13 @@ export const findingsApi = {
   
   export: (format: 'json' | 'jsonl' = 'json') =>
     api.post('/findings/export', null, { params: { output_format: format } }),
+  
+  update: (id: string, data: any) => api.patch(`/findings/${id}`, data),
+  
+  delete: (id: string) => api.delete(`/findings/${id}`),
+  
+  getEnrichment: (id: string, force_regenerate: boolean = false) =>
+    api.post(`/findings/${id}/enrich`, null, { params: { force_regenerate } }),
 }
 
 // Cases API

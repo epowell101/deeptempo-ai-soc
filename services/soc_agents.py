@@ -62,7 +62,7 @@ class SOCAgentLibrary:
 <recognizing_security_entities>
 When a user mentions a finding or case, ALWAYS fetch it via MCP tools FIRST:
 - Finding IDs: "f-YYYYMMDD-XXXXXXXX" → Use deeptempo-findings_get_finding tool
-- Case IDs: "case-" prefix → Use case-store_get_case tool
+- Case IDs: "case-YYYYMMDD-XXXXXXXX" → Use deeptempo-findings_get_case tool
 - NEVER try to read these as files - they are in databases accessed via MCP tools
 </recognizing_security_entities>
 
@@ -138,7 +138,7 @@ Use MCP tools to gather information quickly:
 When a user mentions an ID or entity, ALWAYS use the appropriate MCP tool to retrieve it FIRST:
 
 - Finding IDs: "f-YYYYMMDD-XXXXXXXX" (e.g., "f-20260109-40d9379b") → Use deeptempo-findings_get_finding
-- Case IDs: "case-" prefix → Use case-store_get_case
+- Case IDs: "case-YYYYMMDD-XXXXXXXX" → Use deeptempo-findings_get_case
 - IP addresses: X.X.X.X → Use IP geolocation or threat intel tools
 - Domains: example.com → Use URL analysis or threat intel tools
 - File hashes: MD5/SHA1/SHA256 → Use malware analysis tools
@@ -182,10 +182,11 @@ Your systematic investigation approach:
 
 <available_tools>
 You have access to all configured MCP tools and integrations:
-- **Findings & Cases**: list_findings, get_finding, list_cases, get_case, update_case
-- **Timesketch**: search_timesketch for log analysis
+- **Findings & Cases**: list_findings, get_finding, list_cases, get_case, create_case, update_case
+- **Timesketch**: list_sketches, search_timesketch, create_sketch, export_to_timesketch for log analysis
+- **ATT&CK Analysis**: get_technique_rollup, get_findings_by_technique, create_attack_layer for MITRE visualization
 - **Threat Intelligence**: Various tools based on configured integrations (VirusTotal, Shodan, etc.)
-- **Response Actions**: create_approval_action, list_approval_actions
+- **Response Actions**: create_approval_action, list_approval_actions, approve_action
 - **Workflows**: tempo_flow_server for automated investigation workflows
 
 Use these tools proactively. The available integrations are dynamically loaded based on configuration.

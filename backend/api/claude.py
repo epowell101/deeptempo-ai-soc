@@ -83,14 +83,20 @@ async def chat(request: ChatRequest):
             if isinstance(msg.content, str):
                 messages.append({"role": msg.role, "content": msg.content})
             else:
-                # Handle content blocks (text + images)
+                # Handle content blocks (text + images, skip thinking blocks)
                 content_blocks = []
                 for block in msg.content:
                     if block.type == "text":
                         content_blocks.append({"type": "text", "text": block.text})
                     elif block.type == "image" and block.source:
                         content_blocks.append({"type": "image", "source": block.source})
-                messages.append({"role": msg.role, "content": content_blocks})
+                    # Skip thinking blocks - they should not be included in requests
+                    elif block.type == "thinking":
+                        continue
+                
+                # Only add message if it has content after filtering
+                if content_blocks:
+                    messages.append({"role": msg.role, "content": content_blocks})
         
         # Split messages into context and current message
         # The last message should be the current user message
@@ -157,14 +163,20 @@ async def chat_stream(request: ChatRequest):
                 if isinstance(msg.content, str):
                     messages.append({"role": msg.role, "content": msg.content})
                 else:
-                    # Handle content blocks (text + images)
+                    # Handle content blocks (text + images, skip thinking blocks)
                     content_blocks = []
                     for block in msg.content:
                         if block.type == "text":
                             content_blocks.append({"type": "text", "text": block.text})
                         elif block.type == "image" and block.source:
                             content_blocks.append({"type": "image", "source": block.source})
-                    messages.append({"role": msg.role, "content": content_blocks})
+                        # Skip thinking blocks - they should not be included in requests
+                        elif block.type == "thinking":
+                            continue
+                    
+                    # Only add message if it has content after filtering
+                    if content_blocks:
+                        messages.append({"role": msg.role, "content": content_blocks})
             
             # Split messages into context and current message
             if len(messages) == 0:

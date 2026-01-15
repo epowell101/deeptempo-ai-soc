@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard'
 import Cases from './pages/Cases'
 import Timesketch from './pages/Timesketch'
 import Settings from './pages/Settings'
+import AIDecisions from './pages/AIDecisions'
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route index element={<Dashboard />} />
           <Route path="cases" element={<Cases />} />
           <Route path="timesketch" element={<Timesketch />} />
+          <Route path="ai-decisions" element={<AIDecisions />} />
           <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>

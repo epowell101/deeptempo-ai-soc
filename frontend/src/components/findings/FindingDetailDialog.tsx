@@ -18,8 +18,24 @@ import {
   IconButton,
   Snackbar,
   Alert,
+  CircularProgress,
+  Paper,
+  List,
+  ListItem,
+  ListItemText,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from '@mui/material'
-import { Close as CloseIcon, Save as SaveIcon } from '@mui/icons-material'
+import { 
+  Close as CloseIcon, 
+  Save as SaveIcon, 
+  Psychology as AiIcon,
+  ExpandMore as ExpandMoreIcon,
+  CheckCircle as CheckCircleIcon,
+  Warning as WarningIcon,
+  Info as InfoIcon,
+} from '@mui/icons-material'
 import { findingsApi } from '../../services/api'
 
 interface FindingDetailDialogProps {
@@ -39,6 +55,8 @@ export default function FindingDetailDialog({
   const [editing, setEditing] = useState(false)
   const [finding, setFinding] = useState<any>(null)
   const [editedFinding, setEditedFinding] = useState<any>(null)
+  const [enrichment, setEnrichment] = useState<any>(null)
+  const [enrichmentLoading, setEnrichmentLoading] = useState(false)
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
     open: false,
     message: '',
@@ -48,6 +66,7 @@ export default function FindingDetailDialog({
   useEffect(() => {
     if (open && findingId) {
       loadFinding()
+      loadEnrichment()
     }
   }, [open, findingId])
 
@@ -63,6 +82,35 @@ export default function FindingDetailDialog({
       console.error('Failed to load finding:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const loadEnrichment = async () => {
+    if (!findingId) return
+    
+    setEnrichmentLoading(true)
+    try {
+      const response = await findingsApi.getEnrichment(findingId)
+      setEnrichment(response.data.enrichment)
+      if (!response.data.cached) {
+        setSnackbar({ 
+          open: true, 
+          message: 'AI enrichment generated successfully', 
+          severity: 'success' 
+        })
+      }
+    } catch (error: any) {
+      console.error('Failed to load enrichment:', error)
+      // Only show error if it's not a configuration issue
+      if (error?.response?.status !== 503) {
+        setSnackbar({ 
+          open: true, 
+          message: 'Failed to generate AI enrichment', 
+          severity: 'error' 
+        })
+      }
+    } finally {
+      setEnrichmentLoading(false)
     }
   }
 
@@ -290,6 +338,246 @@ export default function FindingDetailDialog({
                 </Box>
               </Grid>
             )}
+
+            {/* AI Enrichment Section */}
+            <Grid item xs={12}>
+              <Divider sx={{ my: 2 }} />
+              <Box display="flex" alignItems="center" mb={2}>
+                <AiIcon sx={{ mr: 1, color: 'primary.main' }} />
+                <Typography variant="h6" color="primary">
+                  AI-Generated Analysis
+                </Typography>
+              </Box>
+              
+              {enrichmentLoading ? (
+                <Box display="flex" justifyContent="center" alignItems="center" py={4}>
+                  <CircularProgress size={30} />
+                  <Typography variant="body2" sx={{ ml: 2 }}>
+                    Generating AI analysis...
+                  </Typography>
+                </Box>
+              ) : enrichment ? (
+                <Box>
+                  {/* Threat Summary */}
+                  <Paper elevation={2} sx={{ p: 2, mb: 2, bgcolor: 'background.default' }}>
+                    <Box display="flex" alignItems="center" mb={1}>
+                      <InfoIcon sx={{ mr: 1, color: 'info.main' }} />
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Threat Summary
+                      </Typography>
+                    </Box>
+                    <Typography variant="body2">
+                      {enrichment.threat_summary}
+                    </Typography>
+                    
+                    {enrichment.threat_type && (
+                      <Box mt={1}>
+                        <Chip 
+                          label={enrichment.threat_type} 
+                          color="error" 
+                          size="small" 
+                          variant="outlined"
+                        />
+                      </Box>
+                    )}
+                  </Paper>
+
+                  {/* Risk Level & Impact */}
+                  <Grid container spacing={2} mb={2}>
+                    <Grid item xs={12} md={6}>
+                      <Paper elevation={1} sx={{ p: 2, height: '100%' }}>
+                        <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+                          Risk Level
+                        </Typography>
+                        <Chip 
+                          label={enrichment.risk_level || 'Unknown'}
+                          color={
+                            enrichment.risk_level === 'Critical' ? 'error' :
+                            enrichment.risk_level === 'High' ? 'error' :
+                            enrichment.risk_level === 'Medium' ? 'warning' : 'success'
+                          }
+                          sx={{ mt: 1 }}
+                        />
+                      </Paper>
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <Paper elevation={1} sx={{ p: 2, height: '100%' }}>
+                        <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+                          Confidence Score
+                        </Typography>
+                        <Typography variant="h5" color="primary">
+                          {enrichment.confidence_score ? 
+                            `${(enrichment.confidence_score * 100).toFixed(0)}%` : 
+                            'N/A'}
+                        </Typography>
+                      </Paper>
+                    </Grid>
+                  </Grid>
+
+                  {/* Potential Impact */}
+                  {enrichment.potential_impact && (
+                    <Accordion defaultExpanded>
+                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                        <Box display="flex" alignItems="center">
+                          <WarningIcon sx={{ mr: 1, color: 'warning.main' }} />
+                          <Typography fontWeight="bold">Potential Impact</Typography>
+                        </Box>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Typography variant="body2">
+                          {enrichment.potential_impact}
+                        </Typography>
+                      </AccordionDetails>
+                    </Accordion>
+                  )}
+
+                  {/* Recommended Actions */}
+                  {enrichment.recommended_actions && enrichment.recommended_actions.length > 0 && (
+                    <Accordion defaultExpanded>
+                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                        <Box display="flex" alignItems="center">
+                          <CheckCircleIcon sx={{ mr: 1, color: 'success.main' }} />
+                          <Typography fontWeight="bold">Recommended Actions</Typography>
+                        </Box>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <List dense>
+                          {enrichment.recommended_actions.map((action: string, index: number) => (
+                            <ListItem key={index}>
+                              <ListItemText 
+                                primary={action}
+                                primaryTypographyProps={{ variant: 'body2' }}
+                              />
+                            </ListItem>
+                          ))}
+                        </List>
+                      </AccordionDetails>
+                    </Accordion>
+                  )}
+
+                  {/* Investigation Questions */}
+                  {enrichment.investigation_questions && enrichment.investigation_questions.length > 0 && (
+                    <Accordion>
+                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                        <Typography fontWeight="bold">Investigation Questions</Typography>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <List dense>
+                          {enrichment.investigation_questions.map((question: string, index: number) => (
+                            <ListItem key={index}>
+                              <ListItemText 
+                                primary={question}
+                                primaryTypographyProps={{ variant: 'body2' }}
+                              />
+                            </ListItem>
+                          ))}
+                        </List>
+                      </AccordionDetails>
+                    </Accordion>
+                  )}
+
+                  {/* Related MITRE Techniques */}
+                  {enrichment.related_techniques && enrichment.related_techniques.length > 0 && (
+                    <Accordion>
+                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                        <Typography fontWeight="bold">Related MITRE ATT&CK Techniques</Typography>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <List dense>
+                          {enrichment.related_techniques.map((tech: any, index: number) => (
+                            <ListItem key={index}>
+                              <ListItemText 
+                                primary={`${tech.technique_id} - ${tech.technique_name}`}
+                                secondary={tech.relevance}
+                                primaryTypographyProps={{ variant: 'body2', fontWeight: 'bold' }}
+                                secondaryTypographyProps={{ variant: 'body2' }}
+                              />
+                            </ListItem>
+                          ))}
+                        </List>
+                      </AccordionDetails>
+                    </Accordion>
+                  )}
+
+                  {/* Timeline & Business Context */}
+                  {(enrichment.timeline_context || enrichment.business_context) && (
+                    <Accordion>
+                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                        <Typography fontWeight="bold">Additional Context</Typography>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        {enrichment.timeline_context && (
+                          <Box mb={2}>
+                            <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+                              Timeline Context
+                            </Typography>
+                            <Typography variant="body2">
+                              {enrichment.timeline_context}
+                            </Typography>
+                          </Box>
+                        )}
+                        {enrichment.business_context && (
+                          <Box>
+                            <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+                              Business Context
+                            </Typography>
+                            <Typography variant="body2">
+                              {enrichment.business_context}
+                            </Typography>
+                          </Box>
+                        )}
+                      </AccordionDetails>
+                    </Accordion>
+                  )}
+
+                  {/* Indicators */}
+                  {enrichment.indicators && Object.keys(enrichment.indicators).length > 0 && (
+                    <Accordion>
+                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                        <Typography fontWeight="bold">Indicators of Compromise</Typography>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Grid container spacing={2}>
+                          {enrichment.indicators.malicious_ips && enrichment.indicators.malicious_ips.length > 0 && (
+                            <Grid item xs={12}>
+                              <Typography variant="subtitle2" fontWeight="bold">Malicious IPs</Typography>
+                              <Box mt={1}>
+                                {enrichment.indicators.malicious_ips.map((ip: string, i: number) => (
+                                  <Chip key={i} label={ip} size="small" sx={{ mr: 1, mb: 1 }} />
+                                ))}
+                              </Box>
+                            </Grid>
+                          )}
+                          {enrichment.indicators.suspicious_domains && enrichment.indicators.suspicious_domains.length > 0 && (
+                            <Grid item xs={12}>
+                              <Typography variant="subtitle2" fontWeight="bold">Suspicious Domains</Typography>
+                              <Box mt={1}>
+                                {enrichment.indicators.suspicious_domains.map((domain: string, i: number) => (
+                                  <Chip key={i} label={domain} size="small" sx={{ mr: 1, mb: 1 }} />
+                                ))}
+                              </Box>
+                            </Grid>
+                          )}
+                        </Grid>
+                      </AccordionDetails>
+                    </Accordion>
+                  )}
+
+                  {/* Analysis Notes */}
+                  {enrichment.analysis_notes && (
+                    <Box mt={2} p={2} bgcolor="background.paper" borderRadius={1}>
+                      <Typography variant="caption" color="textSecondary">
+                        <strong>Analyst Notes:</strong> {enrichment.analysis_notes}
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
+              ) : (
+                <Alert severity="info">
+                  AI enrichment is not available. This may be because Claude API is not configured.
+                </Alert>
+              )}
+            </Grid>
           </Grid>
         ) : null}
       </DialogContent>

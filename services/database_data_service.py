@@ -148,6 +148,27 @@ class DatabaseDataService:
         else:
             return self._json_service.get_finding(finding_id)
     
+    def update_finding(self, finding_id: str, **updates) -> bool:
+        """
+        Update a finding.
+        
+        Args:
+            finding_id: The finding ID to update.
+            **updates: Fields to update.
+        
+        Returns:
+            True if successful, False otherwise.
+        """
+        if self.use_database and self._db_service:
+            try:
+                success = self._db_service.update_finding(finding_id, **updates)
+                return success
+            except Exception as e:
+                logger.error(f"Error updating finding in database: {e}")
+                return False
+        else:
+            return self._json_service.update_finding(finding_id, **updates)
+    
     def save_findings(self, findings: List[Dict]) -> bool:
         """
         Save findings.

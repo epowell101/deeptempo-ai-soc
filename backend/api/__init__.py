@@ -11,6 +11,7 @@ from api.agents import router as agents_router
 from api.custom_integrations import router as custom_integrations_router
 from api.ingestion import router as ingestion_router
 from api.storage_status import router as storage_status_router
+from api.ai_decisions import router as ai_decisions_router
 
 __all__ = [
     'findings_router',
@@ -24,4 +25,5 @@ __all__ = [
     'custom_integrations_router',
     'ingestion_router',
     'storage_status_router',
+    'ai_decisions_router',
 ]

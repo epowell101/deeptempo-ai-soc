@@ -25,6 +25,7 @@ import {
   Brightness4 as Brightness4Icon,
   Brightness7 as Brightness7Icon,
   Chat as ChatIcon,
+  Psychology as AIIcon,
 } from '@mui/icons-material'
 import { useTheme } from '../../contexts/ThemeContext'
 import ClaudeDrawer from '../claude/ClaudeDrawer'
@@ -80,6 +81,7 @@ export default function MainLayout() {
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
     { text: 'Cases', icon: <FolderIcon />, path: '/cases' },
+    { text: 'AI Decisions', icon: <AIIcon />, path: '/ai-decisions' },
     ...(splunkEnabled ? [{ text: 'Splunk', icon: <SearchIcon />, path: '/splunk' }] : []),
     ...(timesketchEnabled ? [{ text: 'Timesketch', icon: <TimelineIcon />, path: '/timesketch' }] : []),
     { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },

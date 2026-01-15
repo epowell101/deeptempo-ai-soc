@@ -61,6 +61,9 @@ class Finding(Base):
         server_default='new'
     )
     
+    # AI-generated enrichment (cached analysis)
+    ai_enrichment: Mapped[Optional[dict]] = mapped_column(JSONB, nullable=True)
+    
     # Timestamps
     created_at: Mapped[datetime] = mapped_column(
         DateTime, 
@@ -108,6 +111,7 @@ class Finding(Base):
             'cluster_id': self.cluster_id,
             'severity': self.severity,
             'status': self.status,
+            'ai_enrichment': self.ai_enrichment,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
         }
@@ -323,5 +327,102 @@ class AttackLayer(Base):
             'case_id': self.case_id,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+        }
+
+
+class AIDecisionLog(Base):
+    """
+    AI Decision Log - Tracks AI decisions for feedback and learning.
+    
+    This model enables human oversight and continuous improvement of AI agents
+    by tracking all AI decisions, collecting human feedback, and measuring accuracy.
+    """
+    
+    __tablename__ = 'ai_decision_logs'
+    
+    # Primary key
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    decision_id: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+    
+    # Decision context
+    agent_id: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
+    workflow_id: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    finding_id: Mapped[Optional[str]] = mapped_column(
+        String(50),
+        ForeignKey('findings.finding_id', ondelete='CASCADE'),
+        nullable=True
+    )
+    case_id: Mapped[Optional[str]] = mapped_column(
+        String(50),
+        ForeignKey('cases.case_id', ondelete='CASCADE'),
+        nullable=True
+    )
+    
+    # AI's decision
+    decision_type: Mapped[str] = mapped_column(String(50), nullable=False)
+    confidence_score: Mapped[float] = mapped_column(Float, nullable=False)
+    reasoning: Mapped[str] = mapped_column(Text, nullable=False)
+    recommended_action: Mapped[str] = mapped_column(Text, nullable=False)
+    
+    # Additional decision metadata
+    decision_metadata: Mapped[Optional[dict]] = mapped_column(JSONB, nullable=True)
+    
+    # Human feedback
+    human_reviewer: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    human_decision: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    feedback_comment: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    
+    # Grading (0-1 scale)
+    accuracy_grade: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    reasoning_grade: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    action_appropriateness: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    
+    # Outcome tracking
+    actual_outcome: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    time_saved_minutes: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    
+    # Timestamps
+    timestamp: Mapped[datetime] = mapped_column(
+        DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+        server_default='now()'
+    )
+    feedback_timestamp: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    
+    # Indexes
+    __table_args__ = (
+        Index('idx_ai_decision_agent_id', 'agent_id'),
+        Index('idx_ai_decision_finding_id', 'finding_id'),
+        Index('idx_ai_decision_case_id', 'case_id'),
+        Index('idx_ai_decision_timestamp', 'timestamp'),
+        Index('idx_ai_decision_human_decision', 'human_decision'),
+        Index('idx_ai_decision_actual_outcome', 'actual_outcome'),
+    )
+    
+    def to_dict(self) -> dict:
+        """Convert AI decision log to dictionary."""
+        return {
+            'id': self.id,
+            'decision_id': self.decision_id,
+            'agent_id': self.agent_id,
+            'workflow_id': self.workflow_id,
+            'finding_id': self.finding_id,
+            'case_id': self.case_id,
+            'decision_type': self.decision_type,
+            'confidence_score': self.confidence_score,
+            'reasoning': self.reasoning,
+            'recommended_action': self.recommended_action,
+            'decision_metadata': self.decision_metadata,
+            'human_reviewer': self.human_reviewer,
+            'human_decision': self.human_decision,
+            'feedback_comment': self.feedback_comment,
+            'accuracy_grade': self.accuracy_grade,
+            'reasoning_grade': self.reasoning_grade,
+            'action_appropriateness': self.action_appropriateness,
+            'actual_outcome': self.actual_outcome,
+            'time_saved_minutes': self.time_saved_minutes,
+            'timestamp': self.timestamp.isoformat() if self.timestamp else None,
+            'feedback_timestamp': self.feedback_timestamp.isoformat() if self.feedback_timestamp else None,
         }
 

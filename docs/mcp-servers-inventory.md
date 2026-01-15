@@ -51,11 +51,13 @@ Total Servers:        27 (was 41)
 
 | Server | Status | LOC | Tools | Description |
 |--------|--------|-----|-------|-------------|
-| **deeptempo-findings** | ✅ Implemented | 192 | 0 | DeepTempo findings management |
+| **deeptempo-findings** | ✅ Implemented | 500+ | 10 | DeepTempo findings & case management |
 | **tempo-flow** | ✅ Implemented | 166 | 2 | Workflow automation engine |
 | **approval** | ✅ Implemented | 447 | 7 | Security approval workflows |
+| **timesketch** | ✅ Implemented | 350+ | 5 | Log analysis & forensic timelines |
+| **attack-layer** | ✅ Implemented | 400+ | 5 | MITRE ATT&CK visualization & analysis |
 
-**Total:** 805 LOC, 9 tools
+**Total:** 1900+ LOC, 29 tools
 
 ---
 
@@ -175,8 +177,8 @@ The following stub servers were removed during the January 2026 migration:
 - **microsoft_teams_server** - Duplicate of Slack
 - **pagerduty_server** - Not in active use
 
-### Removed - Unfinished/Abandoned
-- **case_store_server** - 0 tools, appears abandoned
+### Removed - Unfinished/Abandoned (Later Restored)
+- **case_store_server** - 0 tools, was abandoned → Case management now integrated into deeptempo-findings server
 - **evidence_snippets_server** - 0 tools, appears abandoned
 
 ### Removed - Replaced with Community Servers

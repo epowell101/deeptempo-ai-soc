@@ -289,3 +289,242 @@ async def bulk_enrich_findings(request: BulkEnrichmentRequest):
         "results": results
     }
 
+
+@router.post("/{finding_id}/enrich")
+async def get_or_generate_enrichment(finding_id: str, force_regenerate: bool = Query(False)):
+    """
+    Get or generate AI enrichment for a finding.
+    
+    This endpoint checks if AI enrichment already exists for the finding.
+    If it exists, returns the cached enrichment immediately.
+    If not, generates new enrichment using Claude AI, caches it, and returns it.
+    
+    Args:
+        finding_id: The finding ID to enrich
+        force_regenerate: Force regeneration even if enrichment exists
+    
+    Returns:
+        AI enrichment data with threat analysis, impact, recommendations, etc.
+    
+    Example Response:
+        {
+            "finding_id": "f-20260114-001",
+            "cached": false,
+            "enrichment": {
+                "threat_summary": "...",
+                "potential_impact": "...",
+                "recommended_actions": [...],
+                "related_techniques": [...],
+                "indicators": {...},
+                "confidence_score": 0.85
+            }
+        }
+    """
+    import asyncio
+    from datetime import datetime
+    
+    # Get the finding
+    finding = data_service.get_finding(finding_id)
+    if not finding:
+        raise HTTPException(status_code=404, detail="Finding not found")
+    
+    # Check if enrichment already exists
+    existing_enrichment = finding.get('ai_enrichment')
+    if existing_enrichment and not force_regenerate:
+        logger.info(f"Returning cached enrichment for {finding_id}")
+        return {
+            "finding_id": finding_id,
+            "cached": True,
+            "enrichment": existing_enrichment
+        }
+    
+    # Generate new enrichment using Claude
+    try:
+        from services.claude_factory import create_claude_service
+        
+        claude_service = create_claude_service(use_mcp_tools=False)
+        
+        # Check if API key is configured
+        if not claude_service.has_api_key():
+            raise HTTPException(
+                status_code=503, 
+                detail="Claude API not configured. AI enrichment requires Claude API key."
+            )
+        
+        # Extract finding details
+        severity = finding.get('severity', 'unknown')
+        data_source = finding.get('data_source', 'unknown')
+        timestamp = finding.get('timestamp', '')
+        description = finding.get('description', '')
+        entity_context = finding.get('entity_context', {})
+        mitre_predictions = finding.get('mitre_predictions', {})
+        predicted_techniques = finding.get('predicted_techniques', [])
+        anomaly_score = finding.get('anomaly_score', 0)
+        
+        # Build entity context string
+        entity_str = ""
+        if entity_context:
+            src_ips = entity_context.get('src_ips', [])
+            dst_ips = entity_context.get('dst_ips', [])
+            hostnames = entity_context.get('hostnames', [])
+            users = entity_context.get('users', [])
+            
+            if src_ips:
+                entity_str += f"Source IPs: {', '.join(src_ips[:5])}\n"
+            if dst_ips:
+                entity_str += f"Destination IPs: {', '.join(dst_ips[:5])}\n"
+            if hostnames:
+                entity_str += f"Hostnames: {', '.join(hostnames[:5])}\n"
+            if users:
+                entity_str += f"Users: {', '.join(users[:5])}\n"
+        
+        # Build MITRE techniques string
+        techniques_str = ""
+        if predicted_techniques:
+            techniques_list = [
+                f"{t.get('technique_id', 'Unknown')} (confidence: {t.get('confidence', 0):.2f})"
+                for t in predicted_techniques[:5]
+            ]
+            techniques_str = "\n".join(techniques_list)
+        elif mitre_predictions:
+            techniques_list = [
+                f"{tech_id} (confidence: {conf:.2f})"
+                for tech_id, conf in sorted(mitre_predictions.items(), key=lambda x: x[1], reverse=True)[:5]
+            ]
+            techniques_str = "\n".join(techniques_list)
+        
+        # Construct comprehensive analysis prompt
+        prompt = f"""You are a cybersecurity analyst reviewing a security finding. Provide a comprehensive, structured analysis.
+
+FINDING DETAILS:
+=================
+Finding ID: {finding_id}
+Severity: {severity}
+Data Source: {data_source}
+Timestamp: {timestamp}
+Anomaly Score: {anomaly_score:.2f}
+
+Description:
+{description if description else 'No description available'}
+
+{f'''Entity Context:
+{entity_str}''' if entity_str else ''}
+
+{f'''MITRE ATT&CK Techniques:
+{techniques_str}''' if techniques_str else 'No MITRE techniques predicted'}
+
+ANALYSIS REQUIREMENTS:
+=======================
+Please provide a detailed analysis in the following JSON structure:
+
+{{
+    "threat_summary": "A clear, concise summary (2-3 sentences) of what this finding represents and why it matters",
+    "threat_type": "Classification of threat (e.g., 'Data Exfiltration', 'Lateral Movement', 'Command & Control', 'Malware', etc.)",
+    "potential_impact": "Detailed explanation of potential impact on the organization (3-4 sentences)",
+    "risk_level": "Overall risk assessment: 'Critical', 'High', 'Medium', or 'Low'",
+    "recommended_actions": [
+        "Immediate action item 1",
+        "Immediate action item 2",
+        "Additional investigation step 1",
+        "Additional investigation step 2"
+    ],
+    "investigation_questions": [
+        "Key question to investigate 1?",
+        "Key question to investigate 2?",
+        "Key question to investigate 3?"
+    ],
+    "indicators": {{
+        "malicious_ips": ["list any suspicious IPs mentioned"],
+        "suspicious_domains": ["list any suspicious domains"],
+        "suspicious_users": ["list any suspicious user accounts"],
+        "suspicious_processes": ["list any suspicious processes or commands"]
+    }},
+    "related_techniques": [
+        {{
+            "technique_id": "T####.###",
+            "technique_name": "Technique name",
+            "relevance": "Why this technique is relevant"
+        }}
+    ],
+    "timeline_context": "Brief explanation of what likely happened and in what order",
+    "business_context": "How this finding relates to typical business operations and what makes it anomalous",
+    "confidence_score": 0.85,
+    "analysis_notes": "Any additional context, caveats, or recommendations for the analyst"
+}}
+
+Respond ONLY with valid JSON. Be specific and actionable. Focus on helping a SOC analyst make quick, informed decisions."""
+
+        # Generate enrichment
+        logger.info(f"Generating AI enrichment for {finding_id}")
+        loop = asyncio.get_event_loop()
+        response = await loop.run_in_executor(
+            None,
+            lambda: claude_service.chat(
+                message=prompt,
+                model="claude-sonnet-4-20250514",
+                max_tokens=4096
+            )
+        )
+        
+        # Parse JSON response
+        import json
+        import re
+        
+        # Try to extract JSON from response (handle markdown code blocks)
+        json_match = re.search(r'```json\s*(\{.*?\})\s*```', response, re.DOTALL)
+        if json_match:
+            json_str = json_match.group(1)
+        else:
+            # Try to find raw JSON
+            json_match = re.search(r'\{.*\}', response, re.DOTALL)
+            if json_match:
+                json_str = json_match.group(0)
+            else:
+                json_str = response
+        
+        try:
+            enrichment = json.loads(json_str)
+        except json.JSONDecodeError:
+            # If JSON parsing fails, create structured enrichment from text response
+            enrichment = {
+                "threat_summary": "AI analysis completed - see full analysis below",
+                "threat_type": "Security Finding",
+                "potential_impact": "Requires manual review",
+                "risk_level": severity.title() if severity else "Medium",
+                "recommended_actions": ["Review the detailed analysis", "Investigate related entities"],
+                "investigation_questions": ["What is the root cause?", "Are there related events?"],
+                "indicators": {},
+                "related_techniques": [],
+                "timeline_context": "Analysis in progress",
+                "business_context": "Requires additional context",
+                "confidence_score": 0.7,
+                "analysis_notes": response[:1000],  # Store first 1000 chars as notes
+                "raw_response": response  # Store full response
+            }
+        
+        # Add metadata
+        enrichment['generated_at'] = datetime.utcnow().isoformat() + 'Z'
+        enrichment['model'] = 'claude-sonnet-4-20250514'
+        
+        # Save enrichment to database
+        success = data_service.update_finding(finding_id, ai_enrichment=enrichment)
+        
+        if not success:
+            logger.error(f"Failed to save enrichment for {finding_id}")
+            # Still return the enrichment even if saving fails
+        else:
+            logger.info(f"Successfully generated and cached enrichment for {finding_id}")
+        
+        return {
+            "finding_id": finding_id,
+            "cached": False,
+            "enrichment": enrichment
+        }
+    
+    except Exception as e:
+        logger.error(f"Error generating enrichment for {finding_id}: {e}")
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Failed to generate enrichment: {str(e)}"
+        )
+
