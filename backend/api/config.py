@@ -12,6 +12,10 @@ import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from secrets_manager import get_secret, set_secret, delete_secret, get_secrets_manager
 
+# Import database config service
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+from database.config_service import get_config_service
+
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
@@ -121,22 +125,35 @@ async def get_s3_config():
     Returns:
         Configuration status
     """
-    config_file = Path.home() / '.deeptempo' / 's3_config.json'
-    
-    if not config_file.exists():
-        return {"configured": False}
-    
     try:
-        with open(config_file, 'r') as f:
-            config = json.load(f)
+        # Try database first
+        config_service = get_config_service()
+        s3_integration = config_service.get_integration_config('s3')
         
-        return {
-            "configured": True,
-            "bucket_name": config.get('bucket_name'),
-            "region": config.get('region'),
-            "findings_path": config.get('findings_path'),
-            "cases_path": config.get('cases_path')
-        }
+        if s3_integration and s3_integration.get('config'):
+            config = s3_integration['config']
+            return {
+                "configured": True,
+                "bucket_name": config.get('bucket_name'),
+                "region": config.get('region'),
+                "findings_path": config.get('findings_path'),
+                "cases_path": config.get('cases_path')
+            }
+        
+        # Fallback to file-based config
+        config_file = Path.home() / '.deeptempo' / 's3_config.json'
+        if config_file.exists():
+            with open(config_file, 'r') as f:
+                config = json.load(f)
+                return {
+                    "configured": True,
+                    "bucket_name": config.get('bucket_name'),
+                    "region": config.get('region'),
+                    "findings_path": config.get('findings_path'),
+                    "cases_path": config.get('cases_path')
+                }
+        
+        return {"configured": False}
     except Exception as e:
         logger.error(f"Error getting S3 config: {e}")
         return {"configured": False, "error": str(e)}
@@ -153,11 +170,8 @@ async def set_s3_config(config: S3Config):
     Returns:
         Success status
     """
-    config_file = Path.home() / '.deeptempo' / 's3_config.json'
-    config_file.parent.mkdir(parents=True, exist_ok=True)
-    
     try:
-        # Save non-sensitive config to file
+        # Non-sensitive config
         config_data = {
             "bucket_name": config.bucket_name,
             "region": config.region,
@@ -165,14 +179,34 @@ async def set_s3_config(config: S3Config):
             "cases_path": config.cases_path
         }
         
+        # Save to database
+        config_service = get_config_service(user_id='web_ui')
+        success = config_service.set_integration_config(
+            integration_id='s3',
+            config=config_data,
+            enabled=True,
+            integration_name='AWS S3',
+            integration_type='storage',
+            description='AWS S3 storage configuration',
+            change_reason='Updated via Settings UI'
+        )
+        
+        if not success:
+            raise HTTPException(status_code=500, detail="Failed to save S3 config to database")
+        
+        # Also save to file for backward compatibility
+        config_file = Path.home() / '.deeptempo' / 's3_config.json'
+        config_file.parent.mkdir(parents=True, exist_ok=True)
         with open(config_file, 'w') as f:
             json.dump(config_data, f, indent=2)
         
-        # Save credentials using secrets manager
+        # Save credentials using secrets manager (unchanged)
         set_secret("AWS_ACCESS_KEY_ID", config.access_key_id)
         set_secret("AWS_SECRET_ACCESS_KEY", config.secret_access_key)
         
         return {"success": True, "message": "S3 configuration saved"}
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error setting S3 config: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -188,15 +222,22 @@ async def get_theme_config():
     Returns:
         Theme configuration
     """
-    config_file = Path.home() / '.deeptempo' / 'theme_config.json'
-    
-    if not config_file.exists():
-        return {"theme": "dark"}
-    
     try:
-        with open(config_file, 'r') as f:
-            config = json.load(f)
-        return {"theme": config.get('theme', 'dark')}
+        # Try database first
+        config_service = get_config_service()
+        config_value = config_service.get_system_config('theme.current')
+        
+        if config_value:
+            return config_value
+        
+        # Fallback to file-based config
+        config_file = Path.home() / '.deeptempo' / 'theme_config.json'
+        if config_file.exists():
+            with open(config_file, 'r') as f:
+                config = json.load(f)
+                return {"theme": config.get('theme', 'dark')}
+        
+        return {"theme": "dark"}
     except Exception as e:
         logger.error(f"Error getting theme config: {e}")
         return {"theme": "dark"}
@@ -213,14 +254,31 @@ async def set_theme_config(config: ThemeConfig):
     Returns:
         Success status
     """
-    config_file = Path.home() / '.deeptempo' / 'theme_config.json'
-    config_file.parent.mkdir(parents=True, exist_ok=True)
-    
     try:
+        config_data = {"theme": config.theme}
+        
+        # Save to database
+        config_service = get_config_service(user_id='web_ui')
+        success = config_service.set_system_config(
+            key='theme.current',
+            value=config_data,
+            description='Current UI theme',
+            config_type='theme',
+            change_reason='Updated via Settings UI'
+        )
+        
+        if not success:
+            raise HTTPException(status_code=500, detail="Failed to save theme to database")
+        
+        # Also save to file for backward compatibility
+        config_file = Path.home() / '.deeptempo' / 'theme_config.json'
+        config_file.parent.mkdir(parents=True, exist_ok=True)
         with open(config_file, 'w') as f:
-            json.dump({"theme": config.theme}, f, indent=2)
+            json.dump(config_data, f, indent=2)
         
         return {"success": True, "message": "Theme saved"}
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error setting theme config: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -236,20 +294,34 @@ async def get_integrations_config():
     Returns:
         Configuration status and enabled integrations
     """
-    config_file = Path.home() / '.deeptempo' / 'integrations_config.json'
-    
-    if not config_file.exists():
-        return {"configured": False, "enabled_integrations": [], "integrations": {}}
-    
     try:
-        with open(config_file, 'r') as f:
-            config = json.load(f)
+        # Try database first
+        config_service = get_config_service()
+        integrations_list = config_service.list_integrations()
         
-        return {
-            "configured": True,
-            "enabled_integrations": config.get('enabled_integrations', []),
-            "integrations": config.get('integrations', {})
-        }
+        if integrations_list:
+            # Build response in the expected format
+            enabled_integrations = [i['integration_id'] for i in integrations_list if i['enabled']]
+            integrations = {i['integration_id']: i['config'] for i in integrations_list}
+            
+            return {
+                "configured": True,
+                "enabled_integrations": enabled_integrations,
+                "integrations": integrations
+            }
+        
+        # Fallback to file-based config
+        config_file = Path.home() / '.deeptempo' / 'integrations_config.json'
+        if config_file.exists():
+            with open(config_file, 'r') as f:
+                config = json.load(f)
+                return {
+                    "configured": True,
+                    "enabled_integrations": config.get('enabled_integrations', []),
+                    "integrations": config.get('integrations', {})
+                }
+        
+        return {"configured": False, "enabled_integrations": [], "integrations": {}}
     except Exception as e:
         logger.error(f"Error getting integrations config: {e}")
         return {"configured": False, "enabled_integrations": [], "integrations": {}, "error": str(e)}
@@ -266,15 +338,31 @@ async def set_integrations_config(config: IntegrationsConfig):
     Returns:
         Success status
     """
-    config_file = Path.home() / '.deeptempo' / 'integrations_config.json'
-    config_file.parent.mkdir(parents=True, exist_ok=True)
-    
     try:
+        config_service = get_config_service(user_id='web_ui')
+        
+        # Save each integration to database
+        for integration_id in config.integrations.keys():
+            integration_config = config.integrations[integration_id]
+            enabled = integration_id in config.enabled_integrations
+            
+            success = config_service.set_integration_config(
+                integration_id=integration_id,
+                config=integration_config,
+                enabled=enabled,
+                change_reason='Updated via Settings UI'
+            )
+            
+            if not success:
+                logger.error(f"Failed to save integration '{integration_id}'")
+        
+        # Also save to file for backward compatibility
+        config_file = Path.home() / '.deeptempo' / 'integrations_config.json'
+        config_file.parent.mkdir(parents=True, exist_ok=True)
         config_data = {
             "enabled_integrations": config.enabled_integrations,
             "integrations": config.integrations
         }
-        
         with open(config_file, 'w') as f:
             json.dump(config_data, f, indent=2)
         
@@ -380,25 +468,33 @@ async def get_general_config():
     Returns:
         General configuration
     """
-    config_file = Path.home() / '.deeptempo' / 'general_config.json'
-    
-    if not config_file.exists():
+    try:
+        # Try database first
+        config_service = get_config_service()
+        config_value = config_service.get_system_config('general.settings')
+        
+        if config_value:
+            return config_value
+        
+        # Fallback to file-based config
+        config_file = Path.home() / '.deeptempo' / 'general_config.json'
+        
+        if config_file.exists():
+            with open(config_file, 'r') as f:
+                config = json.load(f)
+                return {
+                    "auto_start_sync": config.get('auto_start_sync', False),
+                    "show_notifications": config.get('show_notifications', True),
+                    "theme": config.get('theme', 'dark'),
+                    "enable_keyring": config.get('enable_keyring', False)
+                }
+        
+        # Default values
         return {
             "auto_start_sync": False, 
             "show_notifications": True, 
             "theme": "dark",
             "enable_keyring": False
-        }
-    
-    try:
-        with open(config_file, 'r') as f:
-            config = json.load(f)
-        
-        return {
-            "auto_start_sync": config.get('auto_start_sync', False),
-            "show_notifications": config.get('show_notifications', True),
-            "theme": config.get('theme', 'dark'),
-            "enable_keyring": config.get('enable_keyring', False)
         }
     except Exception as e:
         logger.error(f"Error getting general config: {e}")
@@ -421,9 +517,6 @@ async def set_general_config(config: GeneralConfig):
     Returns:
         Success status
     """
-    config_file = Path.home() / '.deeptempo' / 'general_config.json'
-    config_file.parent.mkdir(parents=True, exist_ok=True)
-    
     try:
         config_data = {
             "auto_start_sync": config.auto_start_sync,
@@ -432,6 +525,22 @@ async def set_general_config(config: GeneralConfig):
             "enable_keyring": config.enable_keyring
         }
         
+        # Save to database
+        config_service = get_config_service(user_id='web_ui')
+        success = config_service.set_system_config(
+            key='general.settings',
+            value=config_data,
+            description='General application settings',
+            config_type='general',
+            change_reason='Updated via Settings UI'
+        )
+        
+        if not success:
+            raise HTTPException(status_code=500, detail="Failed to save configuration to database")
+        
+        # Also save to file for backward compatibility (during transition)
+        config_file = Path.home() / '.deeptempo' / 'general_config.json'
+        config_file.parent.mkdir(parents=True, exist_ok=True)
         with open(config_file, 'w') as f:
             json.dump(config_data, f, indent=2)
         
@@ -447,6 +556,8 @@ async def set_general_config(config: GeneralConfig):
             logger.warning(f"Could not update secrets manager: {e}")
         
         return {"success": True, "message": "General settings saved"}
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error setting general config: {e}")
         raise HTTPException(status_code=500, detail=str(e))

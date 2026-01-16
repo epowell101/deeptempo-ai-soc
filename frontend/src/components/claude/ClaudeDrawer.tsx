@@ -19,21 +19,22 @@ import {
   FormControlLabel,
   Chip,
   LinearProgress,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
   Alert,
   List,
   ListItem,
   ListItemText,
   ListItemSecondaryAction,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Tooltip,
 } from '@mui/material'
 import {
   Send as SendIcon,
   Add as AddIcon,
   Close as CloseIcon,
   Settings as SettingsIcon,
-  ExpandMore as ExpandMoreIcon,
   AttachFile as AttachFileIcon,
   Image as ImageIcon,
   Delete as DeleteIcon,
@@ -41,6 +42,7 @@ import {
   CheckCircle as CheckCircleIcon,
   Error as ErrorIcon,
   PictureAsPdf as PdfIcon,
+  Info as InfoIcon,
 } from '@mui/icons-material'
 import { claudeApi, agentsApi, mcpApi } from '../../services/api'
 import { notificationService } from '../../services/notifications'
@@ -79,6 +81,9 @@ interface Agent {
   id: string
   name: string
   description: string
+  icon?: string
+  color?: string
+  specialization?: string
 }
 
 interface Model {
@@ -170,7 +175,7 @@ export default function ClaudeDrawer({ open, onClose, initialMessages, initialAg
       model: 'claude-sonnet-4-20250514',
       maxTokens: 4096,
       enableThinking: false,
-      thinkingBudget: 10,
+      thinkingBudget: 3,  // Default 3k tokens (safe for 4096 max_tokens)
       streaming: false,
       systemPrompt: '',
       selectedAgent: ''
@@ -197,10 +202,17 @@ export default function ClaudeDrawer({ open, onClose, initialMessages, initialAg
   const [thinkingBudget, setThinkingBudget] = useState(persistedSettings.thinkingBudget)
   const [streaming, setStreaming] = useState(persistedSettings.streaming)
   const [systemPrompt, setSystemPrompt] = useState(persistedSettings.systemPrompt)
+  const [validationError, setValidationError] = useState<string | null>(null)
+  
+  // Individual field validation errors
+  const [maxTokensError, setMaxTokensError] = useState<string | null>(null)
+  const [thinkingBudgetError, setThinkingBudgetError] = useState<string | null>(null)
+  const [systemPromptError, setSystemPromptError] = useState<string | null>(null)
   
   // Agent selection
   const [agents, setAgents] = useState<Agent[]>([])
   const [selectedAgent, setSelectedAgent] = useState<string>(persistedSettings.selectedAgent)
+  const [agentInfoDialogOpen, setAgentInfoDialogOpen] = useState(false)
   
   // Models list
   const [models, setModels] = useState<Model[]>([])
@@ -342,12 +354,13 @@ export default function ClaudeDrawer({ open, onClose, initialMessages, initialAg
           
           // Explicitly enable thinking for investigations
           // Investigation agents (investigator, threat_hunter, etc.) need extended thinking
+          // Note: Agents may override max_tokens, so use a safe thinking budget
           const response = await claudeApi.chat({
             messages: initialMessages,
             model: model || 'claude-sonnet-4-20250514',
-            max_tokens: 32768,  // Large token limit for investigations
+            max_tokens: 32768,  // Large token limit for investigations (may be overridden by agent)
             enable_thinking: true,  // Always enable thinking for investigations
-            thinking_budget: 20000,  // 20k token budget (must be less than max_tokens)
+            thinking_budget: 10000,  // 10k token budget (safe for agents with 16k+ max_tokens)
             agent_id: initialAgentId,
             streaming: streaming || false,
           })
@@ -427,8 +440,52 @@ export default function ClaudeDrawer({ open, onClose, initialMessages, initialAg
     })
     // Add current input
     total += input.length / 4
+    // Add system prompt if present
+    if (systemPrompt) {
+      total += systemPrompt.length / 4
+    }
     setEstimatedTokens(Math.round(total))
-  }, [tabs, currentTab, input])
+  }, [tabs, currentTab, input, systemPrompt])
+
+  // Validation effect - check for invalid configurations with individual field errors
+  useEffect(() => {
+    let hasError = false
+    let maxTokensErr: string | null = null
+    let thinkingBudgetErr: string | null = null
+    let systemPromptErr: string | null = null
+    
+    // Validate Max Tokens
+    if (maxTokens < 256 || maxTokens > 32768) {
+      maxTokensErr = 'Must be between 256 and 32,768'
+      hasError = true
+    }
+    
+    // Validate Thinking Budget
+    if (enableThinking) {
+      if (thinkingBudget < 1 || thinkingBudget > 100) {
+        thinkingBudgetErr = 'Must be between 1 and 100k tokens'
+        hasError = true
+      } else if ((thinkingBudget * 1000) >= maxTokens) {
+        thinkingBudgetErr = `Must be less than max tokens (${maxTokens}). Current: ${thinkingBudget * 1000} tokens`
+        // Also mark max tokens as related to the error
+        if (!maxTokensErr) {
+          maxTokensErr = `Must be greater than thinking budget (${thinkingBudget * 1000} tokens)`
+        }
+        hasError = true
+      }
+    }
+    
+    // Validate System Prompt
+    if (systemPrompt.length > 10000) {
+      systemPromptErr = `Exceeds maximum length (${systemPrompt.length}/10,000 characters)`
+      hasError = true
+    }
+    
+    setMaxTokensError(maxTokensErr)
+    setThinkingBudgetError(thinkingBudgetErr)
+    setSystemPromptError(systemPromptErr)
+    setValidationError(hasError ? 'Please fix the configuration errors below' : null)
+  }, [maxTokens, enableThinking, thinkingBudget, systemPrompt])
 
   const loadAgents = async () => {
     try {
@@ -506,7 +563,7 @@ export default function ClaudeDrawer({ open, onClose, initialMessages, initialAg
   }
 
   const handleSend = async () => {
-    if ((!input.trim() && attachedFiles.length === 0) || loading) return
+    if ((!input.trim() && attachedFiles.length === 0) || loading || validationError) return
 
     // Build message content
     let messageContent: string | ContentBlock[]
@@ -561,31 +618,115 @@ export default function ClaudeDrawer({ open, onClose, initialMessages, initialAg
         ? newTabs[currentTab].messages 
         : stripThinkingBlocks(newTabs[currentTab].messages)
       
-      const response = await claudeApi.chat({
-        messages: messagesToSend,
-        model,
-        max_tokens: maxTokens,
-        enable_thinking: enableThinking,
-        thinking_budget: thinkingBudget * 1000,
-        agent_id: selectedAgent || undefined,
-        system_prompt: systemPrompt || undefined,
-        streaming,
-      })
+      if (streaming) {
+        // Handle streaming mode
+        try {
+          const response = await fetch('/api/claude/chat/stream', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              messages: messagesToSend,
+              model,
+              max_tokens: maxTokens,
+              enable_thinking: enableThinking,
+              thinking_budget: thinkingBudget * 1000,
+              agent_id: selectedAgent || undefined,
+              system_prompt: systemPrompt || undefined,
+            }),
+          })
 
-      // Add assistant response
-      const assistantMessage: Message = {
-        role: 'assistant',
-        content: response.data.response || 'No response',
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`)
+          }
+
+          const reader = response.body?.getReader()
+          const decoder = new TextDecoder()
+          let assistantContent = ''
+
+          // Add placeholder message
+          const assistantMessage: Message = {
+            role: 'assistant',
+            content: '',
+          }
+          const updatedTabs = [...newTabs]
+          updatedTabs[currentTab].messages.push(assistantMessage)
+          setTabs(updatedTabs)
+
+          if (reader) {
+            while (true) {
+              const { done, value } = await reader.read()
+              if (done) break
+
+              const chunk = decoder.decode(value)
+              const lines = chunk.split('\n')
+
+              for (const line of lines) {
+                if (line.startsWith('data: ')) {
+                  try {
+                    const data = JSON.parse(line.slice(6))
+                    if (data.error) {
+                      throw new Error(data.error)
+                    }
+                    if (data.content) {
+                      assistantContent += data.content
+                      // Update message content
+                      const streamingTabs = [...updatedTabs]
+                      const lastMessage = streamingTabs[currentTab].messages[streamingTabs[currentTab].messages.length - 1]
+                      lastMessage.content = assistantContent
+                      setTabs(streamingTabs)
+                    }
+                    if (data.done) {
+                      break
+                    }
+                  } catch (e) {
+                    console.error('Error parsing streaming data:', e)
+                  }
+                }
+              }
+            }
+          }
+        } catch (streamError: any) {
+          console.error('Streaming error:', streamError)
+          throw streamError
+        }
+      } else {
+        // Handle non-streaming mode
+        console.log('Sending non-streaming request with max_tokens:', maxTokens)
+        const response = await claudeApi.chat({
+          messages: messagesToSend,
+          model,
+          max_tokens: maxTokens,
+          enable_thinking: enableThinking,
+          thinking_budget: thinkingBudget * 1000,
+          agent_id: selectedAgent || undefined,
+          system_prompt: systemPrompt || undefined,
+        })
+
+        console.log('Received response:', response.data)
+        
+        // Check if response seems incomplete
+        const responseText = response.data.response || 'No response'
+        if (responseText.length < 100 && responseText.includes('Let me')) {
+          console.warn('Response may be incomplete - appears to be cut off')
+        }
+
+        // Add assistant response
+        const assistantMessage: Message = {
+          role: 'assistant',
+          content: responseText,
+        }
+
+        const updatedTabs = [...newTabs]
+        updatedTabs[currentTab].messages.push(assistantMessage)
+        setTabs(updatedTabs)
       }
-
-      const updatedTabs = [...newTabs]
-      updatedTabs[currentTab].messages.push(assistantMessage)
-      setTabs(updatedTabs)
     } catch (error: any) {
       console.error('Chat error:', error)
       const errorMessage: Message = {
         role: 'assistant',
-        content: `Error: ${error?.response?.data?.detail || 'Failed to get response'}`,
+        content: `Error: ${error?.response?.data?.detail || error?.message || 'Failed to get response'}`,
       }
       const updatedTabs = [...newTabs]
       updatedTabs[currentTab].messages.push(errorMessage)
@@ -613,7 +754,17 @@ export default function ClaudeDrawer({ open, onClose, initialMessages, initialAg
   }
 
   const handleCloseTab = (index: number) => {
-    if (tabs.length === 1) return // Keep at least one tab
+    // If this is the last tab, replace it with a fresh empty tab
+    if (tabs.length === 1) {
+      const freshTab: ChatTab = {
+        id: `${Date.now()}`,
+        title: 'Chat 1',
+        messages: [],
+      }
+      setTabs([freshTab])
+      setCurrentTab(0)
+      return
+    }
 
     const newTabs = tabs.filter((_, i) => i !== index)
     setTabs(newTabs)
@@ -732,160 +883,152 @@ export default function ClaudeDrawer({ open, onClose, initialMessages, initialAg
             position: 'relative',
             zIndex: 1
           }}>
-            <Accordion defaultExpanded>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="subtitle2">Chat Settings</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%' }}>
-                  {/* Model Selection */}
-                  <FormControl fullWidth size="small">
-                    <InputLabel>Model</InputLabel>
-                    <Select value={model} onChange={(e) => setModel(e.target.value)} label="Model">
-                      {models.map((m) => (
-                        <MenuItem key={m.id} value={m.id}>
-                          {m.name}
-                        </MenuItem>
-                      ))}
-                      {models.length === 0 && (
-                        <>
-                          <MenuItem value="claude-sonnet-4-20250514">DeepTempo 4.5 Sonnet</MenuItem>
-                          <MenuItem value="claude-3-5-sonnet-20241022">DeepTempo 3.5 Sonnet</MenuItem>
-                          <MenuItem value="claude-3-5-haiku-20241022">DeepTempo 3.5 Haiku</MenuItem>
-                        </>
-                      )}
-                    </Select>
-                  </FormControl>
-
-                  {/* Max Tokens */}
-                  <TextField
-                    fullWidth
-                    size="small"
-                    type="number"
-                    label="Max Tokens"
-                    value={maxTokens}
-                    onChange={(e) => setMaxTokens(parseInt(e.target.value) || 4096)}
-                    inputProps={{ min: 256, max: 8192, step: 256 }}
-                  />
-
-                  {/* Agent Selection */}
-                  <FormControl fullWidth size="small">
-                    <InputLabel>Agent (Optional)</InputLabel>
-                    <Select
-                      value={selectedAgent}
-                      onChange={(e) => setSelectedAgent(e.target.value)}
-                      label="Agent (Optional)"
-                    >
-                      <MenuItem value="">
-                        <em>None</em>
-                      </MenuItem>
-                      {agents.map((agent) => (
-                        <MenuItem key={agent.id} value={agent.id}>
-                          {agent.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-
-                  {/* Extended Thinking */}
-                  <Box sx={{ width: '100%' }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={enableThinking}
-                          onChange={(e) => setEnableThinking(e.target.checked)}
-                        />
-                      }
-                      label="Enable Extended Thinking"
+            <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 'bold' }}>
+              Chat Settings
+            </Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%' }}>
+              {/* MCP Status */}
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'space-between', bgcolor: 'background.paper', p: 1.5, borderRadius: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography variant="body2" fontWeight="bold">MCP Tools:</Typography>
+                  {mcpStatus ? (
+                    <Chip
+                      icon={mcpStatus.available > 0 ? <CheckCircleIcon /> : <ErrorIcon />}
+                      label={`${mcpStatus.available}/${mcpStatus.total}`}
+                      size="small"
+                      color={mcpStatus.available > 0 ? 'success' : 'error'}
                     />
-                    {enableThinking && (
-                      <Box sx={{ mt: 1, width: '100%' }}>
-                        <TextField
-                          fullWidth
-                          size="small"
-                          type="number"
-                          label="Thinking Budget (k tokens)"
-                          value={thinkingBudget}
-                          onChange={(e) => setThinkingBudget(parseInt(e.target.value) || 10)}
-                          inputProps={{ min: 1, max: 100, step: 1 }}
-                          helperText="Budget for extended thinking in thousands of tokens"
-                        />
-                      </Box>
-                    )}
-                  </Box>
-
-                  {/* Streaming Toggle */}
-                  <Box sx={{ width: '100%' }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox checked={streaming} onChange={(e) => setStreaming(e.target.checked)} />
-                      }
-                      label="Enable Streaming"
-                    />
-                  </Box>
-
-                  {/* System Prompt */}
-                  <TextField
-                    fullWidth
-                    size="small"
-                    multiline
-                    rows={3}
-                    label="System Prompt (Optional)"
-                    value={systemPrompt}
-                    onChange={(e) => setSystemPrompt(e.target.value)}
-                    placeholder="Enter custom system prompt..."
-                  />
+                  ) : mcpError ? (
+                    <Chip icon={<ErrorIcon />} label="Error" size="small" color="error" />
+                  ) : (
+                    <CircularProgress size={16} />
+                  )}
                 </Box>
-              </AccordionDetails>
-            </Accordion>
+                <IconButton size="small" onClick={loadMcpStatus}>
+                  <RefreshIcon fontSize="small" />
+                </IconButton>
+              </Box>
+
+              {/* Token Usage */}
+              <Box sx={{ bgcolor: 'background.paper', p: 1.5, borderRadius: 1 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                  <Typography variant="body2" fontWeight="bold">Token Usage:</Typography>
+                  <Typography variant="caption" color="textSecondary">
+                    ~{estimatedTokens.toLocaleString()} / {maxTokens.toLocaleString()}
+                  </Typography>
+                </Box>
+                <LinearProgress
+                  variant="determinate"
+                  value={Math.min((estimatedTokens / maxTokens) * 100, 100)}
+                  sx={{ height: 6, borderRadius: 1 }}
+                />
+              </Box>
+
+              {/* Token Warning Alert */}
+              {!validationError && estimatedTokens > maxTokens * 0.8 && (
+                <Alert severity="warning" sx={{ mb: 2 }}>
+                  Conversation is approaching token limit ({estimatedTokens.toLocaleString()} / {maxTokens.toLocaleString()} tokens).
+                  {estimatedTokens > maxTokens && ' Consider clearing history or increasing max tokens.'}
+                </Alert>
+              )}
+              
+              {/* Model Selection */}
+              <FormControl fullWidth size="small">
+                <InputLabel>Model</InputLabel>
+                <Select value={model} onChange={(e) => setModel(e.target.value)} label="Model">
+                  {models.map((m) => (
+                    <MenuItem key={m.id} value={m.id}>
+                      {m.name}
+                    </MenuItem>
+                  ))}
+                  {models.length === 0 && (
+                    <>
+                      <MenuItem value="claude-sonnet-4-20250514">DeepTempo 4.5 Sonnet</MenuItem>
+                      <MenuItem value="claude-3-5-sonnet-20241022">DeepTempo 3.5 Sonnet</MenuItem>
+                      <MenuItem value="claude-3-5-haiku-20241022">DeepTempo 3.5 Haiku</MenuItem>
+                    </>
+                  )}
+                </Select>
+              </FormControl>
+
+              {/* Max Tokens */}
+              <TextField
+                fullWidth
+                size="small"
+                type="number"
+                label="Max Tokens"
+                value={maxTokens || ''}
+                onChange={(e) => {
+                  const value = e.target.value === '' ? 0 : parseInt(e.target.value)
+                  setMaxTokens(value)
+                }}
+                inputProps={{ min: 256, max: 32768, step: 1 }}
+                helperText={maxTokensError || "Maximum response length (256-32,768 tokens)"}
+                error={!!maxTokensError}
+              />
+
+              {/* Extended Thinking */}
+              <Box sx={{ width: '100%' }}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={enableThinking}
+                      onChange={(e) => setEnableThinking(e.target.checked)}
+                    />
+                  }
+                  label="Enable Extended Thinking"
+                />
+                {enableThinking && (
+                  <Box sx={{ mt: 1, width: '100%' }}>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        type="number"
+                        label="Thinking Budget (k tokens)"
+                        value={thinkingBudget || ''}
+                        onChange={(e) => {
+                          const value = e.target.value === '' ? 0 : parseInt(e.target.value)
+                          setThinkingBudget(value)
+                        }}
+                        inputProps={{ min: 1, max: Math.min(100, Math.floor(maxTokens / 1000) - 1), step: 1 }}
+                        helperText={thinkingBudgetError || `Budget for extended thinking (1-${Math.min(100, Math.floor(maxTokens / 1000) - 1)}k tokens, must be < max tokens)`}
+                        error={!!thinkingBudgetError}
+                      />
+                  </Box>
+                )}
+              </Box>
+
+              {/* Streaming Toggle */}
+              <Box sx={{ width: '100%' }}>
+                <FormControlLabel
+                  control={
+                    <Checkbox checked={streaming} onChange={(e) => setStreaming(e.target.checked)} />
+                  }
+                  label="Enable Streaming"
+                />
+              </Box>
+
+              {/* System Prompt */}
+              <TextField
+                fullWidth
+                size="small"
+                multiline
+                rows={3}
+                label="System Prompt (Optional)"
+                value={systemPrompt}
+                onChange={(e) => {
+                  const value = e.target.value
+                  if (value.length <= 10000) {
+                    setSystemPrompt(value)
+                  }
+                }}
+                placeholder="Enter custom system prompt..."
+                helperText={systemPromptError || `${systemPrompt.length}/10,000 characters`}
+                error={!!systemPromptError}
+              />
+            </Box>
           </Box>
         </Collapse>
-
-        {/* MCP Status & Token Counter */}
-        <Box
-          sx={{
-            px: 2,
-            py: 1,
-            bgcolor: 'background.default',
-            borderBottom: 1,
-            borderColor: 'divider',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {mcpStatus ? (
-              <Chip
-                icon={mcpStatus.available > 0 ? <CheckCircleIcon /> : <ErrorIcon />}
-                label={`MCP: ${mcpStatus.available}/${mcpStatus.total} tools`}
-                size="small"
-                color={mcpStatus.available > 0 ? 'success' : 'error'}
-              />
-            ) : mcpError ? (
-              <Chip icon={<ErrorIcon />} label="MCP: Error" size="small" color="error" />
-            ) : (
-              <CircularProgress size={16} />
-            )}
-            <IconButton size="small" onClick={loadMcpStatus}>
-              <RefreshIcon fontSize="small" />
-            </IconButton>
-          </Box>
-
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography variant="caption" color="textSecondary">
-              ~{estimatedTokens.toLocaleString()} / {maxTokens.toLocaleString()} tokens
-            </Typography>
-          </Box>
-        </Box>
-
-        <Box sx={{ px: 2, pt: 0.5 }}>
-          <LinearProgress
-            variant="determinate"
-            value={Math.min((estimatedTokens / maxTokens) * 100, 100)}
-            sx={{ height: 4, borderRadius: 2 }}
-          />
-        </Box>
 
         {/* Tabs */}
         <Box sx={{ borderBottom: 1, borderColor: 'divider', position: 'relative', zIndex: 0 }}>
@@ -903,18 +1046,16 @@ export default function ClaudeDrawer({ open, onClose, initialMessages, initialAg
                   label={
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                       <span>{tab.title}</span>
-                      {tabs.length > 1 && (
-                        <IconButton
-                          size="small"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleCloseTab(index)
-                          }}
-                          sx={{ ml: 1 }}
-                        >
-                          <CloseIcon fontSize="small" />
-                        </IconButton>
-                      )}
+                      <IconButton
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleCloseTab(index)
+                        }}
+                        sx={{ ml: 1 }}
+                      >
+                        <CloseIcon fontSize="small" />
+                      </IconButton>
                     </Box>
                   }
                 />
@@ -991,7 +1132,7 @@ export default function ClaudeDrawer({ open, onClose, initialMessages, initialAg
 
         {/* Input */}
         <Box sx={{ p: 2, borderTop: 1, borderColor: 'divider' }}>
-          <Box sx={{ display: 'flex', gap: 1, mb: 1, flexWrap: 'wrap' }}>
+          <Box sx={{ display: 'flex', gap: 1, mb: 1, flexWrap: 'wrap', alignItems: 'center' }}>
             <input
               type="file"
               ref={fileInputRef}
@@ -1009,6 +1150,47 @@ export default function ClaudeDrawer({ open, onClose, initialMessages, initialAg
             >
               Attach
             </Button>
+            
+            {/* Agent Selection */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <FormControl size="small" sx={{ minWidth: 180 }}>
+                <InputLabel>Agent</InputLabel>
+                <Select
+                  value={selectedAgent}
+                  onChange={(e) => setSelectedAgent(e.target.value)}
+                  label="Agent"
+                >
+                  <MenuItem value="">
+                    <em>None</em>
+                  </MenuItem>
+                  {agents.map((agent) => (
+                    <MenuItem key={agent.id} value={agent.id}>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', py: 0.5 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <span>{agent.icon}</span>
+                          <span>{agent.name}</span>
+                        </Box>
+                        {agent.specialization && (
+                          <Typography variant="caption" color="text.secondary" sx={{ ml: 3 }}>
+                            {agent.specialization}
+                          </Typography>
+                        )}
+                      </Box>
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <Tooltip title="View all agents and their capabilities">
+                <IconButton 
+                  size="small" 
+                  onClick={() => setAgentInfoDialogOpen(true)}
+                  sx={{ ml: -0.5 }}
+                >
+                  <InfoIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Box>
+            
             <Button
               variant="outlined"
               size="small"
@@ -1043,7 +1225,7 @@ export default function ClaudeDrawer({ open, onClose, initialMessages, initialAg
               variant="contained"
               color="error"
               onClick={handleSend}
-              disabled={(!input.trim() && attachedFiles.length === 0) || loading}
+              disabled={(!input.trim() && attachedFiles.length === 0) || loading || !!validationError}
               endIcon={<SendIcon />}
             >
               Send
@@ -1051,6 +1233,88 @@ export default function ClaudeDrawer({ open, onClose, initialMessages, initialAg
           </Box>
         </Box>
       </Box>
+
+      {/* Agent Info Dialog */}
+      <Dialog
+        open={agentInfoDialogOpen}
+        onClose={() => setAgentInfoDialogOpen(false)}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <InfoIcon color="primary" />
+            <Typography variant="h6">Available SOC Agents</Typography>
+          </Box>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Typography variant="body2" color="text.secondary" paragraph>
+            Choose the right agent for your security task. Each agent is specialized for specific SOC operations.
+          </Typography>
+          
+          <List>
+            {agents.map((agent) => (
+              <ListItem
+                key={agent.id}
+                sx={{
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  borderLeft: 3,
+                  borderColor: agent.color || 'primary.main',
+                  mb: 2,
+                  bgcolor: 'background.default',
+                  borderRadius: 1,
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                  <Typography variant="h6" component="span" sx={{ fontSize: '1.5rem' }}>
+                    {agent.icon}
+                  </Typography>
+                  <Box>
+                    <Typography variant="subtitle1" fontWeight="bold">
+                      {agent.name}
+                    </Typography>
+                    {agent.specialization && (
+                      <Chip
+                        label={agent.specialization}
+                        size="small"
+                        sx={{ 
+                          height: 20, 
+                          fontSize: '0.7rem',
+                          bgcolor: agent.color || 'primary.main',
+                          color: 'white'
+                        }}
+                      />
+                    )}
+                  </Box>
+                </Box>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                  {agent.description}
+                </Typography>
+                {selectedAgent === agent.id && (
+                  <Chip
+                    label="Currently Selected"
+                    size="small"
+                    color="success"
+                    sx={{ mt: 1 }}
+                  />
+                )}
+              </ListItem>
+            ))}
+          </List>
+          
+          {agents.length === 0 && (
+            <Alert severity="info">
+              No agents available. Please check your backend connection.
+            </Alert>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setAgentInfoDialogOpen(false)} variant="contained">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Drawer>
   )
 }

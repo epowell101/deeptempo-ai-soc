@@ -57,6 +57,8 @@ async def chat(request: ChatRequest):
     enable_thinking = request.enable_thinking
     max_tokens = request.max_tokens
     
+    thinking_budget = request.thinking_budget
+    
     if request.agent_id:
         agent_manager = AgentManager()
         agent = agent_manager.agents.get(request.agent_id)
@@ -65,11 +67,17 @@ async def chat(request: ChatRequest):
             enable_thinking = agent.enable_thinking
             max_tokens = agent.max_tokens
             logger.info(f"Using agent: {agent.name}")
+            
+            # Ensure thinking_budget is less than max_tokens when agent overrides settings
+            if enable_thinking and thinking_budget and thinking_budget >= max_tokens:
+                # Auto-adjust to 60% of max_tokens for safety
+                thinking_budget = int(max_tokens * 0.6)
+                logger.warning(f"Adjusted thinking_budget from {request.thinking_budget} to {thinking_budget} (agent max_tokens: {max_tokens})")
     
     claude_service = create_claude_service(
         use_mcp_tools=True,
         enable_thinking=enable_thinking,
-        thinking_budget=request.thinking_budget
+        thinking_budget=thinking_budget
     )
     
     # Check if API key is configured (works for both implementations)

@@ -136,8 +136,10 @@ Your goal is to help SOC analysts work more efficiently by leveraging all availa
                            get_secret("anthropic_api_key"))
             
             if self.api_key and ANTHROPIC_AVAILABLE:
-                self.client = Anthropic(api_key=self.api_key)
-                self.async_client = AsyncAnthropic(api_key=self.api_key)
+                # Set longer timeout for operations that may take more than 10 minutes
+                # Default is 600 seconds (10 min), we set to 1800 seconds (30 min)
+                self.client = Anthropic(api_key=self.api_key, timeout=1800.0)
+                self.async_client = AsyncAnthropic(api_key=self.api_key, timeout=1800.0)
                 return True
             
             return False
@@ -262,8 +264,10 @@ Your goal is to help SOC analysts work more efficiently by leveraging all availa
             return False
         
         try:
-            self.client = Anthropic(api_key=self.api_key)
-            self.async_client = AsyncAnthropic(api_key=self.api_key)
+            # Set longer timeout for operations that may take more than 10 minutes
+            # Default is 600 seconds (10 min), we set to 1800 seconds (30 min)
+            self.client = Anthropic(api_key=self.api_key, timeout=1800.0)
+            self.async_client = AsyncAnthropic(api_key=self.api_key, timeout=1800.0)
             
             if save:
                 # Save using secrets manager
@@ -710,90 +714,42 @@ Your goal is to help SOC analysts work more efficiently by leveraging all availa
             if thinking_config:
                 api_kwargs["thinking"] = thinking_config
             
-            # Stream with proper tool use handling
-            # First, make a non-streaming call to detect tool use
-            # Then stream the response
-            response = await self.async_client.messages.create(**api_kwargs)
+            # Stream with proper tool use handling using streaming API throughout
+            max_iterations = 5  # Prevent infinite loops
+            iteration = 0
             
-            # Check if tool use is needed
-            if response.stop_reason == "tool_use" and response.content:
-                # Yield initial text if any
-                for content_block in response.content:
-                    # Only process text blocks, skip thinking blocks and other types
-                    if hasattr(content_block, 'type') and content_block.type == "text":
-                        if hasattr(content_block, 'text'):
-                            yield content_block.text
+            while iteration < max_iterations:
+                iteration += 1
                 
-                yield "\n\n[Processing tools...]\n"
-                
-                # Process tool use
-                tool_results = await self._process_tool_use(response.content)
-                
-                # Add assistant message and tool results
-                # Convert response.content to proper format if needed
-                assistant_content = response.content
-                if not isinstance(assistant_content, list):
-                    assistant_content = [assistant_content] if assistant_content else []
-                messages.append({"role": "assistant", "content": assistant_content})
-                # Tool results need to be wrapped in a user message
-                messages.append({"role": "user", "content": tool_results})
-                
-                # Continue conversation with tool results - now stream it
-                continue_kwargs = {
-                    "model": model,
-                    "max_tokens": max_tokens,
-                    "messages": messages,
-                }
-                if effective_system_prompt:
-                    continue_kwargs["system"] = effective_system_prompt
-                if tools:
-                    continue_kwargs["tools"] = tools
-                if thinking_config:
-                    continue_kwargs["thinking"] = thinking_config
-                
-                # Stream the continuation (may need multiple rounds for tool use)
-                max_iterations = 5  # Prevent infinite loops
-                iteration = 0
-                while iteration < max_iterations:
-                    iteration += 1
-                    continue_response = await self.async_client.messages.create(**continue_kwargs)
+                # Use streaming API to avoid timeout issues with tool use
+                async with self.async_client.messages.stream(**api_kwargs) as stream:
+                    accumulated_content = []
                     
-                    # Stream text content - skip thinking blocks
-                    for content_block in continue_response.content:
-                        # Only yield text blocks, explicitly skip thinking blocks
-                        if hasattr(content_block, 'type'):
-                            if content_block.type == "text" and hasattr(content_block, 'text'):
-                                yield content_block.text
-                            # Skip thinking blocks silently
-                            elif content_block.type == "thinking":
-                                continue
+                    async for text in stream.text_stream:
+                        # Yield text chunks as they arrive
+                        yield text
                     
-                    # Check if more tool use is needed
-                    if continue_response.stop_reason == "tool_use" and continue_response.content:
-                        yield "\n\n[Processing additional tools...]\n"
-                        tool_results = await self._process_tool_use(continue_response.content)
-                        # Convert response.content to proper format if needed
-                        assistant_content = continue_response.content
-                        if not isinstance(assistant_content, list):
-                            assistant_content = [assistant_content] if assistant_content else []
-                        messages.append({"role": "assistant", "content": assistant_content})
-                        # Tool results need to be wrapped in a user message
-                        messages.append({"role": "user", "content": tool_results})
-                        # Update kwargs for next iteration
-                        continue_kwargs["messages"] = messages
-                    else:
-                        # Done - no more tool use
-                        break
-            else:
-                # No tool use - just stream the text response (skip thinking blocks)
-                for content_block in response.content:
-                    # Only yield text blocks, explicitly skip thinking blocks
-                    if hasattr(content_block, 'type'):
-                        if content_block.type == "text" and hasattr(content_block, 'text'):
-                            yield content_block.text
-                        # Skip thinking blocks silently
-                        elif content_block.type == "thinking":
-                            continue
+                    # Get the final message to check for tool use
+                    final_message = await stream.get_final_message()
+                    accumulated_content = final_message.content
+                    stop_reason = final_message.stop_reason
+                
+                # Check if tool use is needed
+                if stop_reason == "tool_use" and accumulated_content:
+                    yield "\n\n[Processing tools...]\n"
+                    
+                    # Process tool use
+                    tool_results = await self._process_tool_use(accumulated_content)
+                    
+                    # Add assistant message and tool results to conversation
+                    messages.append({"role": "assistant", "content": accumulated_content})
+                    messages.append({"role": "user", "content": tool_results})
+                    
+                    # Update api_kwargs for next iteration with tool results
+                    api_kwargs["messages"] = messages
+                else:
+                    # Done - no more tool use needed
+                    break
         
         except Exception as e:
             logger.error(f"Error in Claude chat stream: {e}")

@@ -7,6 +7,11 @@ from pathlib import Path
 from datetime import datetime
 from dataclasses import dataclass, asdict
 from enum import Enum
+import sys
+
+# Add path for database imports
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from database.config_service import get_config_service
 
 logger = logging.getLogger(__name__)
 
@@ -102,29 +107,62 @@ class ApprovalService:
             logger.error(f"Error saving actions: {e}")
     
     def _load_config(self):
-        """Load approval configuration."""
+        """Load approval configuration from database with file fallback."""
         try:
+            # Try database first
+            config_service = get_config_service()
+            config_value = config_service.get_system_config('approval.force_manual_approval')
+            
+            if config_value:
+                self.force_manual_approval = config_value.get('enabled', False)
+                logger.debug(f"Loaded approval config from database: force_manual_approval={self.force_manual_approval}")
+                return
+            
+            # Fallback to file-based config
             if self.config_file.exists():
                 with open(self.config_file, 'r') as f:
                     config = json.load(f)
                     self.force_manual_approval = config.get("force_manual_approval", False)
+                    logger.debug(f"Loaded approval config from file: force_manual_approval={self.force_manual_approval}")
             else:
                 self.force_manual_approval = False
                 self._save_config()
         except Exception as e:
-            logger.error(f"Error loading config: {e}")
+            logger.error(f"Error loading approval config: {e}")
             self.force_manual_approval = False
     
     def _save_config(self):
-        """Save approval configuration."""
+        """Save approval configuration to database and file."""
         try:
+            config_value = {
+                "enabled": self.force_manual_approval
+            }
+            
+            # Save to database
+            config_service = get_config_service(user_id='approval_service')
+            success = config_service.set_system_config(
+                key='approval.force_manual_approval',
+                value=config_value,
+                description='Force manual approval for all actions',
+                config_type='approval',
+                change_reason='Updated by approval service'
+            )
+            
+            if success:
+                logger.debug("Saved approval config to database")
+            else:
+                logger.warning("Failed to save approval config to database")
+            
+            # Also save to file for backward compatibility
             config = {
                 "force_manual_approval": self.force_manual_approval
             }
             with open(self.config_file, 'w') as f:
                 json.dump(config, f, indent=2)
+                logger.debug("Saved approval config to file")
+                
         except Exception as e:
-            logger.error(f"Error saving config: {e}")
+            logger.error(f"Error saving approval config: {e}")
     
     def set_force_manual_approval(self, force: bool):
         """
